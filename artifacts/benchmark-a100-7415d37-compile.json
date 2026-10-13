@@ -1,0 +1,88 @@
+{
+  "commit": "7415d37",
+  "environment": {
+    "bf16_supported": true,
+    "cuda": "13.0",
+    "cuda_available": true,
+    "gpu": "NVIDIA A100-SXM4-40GB",
+    "gpu_memory_gib": 39.49,
+    "torch": "2.11.0+cu130"
+  },
+  "kind": "throughput_benchmark",
+  "results": [
+    {
+      "gradient_checkpointing": false,
+      "mfu_estimate": 0.064,
+      "micro_batch": 32,
+      "parameters": {
+        "active_per_token_estimate": 26686944,
+        "total": 53229024
+      },
+      "peak_vram_gib": 16.56,
+      "preset": "s-50m",
+      "pretraining_estimate": {
+        "colab_compute_units": 18.9,
+        "hours_on_this_gpu": 3.5,
+        "target_tokens": 1500000000.0
+      },
+      "random_token_loss": 8.288,
+      "sequence_length": 1024,
+      "status": "ok",
+      "step_seconds": 0.2756,
+      "tokens_per_second": 118910,
+      "torch_compile": true
+    },
+    {
+      "gradient_checkpointing": false,
+      "mfu_estimate": 0.073,
+      "micro_batch": 32,
+      "parameters": {
+        "active_per_token_estimate": 48841344,
+        "total": 96027264
+      },
+      "peak_vram_gib": 22.98,
+      "preset": "m-100m",
+      "pretraining_estimate": {
+        "colab_compute_units": 60.3,
+        "hours_on_this_gpu": 11.16,
+        "target_tokens": 3000000000.0
+      },
+      "random_token_loss": 8.471,
+      "sequence_length": 1024,
+      "status": "ok",
+      "step_seconds": 0.4389,
+      "tokens_per_second": 74662,
+      "torch_compile": true
+    },
+    {
+      "gradient_checkpointing": false,
+      "mfu_estimate": 0.107,
+      "micro_batch": 32,
+      "parameters": {
+        "active_per_token_estimate": 93177104,
+        "total": 199345424
+      },
+      "peak_vram_gib": 33.07,
+      "preset": "l-200m",
+      "pretraining_estimate": {
+        "colab_compute_units": 102.9,
+        "hours_on_this_gpu": 19.05,
+        "target_tokens": 4000000000.0
+      },
+      "random_token_loss": 8.429,
+      "sequence_length": 1024,
+      "status": "ok",
+      "step_seconds": 0.5619,
+      "tokens_per_second": 58316,
+      "torch_compile": true
+    }
+  ],
+  "schema_version": "1.0",
+  "settings": {
+    "gradient_checkpointing": false,
+    "micro_batch": 32,
+    "sequence_length": 1024,
+    "steps": 10,
+    "use_compile": true
+  }
+}

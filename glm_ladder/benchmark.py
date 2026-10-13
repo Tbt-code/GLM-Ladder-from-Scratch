@@ -97,6 +97,8 @@ def benchmark_preset(
     if not torch.cuda.is_available():
         raise RuntimeError("the throughput benchmark needs a CUDA GPU")
     torch.set_float32_matmul_precision("high")  # TF32 tensor cores for the float32 linear-attention core
+    torch._dynamo.config.recompile_limit = 64            # one compiled variant per block is fine
+    torch._dynamo.config.capture_dynamic_output_shape_ops = True  # let torch.where stay inside the graph
     config = get_preset(name)
     sequence_length = min(sequence_length, config.max_sequence_length)
     device = torch.device("cuda")

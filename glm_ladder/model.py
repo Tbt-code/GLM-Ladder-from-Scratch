@@ -204,8 +204,6 @@ class SparseMoE(nn.Module):
         output = self.shared(flat)
         for expert_id, expert in enumerate(self.experts):
             positions, slots = torch.where(top_indices == expert_id)
-            if positions.numel() == 0:
-                continue
             
             token_slice = flat[positions]
             contribution = expert(token_slice) * top_weights[positions,slots][:,None]
