@@ -14,7 +14,10 @@ def test_parameter_counts_match_lesson_1_formula(name: str) -> None:
     config = PRESETS[name]
     with torch.device("meta"):
         model = GLMLadderModel(config)
-    assert model.parameter_counts() == expected_parameter_counts(config)
+    counts = model.parameter_counts()
+    # Other code (benchmark, receipts) reads these exact keys.
+    assert set(counts) == {"total", "active_per_token_estimate"}
+    assert counts == expected_parameter_counts(config)
 
 
 def test_output_is_tied_to_embedding() -> None:

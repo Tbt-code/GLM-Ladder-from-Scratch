@@ -309,4 +309,4 @@ class GLMLadderModel(nn.Module):
                     for parameter in expert.parameters()
                 )
         active = total - routed + routed * self.config.top_k // self.config.experts
-        return {"total parameters": total, "active parameters": active}
+        return {"total": total, "active_per_token_estimate": active}

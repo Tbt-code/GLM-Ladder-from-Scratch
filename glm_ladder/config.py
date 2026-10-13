@@ -74,7 +74,7 @@ def expected_parameter_counts(config:ModelConfig) -> dict[str,int]:
     total_routed_params = l * (e * 3 * d * h)
     active_params = total_params - total_routed_params + total_routed_params * config.top_k // e
 
-    return {"total parameters":total_params ,"active parameters": active_params}
+    return {"total": total_params, "active_per_token_estimate": active_params}
 
 BPE_VOCAB_SIZE = 16_384
 
