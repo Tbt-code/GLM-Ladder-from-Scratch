@@ -130,4 +130,4 @@ def test_sparse_attention_output_shape() -> None:
     attention = SparseAttention(config)
     x = torch.randn(2, 10, 32)
     assert attention(x).shape == (2, 10, 32)
-    
+

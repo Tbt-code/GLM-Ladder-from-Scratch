@@ -46,3 +46,10 @@ L4 costs roughly the same per token as A100 (about 3× slower, about 3× cheaper
 - Checkpoints stored as `safetensors` (no pickle, no code execution on load).
 - SHA-256 of every checkpoint recorded in GitHub receipts and verified on load.
 - All checkpoints are reproducible from configs and seeds in this repository.
+
+## Open research questions
+
+- **Double residual.** HybridBlock returns `x + delta` and HyperConnection adds it to the
+  stream again, so the input is counted twice per layer (inherited from the original model,
+  kept for parity). Ablation: blocks return only `delta`. Does it change loss or stability?
+- **RoPE base.** 1,000 vs 10,000 vs 100,000 at 1024-token context.

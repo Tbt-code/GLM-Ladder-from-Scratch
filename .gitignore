@@ -4,6 +4,7 @@ __pycache__/
 .venv/
 .ipynb_checkpoints/
 *.egg-info/
+/scratch/
 
 # Weights and data live on Hugging Face Hub, never in git.
 *.pt
