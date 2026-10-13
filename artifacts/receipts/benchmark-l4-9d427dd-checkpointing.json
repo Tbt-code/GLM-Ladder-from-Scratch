@@ -1,0 +1,44 @@
+{
+  "commit": "9d427dd",
+  "environment": {
+    "bf16_supported": true,
+    "cuda": "12.8",
+    "cuda_available": true,
+    "gpu": "NVIDIA L4",
+    "gpu_memory_gib": 22.03,
+    "torch": "2.11.0+cu128"
+  },
+  "kind": "throughput_benchmark",
+  "results": [
+    {
+      "gradient_checkpointing": true,
+      "mfu_estimate": 0.041,
+      "micro_batch": 32,
+      "parameters": {
+        "active_per_token_estimate": 93177104,
+        "total": 199345424
+      },
+      "peak_vram_gib": 15.1,
+      "preset": "l-200m",
+      "pretraining_estimate": {
+        "colab_compute_units": 221.7,
+        "hours_on_this_gpu": 129.62,
+        "target_tokens": 4000000000.0
+      },
+      "random_token_loss": 8.351,
+      "sequence_length": 1024,
+      "status": "ok",
+      "step_seconds": 3.8227,
+      "tokens_per_second": 8572,
+      "torch_compile": false
+    }
+  ],
+  "schema_version": "1.0",
+  "settings": {
+    "gradient_checkpointing": true,
+    "micro_batch": 64,
+    "sequence_length": 1024,
+    "steps": 10,
+    "use_compile": false
+  }
+}

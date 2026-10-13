@@ -96,6 +96,7 @@ def benchmark_preset(
     """Benchmark one preset, halving the micro-batch until it fits in memory."""
     if not torch.cuda.is_available():
         raise RuntimeError("the throughput benchmark needs a CUDA GPU")
+    torch.set_float32_matmul_precision("high")  # TF32 tensor cores for the float32 linear-attention core
     config = get_preset(name)
     sequence_length = min(sequence_length, config.max_sequence_length)
     device = torch.device("cuda")
