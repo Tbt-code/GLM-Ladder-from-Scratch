@@ -3,3 +3,6 @@
 torch>=2.4
 numpy>=1.26
 pytest>=8.0
+tokenizers>=0.20
+datasets>=3.0
+huggingface_hub>=0.25

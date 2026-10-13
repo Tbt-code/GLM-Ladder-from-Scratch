@@ -21,6 +21,8 @@ Decisions are recorded with their reasons so the final report can explain why th
 | 2026-10-13 | Same tokens-per-parameter ratio for every rung (20, on total parameters) | Rungs trained with different ratios cannot be compared fairly |
 | 2026-10-13 | Defer `l-200m` until all phases (pretraining → SFT → fine-tuning → RL) are complete on `s-50m` and `m-100m` | Learn the full pipeline on cheap runs first; 200M was ~2/3 of the pretraining budget |
 | 2026-10-13 | A100 for `m-100m` (and later `l-200m`); `s-50m` on either GPU | Measured cost per token is similar on L4 and A100; A100 needs ~3× fewer Colab sessions |
+| 2026-10-13 | Data mix by UTF-8 bytes: 60% English (FineWeb-Edu sample-10BT), 30% Python (codeparrot-clean), 10% Turkish (FineWeb2-HQ tur_Latn) | Code enables executable-reward RL; Turkish keeps a Turkish fine-tuning task possible, and must be in the tokenizer now because the tokenizer cannot change after pretraining |
+| 2026-10-13 | Train the tokenizer locally; tokenise the full corpus on a Colab CPU runtime | Tokenizer training needs ~300 MB and minutes; keeping `tokenizer.json` in git avoids moving files out of Colab |
 | open | Fine-tuning task | To be decided before Phase 4 |
 
 ## Compute budget (measured, A100 40 GB, torch.compile + TF32, commit 181c686)

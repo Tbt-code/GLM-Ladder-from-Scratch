@@ -19,3 +19,4 @@ include = ["glm_ladder*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-p no:faulthandler"
