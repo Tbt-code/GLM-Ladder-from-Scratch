@@ -13,24 +13,32 @@ Decisions are recorded with their reasons so the final report can explain why th
 | 2026-10-12 | Code and receipts on GitHub; checkpoints and token shards on Hugging Face Hub (free tier) | GitHub rejects files over 100 MB; a 200M resume checkpoint is about 2.4 GB |
 | 2026-10-12 | No paid services beyond the existing Colab Pro subscription | Owner constraint |
 | 2026-10-12 | Everything in the repository is written in English | Owner preference |
-| 2026-10-12 | Only the owner pushes to GitHub | Owner preference |
+| 2026-10-12 | Only the owner pushes to GitHub | Owner preference 
+
+| 2026-10-13 | Phase 0 benchmarks measured MFU of 4–11% (L4 and A100), not the assumed ~30% | Profiling showed ~80% of GPU time in elementwise ops and dtype copies; the model is memory- and launch-bound at this scale |
+| 2026-10-13 | Enable TF32 and `torch.compile` for all training | Measured 1.41× on L4 from compile; TF32 moves the float32 linear-attention core onto tensor cores |
+| 2026-10-13 | Stop throughput optimisation for now | One more round (graph-break fix) gave +10% on m-100m only; further gains need deeper rewrites |
+| 2026-10-13 | Same tokens-per-parameter ratio for every rung (20, on total parameters) | Rungs trained with different ratios cannot be compared fairly |
+| 2026-10-13 | Defer `l-200m` until all phases (pretraining → SFT → fine-tuning → RL) are complete on `s-50m` and `m-100m` | Learn the full pipeline on cheap runs first; 200M was ~2/3 of the pretraining budget |
+| 2026-10-13 | A100 for `m-100m` (and later `l-200m`); `s-50m` on either GPU | Measured cost per token is similar on L4 and A100; A100 needs ~3× fewer Colab sessions |
 | open | Fine-tuning task | To be decided before Phase 4 |
 
-## Compute budget (estimates until Phase 0 measurements)
+## Compute budget (measured, A100 40 GB, torch.compile + TF32, commit 181c686)
 
-Assumes about 30% model-FLOPs utilization after the Phase 0 fixes. Colab rates checked March 2026: L4 ≈ 1.71 units/hour, A100 40 GB ≈ 5.40 units/hour.
+| Rung | Tokens/s | Target tokens (20/param) | Hours | Units (+15% overhead) |
+|---|---:|---:|---:|---:|
+| `s-50m` | 117,117 | 1.06B | 2.5 | ~16 |
+| `m-100m` | 82,307 | 1.92B | 6.5 | ~40 |
+| `l-200m` (deferred) | 58,229 | 3.99B (or 1.99B at 10/param) | 19.0 (9.5) | ~118 (~59) |
 
-| Item | GPU | Estimate | Units |
-|---|---|---|---:|
-| Baseline reproduction and smoke tests | L4 | < 1 hour | ~2 |
-| `s-50m` pretraining, ~1.5B tokens | L4 | 2–3 hours | ~5 |
-| `m-100m` pretraining, ~3B tokens | A100 | 3–4 hours | ~20 |
-| `l-200m` pretraining, ~4B tokens | A100 | 7–10 hours | ~40–55 |
-| SFT, fine-tuning, RL across all rungs | mixed | — | ~60–80 |
-| Ablations and seed replications | mixed | — | ~60 |
-| Reserve | — | — | ~50+ |
+| Item | Units |
+|---|---:|
+| `s-50m` + `m-100m` pretraining | ~56 |
+| SFT, fine-tuning, RL on both rungs | ~60–80 |
+| Ablations on `s-50m` (shortened runs) | ~40 |
+| Remaining for `l-200m` and reserve | ~125–140 |
 
-L4 costs roughly the same per token as A100 (about 3× slower, about 3× cheaper per hour), so any run can fall back to L4 at the cost of wall-clock time.
+Raw measurements: [`artifacts/receipts/`](artifacts/receipts/).
 
 ## Session-loss resilience (Phase 1–2 requirement)
 
