@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.ipynb_checkpoints/
+*.egg-info/
+
+# Weights and data live on Hugging Face Hub, never in git.
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+*.npy
+/runs/
+/checkpoints/
+/data/
+
+# Secrets
+.env
+*.token

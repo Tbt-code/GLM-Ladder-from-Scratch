@@ -1,0 +1,5 @@
+# Colab already ships recent versions of all of these; lower bounds avoid
+# reinstalling torch on the runtime.
+torch>=2.4
+numpy>=1.26
+pytest>=8.0
