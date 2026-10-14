@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "kind": "pretraining_corpus",
+  "repo_id": "Tbt-AI/glm-ladder-data",
+  "commit": "8e83c43",
+  "tokenizer_sha256": "631f5da9e93fac546dca6666a1c212f08f953fa3e3477beb23a6fec25e0db40a",
+  "sources": {
+    "turkish": {
+      "dataset": [
+        "epfml/FineWeb2-HQ",
+        "tur_Latn"
+      ],
+      "train_tokens": 300008360,
+      "val_tokens": 10003016,
+      "shards": 4,
+      "documents": 397309,
+      "skipped_documents": 0
+    },
+    "code": {
+      "dataset": [
+        "codeparrot/codeparrot-clean",
+        null
+      ],
+      "train_tokens": 700033862,
+      "val_tokens": 10003441,
+      "shards": 8,
+      "documents": 272590,
+      "skipped_documents": 1
+    },
+    "english": {
+      "dataset": [
+        "HuggingFaceFW/fineweb-edu",
+        "sample-10BT"
+      ],
+      "train_tokens": 1200008673,
+      "val_tokens": 10006579,
+      "shards": 13,
+      "documents": 1081333,
+      "skipped_documents": 0
+    }
+  },
+  "train_tokens_total": 2200050895
+}
