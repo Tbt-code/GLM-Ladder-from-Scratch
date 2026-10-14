@@ -6,3 +6,4 @@ pytest>=8.0
 tokenizers>=0.20
 datasets>=3.0
 huggingface_hub>=0.25
+safetensors>=0.4
