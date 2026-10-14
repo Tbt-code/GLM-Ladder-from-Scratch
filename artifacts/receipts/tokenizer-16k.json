@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0",
+  "kind": "tokenizer",
+  "path": "tokenizer\\glm-ladder-16k.json",
+  "sha256": "631f5da9e93fac546dca6666a1c212f08f953fa3e3477beb23a6fec25e0db40a",
+  "vocab_size": 16384,
+  "requested_vocab_size": 16384,
+  "special_tokens": [
+    "<|endoftext|>",
+    "<|pad|>",
+    "<|system|>",
+    "<|user|>",
+    "<|assistant|>",
+    "<|end|>",
+    "<|reserved_0|>",
+    "<|reserved_1|>",
+    "<|reserved_2|>",
+    "<|reserved_3|>",
+    "<|reserved_4|>",
+    "<|reserved_5|>",
+    "<|reserved_6|>",
+    "<|reserved_7|>",
+    "<|reserved_8|>",
+    "<|reserved_9|>"
+  ],
+  "sources": {
+    "english": [
+      "HuggingFaceFW/fineweb-edu",
+      "sample-10BT"
+    ],
+    "code": [
+      "codeparrot/codeparrot-clean",
+      null
+    ],
+    "turkish": [
+      "epfml/FineWeb2-HQ",
+      "tur_Latn"
+    ]
+  },
+  "mix": {
+    "english": 0.6,
+    "code": 0.3,
+    "turkish": 0.1
+  },
+  "sample_bytes": 200025148,
+  "sample_documents": 38550,
+  "eval_bytes_per_source": 2000000,
+  "bytes_per_token": {
+    "english": 4.103,
+    "code": 3.468,
+    "turkish": 3.507
+  },
+  "comparison_without_turkish": {
+    "mix": {
+      "english": 0.6666666666666666,
+      "code": 0.3333333333333333
+    },
+    "bytes_per_token": {
+      "english": 4.169,
+      "code": 3.513,
+      "turkish": 1.943
+    }
+  },
+  "sample_seconds": 99.9,
+  "total_seconds": 236.0,
+  "tokenizers_version": "0.23.3"
+}

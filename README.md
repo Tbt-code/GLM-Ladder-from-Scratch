@@ -44,6 +44,32 @@ The rewritten model keeps the original parameter names, so original checkpoints 
 
 The sparse layers still compute a full masked score matrix. At 1024 tokens that is fast, but it is not a sub-quadratic kernel.
 
+## Tokenizer
+
+A 16,384-token byte-level BPE (Hugging Face `tokenizers`, GPT-2 pre-tokenization) trained on a
+200 MB sample with the same mix as the pretraining data: 60% English (FineWeb-Edu),
+30% Python (codeparrot-clean), 10% Turkish (FineWeb2-HQ). Ids fit in uint16.
+Sixteen special tokens are reserved up front (document separator, padding, chat roles,
+ten spares) because the vocabulary cannot change after pretraining.
+
+Held-out compression (UTF-8 bytes per token; higher is better; the original byte tokenizer scores 1.0):
+
+| Text | With 10% Turkish | Same English + code, no Turkish |
+|---|---:|---:|
+| English | 4.103 | 4.169 |
+| Python | 3.468 | 3.513 |
+| Turkish | **3.507** | 1.943 |
+
+Adding 10% Turkish to the tokenizer sample makes Turkish text 1.8× shorter in tokens,
+at a cost of 1.6% on English and 1.3% on Python. Both tokenizers saw identical English and
+code documents, so the difference is attributable to the Turkish data.
+
+Known limitation: GPT-2 pre-tokenization keeps digit runs together (305 number tokens,
+up to 8 digits), which makes arithmetic harder than digit-split schemes.
+
+Receipt: [`artifacts/receipts/tokenizer-16k.json`](artifacts/receipts/tokenizer-16k.json).
+Reproduce: `python scripts/train_tokenizer.py --compare-without-turkish`.
+
 ## Plan
 
 | Phase | Work | Exit criterion |

@@ -38,8 +38,14 @@ def take_bytes(texts: Iterable[str], budget: int) -> Iterator[str]:
     The text that crosses the budget is still yielded (whole documents only),
     so the total may overshoot by at most one document.
     """
-    # TODO(you)
-    raise NotImplementedError
+    if budget <= 0:
+        return
+    used = 0
+    for text in texts:
+        yield text
+        used += len(text.encode("utf-8"))
+        if used >= budget:
+            return
 
 
 def mixed_sample(
@@ -48,9 +54,22 @@ def mixed_sample(
     sources: Mapping[str, Iterable[str]],
 ) -> list[str]:
     """Return roughly `total_bytes` of text, `mix[name]` of it taken from `sources[name]`."""
-    # TODO(you):
+
     #   1. check that the fractions sum to 1 (within a small tolerance) -> ValueError otherwise
-    #   2. for each name: budget = int(total_bytes * fraction); take_bytes from that source
-    #   3. return everything as one list
-    # Order does not matter for tokenizer training: BPE only counts pairs.
-    raise NotImplementedError
+    total_fraction = sum(mix.values())
+    if abs(total_fraction - 1.0) > 1e-6:
+        raise ValueError(f"Mix fractions must sum to 1.0, got {total_fraction}")
+
+    result: list[str] = []
+
+    # 2. for each name: budget = int(total_bytes * fraction); take_bytes from that source
+    for name,fraction in mix.items():
+        if fraction <= 0:
+            continue
+        budget = int(total_bytes * fraction)
+        source_iterable = sources[name]
+
+        #   3. return everything as one list
+        result.extend(list(take_bytes(source_iterable,budget)))
+    
+    return result
