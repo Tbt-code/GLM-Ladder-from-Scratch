@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "kind": "pretraining_run",
+  "run_name": "s50m-001",
+  "commit": "6cc3e52",
+  "preset": "s-50m",
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "parameters": {
+    "total": 53229024,
+    "active_per_token_estimate": 26686944
+  },
+  "pretrain_config": {
+    "balance_coef": 0.01,
+    "batch_rows": 256,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "checkpoint_every_steps": null,
+    "checkpoint_minutes": 25.0,
+    "compile": true,
+    "eval_every": 250,
+    "eval_windows": 128,
+    "grad_clip": 1.0,
+    "log_every": 10,
+    "max_lr": 0.0006,
+    "micro_batch": 32,
+    "min_lr_ratio": 0.1,
+    "run_name": "s50m-001",
+    "seed": 1234,
+    "seq_len": 1024,
+    "total_tokens": 1060000000,
+    "warmup_steps": 100,
+    "weight_decay": 0.1
+  },
+  "steps": 4044,
+  "tokens_seen": 1060110336,
+  "finished": true,
+  "train_hours": 1.77,
+  "mean_tokens_per_second": 166499,
+  "final_eval_step": 4044,
+  "final_eval": {
+    "code": 1.7714588940143585,
+    "english": 3.5412440299987793,
+    "turkish": 3.479462683200836
+  },
+  "final_eval_mixed": 2.9484981704184867,
+  "checkpoints": "Tbt-AI/glm-ladder-runs/runs/s50m-001 @ step-004044"
+}
