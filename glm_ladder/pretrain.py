@@ -68,7 +68,7 @@ RESUME_FIELDS = (
 def check_resume_compatible(saved: Mapping, current: Mapping) -> None:
     """Raise ValueError naming every RESUME_FIELDS entry whose value differs."""
     # collect the fields in RESUME_FIELDS
-    diffs = [f"{field}: {saved.get(field)}"
+    diffs = [f"{field}: {saved.get(field)!r} -> {current.get(field)!r}"
              for field in RESUME_FIELDS
              if saved.get(field) != current.get(field)
         ]
