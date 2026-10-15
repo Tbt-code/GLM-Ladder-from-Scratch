@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "kind": "pretraining_run",
+  "run_name": "smoke-s50m-001",
+  "commit": "f54e0d4",
+  "preset": "s-50m",
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "parameters": {
+    "total": 53229024,
+    "active_per_token_estimate": 26686944
+  },
+  "pretrain_config": {
+    "run_name": "smoke-s50m-001",
+    "total_tokens": 39321600,
+    "seq_len": 1024,
+    "batch_rows": 256,
+    "micro_batch": 32,
+    "max_lr": 0.0006,
+    "min_lr_ratio": 0.1,
+    "warmup_steps": 20,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "balance_coef": 0.01,
+    "grad_clip": 1.0,
+    "seed": 1234,
+    "eval_every": 50,
+    "eval_windows": 128,
+    "log_every": 10,
+    "checkpoint_minutes": 25.0,
+    "checkpoint_every_steps": 75,
+    "compile": true
+  },
+  "steps": 150,
+  "tokens_seen": 39321600,
+  "finished": true,
+  "train_hours": 0.19,
+  "mean_tokens_per_second": 57711,
+  "final_eval": {
+    "code": 6.190967679023743,
+    "english": 6.71013879776001,
+    "turkish": 7.245771288871765
+  },
+  "final_eval_mixed": 6.596694596052828,
+  "checkpoints": "Tbt-AI/glm-ladder-runs/runs/smoke-s50m-001 @ step-000150"
+}
