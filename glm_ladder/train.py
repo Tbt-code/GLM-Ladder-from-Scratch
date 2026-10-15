@@ -67,7 +67,7 @@ def train_step(
     `forward` may be a torch.compile'd wrapper of `model`; gradients still land in
     `model`'s parameters because the wrapper shares them.
     """
-    forward = forward or model
+    forward = model if forward is None else forward
     model.train()
     optimizer.zero_grad(set_to_none=True)
     steps = len(micro_batches)
