@@ -202,14 +202,19 @@ class SparseMoE(nn.Module):
 
 
         output = self.shared(flat)
+        # torch.compile kernels fail (ZeroDivisionError) on zero-sized data-dependent shapes,
+        # which happen whenever the router sends no token to an expert. Every expert therefore
+        # also gets one zero "dummy" row (index `tokens`) with weight 0; it is dropped at the end.
+        padded = torch.cat([flat, flat.new_zeros(1, flat.shape[-1])])
+        output = torch.cat([output, output.new_zeros(1, output.shape[-1])])
+        dummy = torch.full((1,), tokens, dtype=torch.long, device=flat.device)
         for expert_id, expert in enumerate(self.experts):
             positions, slots = torch.where(top_indices == expert_id)
-            
-            token_slice = flat[positions]
-            contribution = expert(token_slice) * top_weights[positions,slots][:,None]
-            contribution = contribution.to(output.dtype)
-            output.index_add_(0,positions,contribution)
-        return output.view(original_shape), balance_loss, fraction.detach()
+            weights = torch.cat([top_weights[positions, slots], top_weights.new_zeros(1)])
+            positions = torch.cat([positions, dummy])
+            contribution = expert(padded[positions]) * weights[:, None]
+            output.index_add_(0, positions, contribution.to(output.dtype))
+        return output[:tokens].view(original_shape), balance_loss, fraction.detach()
 
 
 
