@@ -7,6 +7,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import math
 
 from .loader import PackedSource
 
@@ -47,3 +48,7 @@ def evaluate(
         results[name] = total_loss / total_count if total_count > 0 else 0.0
     model.train()
     return results
+
+def bits_per_byte(loss: float, bytes_per_token: float) -> float:
+    """Mean cross-entropy (nats per token) -> bits per UTF-8 byte; comparable across tokenizers."""
+    return (loss /math.log(2)) / bytes_per_token
