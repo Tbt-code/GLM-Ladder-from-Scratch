@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "kind": "pretraining_run",
+  "run_name": "m100m-001",
+  "commit": "8a3b3c9",
+  "preset": "m-100m",
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "parameters": {
+    "total": 96027264,
+    "active_per_token_estimate": 48841344
+  },
+  "pretrain_config": {
+    "balance_coef": 0.01,
+    "batch_rows": 256,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "checkpoint_every_steps": null,
+    "checkpoint_minutes": 25.0,
+    "compile": true,
+    "eval_every": 250,
+    "eval_windows": 128,
+    "grad_clip": 1.0,
+    "log_every": 10,
+    "max_lr": 0.0006,
+    "micro_batch": 32,
+    "min_lr_ratio": 0.1,
+    "run_name": "m100m-001",
+    "seed": 1234,
+    "seq_len": 1024,
+    "total_tokens": 1920000000,
+    "warmup_steps": 100,
+    "weight_decay": 0.1
+  },
+  "steps": 7325,
+  "tokens_seen": 1920204800,
+  "finished": true,
+  "train_hours": 5.35,
+  "mean_tokens_per_second": 99714,
+  "final_eval_step": 7325,
+  "final_eval": {
+    "code": 1.4875591397285461,
+    "english": 3.2203423976898193,
+    "turkish": 3.1261338591575623
+  },
+  "final_eval_mixed": 2.6363091784242063,
+  "checkpoints": "Tbt-AI/glm-ladder-runs/runs/m100m-001 @ step-007325"
+}
