@@ -14,6 +14,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 import torch
+from safetensors.torch import load_model
 
 from .checkpoint import load_checkpoint, save_checkpoint
 from .config import ModelConfig
@@ -91,18 +92,24 @@ def run_pretraining(
     metadata: Mapping | None = None,
     log: Callable[[str], None] = print,
     stop_after_steps: int | None = None,
+    init_from: str | Path | None = None,
+    extra_val_sources: Mapping[str, PackedSource] | None = None,
 ) -> dict:
     """Train until cfg.total_steps, resuming from the store's latest checkpoint if there is one.
 
+    `init_from`: a model.safetensors to start a *new* run from (fine-tuning); ignored when resuming,
+    because the checkpoint already holds the fine-tuned weights.
+    `extra_val_sources`: also evaluated at every eval and logged as "eval_extra", e.g. the
+    pretraining validation sets during SFT, to measure forgetting.
     `stop_after_steps` stops without saving, to simulate an interrupted session in tests.
     """
     if cfg.batch_rows % cfg.micro_batch:
         raise ValueError("batch_rows must be a multiple of micro_batch")
     if cfg.seq_len > model_config.max_sequence_length:
         raise ValueError("seq_len exceeds the model's max_sequence_length")
-    for source in [*train_sources.values(), *val_sources.values()]:
+    for source in [*train_sources.values(), *val_sources.values(), *(extra_val_sources or {}).values()]:
         if source.seq_len != cfg.seq_len:
-            raise ValueError("every PackedSource must use cfg.seq_len")
+            raise ValueError("every source must use cfg.seq_len")
     if device.type == "cuda":
         torch.set_float32_matmul_precision("high")      # TF32 for the float32 linear-attention core
 
@@ -141,6 +148,9 @@ def run_pretraining(
     else:
         if metrics.path.exists():
             metrics.path.unlink()                         # leftovers from a run that never checkpointed
+        if init_from is not None:
+            load_model(model, str(init_from), strict=True, device=str(device))
+            log(f"initialised from {init_from}")
         counts = model.parameter_counts()
         log(f"new run {cfg.run_name}: {counts['total']:,} params, {cfg.total_steps} steps "
             f"x {cfg.tokens_per_step:,} tokens")
@@ -195,8 +205,14 @@ def run_pretraining(
         if final or step % cfg.eval_every == 0:
             val = evaluate(model, val_sources, windows=cfg.eval_windows, batch_size=micro, device=device)
             mixed = sum(weights[name] * val[name] for name in val) / sum(weights[name] for name in val)
-            metrics.append({"step": step, "eval": val, "eval_mixed": mixed})
-            log(f"eval @ {step}: mixed {mixed:.4f}  " + "  ".join(f"{k} {v:.4f}" for k, v in val.items()))
+            row = {"step": step, "eval": val, "eval_mixed": mixed}
+            message = f"eval @ {step}: mixed {mixed:.4f}  " + "  ".join(f"{k} {v:.4f}" for k, v in val.items())
+            if extra_val_sources:
+                row["eval_extra"] = evaluate(model, extra_val_sources, windows=cfg.eval_windows,
+                                             batch_size=micro, device=device)
+                message += "  | extra " + "  ".join(f"{k} {v:.4f}" for k, v in row["eval_extra"].items())
+            metrics.append(row)
+            log(message)
 
         due = (cfg.checkpoint_every_steps is not None and step % cfg.checkpoint_every_steps == 0) \
             or time.monotonic() - last_save >= cfg.checkpoint_minutes * 60

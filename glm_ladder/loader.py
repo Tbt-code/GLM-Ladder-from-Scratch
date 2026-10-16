@@ -13,6 +13,7 @@ from pathlib import Path
 
 import numpy as np
 
+IGNORE_INDEX = -100   # F.cross_entropy skips targets with this value
 
 def token_mix(byte_mix: Mapping[str, float], bytes_per_token: Mapping[str, float]) -> dict[str, float]:
     """Convert a mix defined in UTF-8 bytes into the equivalent mix in tokens."""
@@ -20,6 +21,21 @@ def token_mix(byte_mix: Mapping[str, float], bytes_per_token: Mapping[str, float
     raw_mix = {name: byte_mix[name] / bytes_per_token[name] for name in byte_mix}
     total = sum(raw_mix.values())
     return {name:val / total for name,val in raw_mix.items()}
+
+
+
+def make_batch(pairs: Sequence[tuple[object, int]]) -> tuple[np.ndarray, np.ndarray]:
+    """(inputs, targets) int64 [len(pairs), seq_len] from (source, window index) pairs.
+
+    Sources with a `learn(index)` method (SFT data) say which targets to train on;
+    the others become IGNORE_INDEX. Pretraining sources have no mask and are unchanged.
+    """
+    rows = np.stack([source.window(index) for source, index in pairs]).astype(np.int64)
+    inputs, targets = rows[:, :-1], rows[:, 1:].copy()
+    for row, (source, index) in enumerate(pairs):
+        if hasattr(source, "learn"):
+            targets[row, ~source.learn(index)[1:]] = IGNORE_INDEX
+    return inputs, targets
 
 
 
@@ -81,14 +97,13 @@ class MixedLoader:
         """Return (inputs, targets), each int64 [batch_size, seq_len]."""
         rng = np.random.default_rng([self.seed, self.step])
         choices = rng.choice(len(self.names), size=self.batch_size, p=self.probabilities)
-        rows = []
+        pairs = []
         for choice in choices:
             name = self.names[choice]
-            rows.append(self.sources[name].window(self._window_index(name, self.cursors[name])))
+            pairs.append((self.sources[name], self._window_index(name, self.cursors[name])))
             self.cursors[name] += 1
         self.step += 1
-        batch = np.stack(rows).astype(np.int64)
-        return batch[:, :-1], batch[:, 1:]
+        return make_batch(pairs)
 
     def state_dict(self) -> dict:
         """Everything needed to continue exactly where we are. Must be JSON-serialisable."""

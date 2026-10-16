@@ -10,6 +10,7 @@ import torch.nn.functional as F
 import math
 
 from .loader import PackedSource
+from .loader import IGNORE_INDEX, PackedSource, make_batch
 
 
 @torch.no_grad()
@@ -32,9 +33,9 @@ def evaluate(
         indices = list(range(num_windows))
         for i in range(0,num_windows,batch_size):
             chunk = indices[i : i + batch_size]
-            rows = np.stack([source.window(idx) for idx in chunk]).astype(np.int64)
-            x = torch.as_tensor(rows[:,:-1],device=device)
-            y = torch.as_tensor(rows[:,1:],device=device)
+            x, y = make_batch([(source, idx) for idx in chunk])   # a list of (source, index) tuples
+            x = torch.as_tensor(x, device=device)
+            y = torch.as_tensor(y, device=device)
 
             with torch.autocast(device_type = device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"):
                 output = model(x)
@@ -43,7 +44,7 @@ def evaluate(
                 loss_sum = F.cross_entropy(logits.float().flatten(0,1),y.flatten(), reduction="sum")
 
             total_loss += loss_sum.item()
-            total_count += y.numel()
+            total_count += int((y != IGNORE_INDEX).sum().item())
 
         results[name] = total_loss / total_count if total_count > 0 else 0.0
     model.train()
