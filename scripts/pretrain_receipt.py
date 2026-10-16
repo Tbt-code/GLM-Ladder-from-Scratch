@@ -53,6 +53,9 @@ def build_receipt(api: HfApi, repo_id: str, run_name: str) -> dict:
         "mean_tokens_per_second": round(len(train) * tokens_per_step / seconds) if seconds else None,
         "final_eval_step": final.get("step"),
         "final_eval": final.get("eval"), "final_eval_mixed": final.get("eval_mixed"),
+        # Fine-tuning runs: extra sets scored at every eval (e.g. pretraining validation, to measure forgetting).
+        **({"final_eval_extra": final["eval_extra"]} if "eval_extra" in final else {}),
+        **({"stage": metadata["stage"], "init_from": metadata.get("init_from")} if "stage" in metadata else {}),
         "checkpoints": f"{repo_id}/runs/{run_name} @ {latest}",
     }
 
