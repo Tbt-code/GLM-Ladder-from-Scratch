@@ -34,8 +34,11 @@ DEFAULT_PROMPTS = [
     "Photosynthesis is the process by which",
     "Türkiye'nin en kalabalık şehri",
     "Yapay zeka, günümüzde",
-    "def fibonacci(n):\n",
-    "import numpy as np\n\n\ndef normalize(x):\n",
+    "Bir varmış, bir yokmuş",
+    # No trailing newline: "\n" plus indentation is usually a single BPE token, so ending
+    # the prompt on "\n" forces a token boundary the model rarely saw in training.
+    "def fibonacci(n):",
+    "import numpy as np\n\n\ndef normalize(x):",
 ]
 
 
@@ -68,24 +71,38 @@ def main() -> None:
     parser.add_argument("--temperature", type=float, default=0.8)
     parser.add_argument("--top-k", type=int, default=50)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--out", help="also write the samples as Markdown (UTF-8), e.g. artifacts/samples/s50m-001.md")
     args = parser.parse_args()
 
     torch.manual_seed(args.seed)
     api = HfApi(token=getpass("Hugging Face token: "))
     model, state = load_run(api, args.repo, args.run, args.checkpoint)
     tokenizer = load_tokenizer(ROOT / "tokenizer" / "glm-ladder-16k.json")
-    print(f"{args.run} @ {state['checkpoint']}: step {state['step']}, {state['tokens_seen']:,} tokens; "
-          f"temperature {args.temperature}, top-k {args.top_k}, seed {args.seed}\n")
+    header = (f"{args.run} @ {state['checkpoint']}: step {state['step']}, {state['tokens_seen']:,} tokens; "
+              f"temperature {args.temperature}, top-k {args.top_k}, {args.tokens} new tokens, seed {args.seed}")
+    print(header + "\n")
 
+    samples = []
     for prompt in args.prompt or DEFAULT_PROMPTS:
         # Every training document follows an <|endoftext|>, so start the context the same way.
         prompt_ids = [EOS_ID, *tokenizer.encode(prompt).ids]
         new_ids = generate(model, prompt_ids, max_new_tokens=args.tokens, temperature=args.temperature,
                            top_k=args.top_k, seed=args.seed)
         ended = " [end of document]" if new_ids and new_ids[-1] == EOS_ID else ""
+        samples.append((prompt, tokenizer.decode(new_ids) + ended))
         print("=" * 80)
-        print(prompt + tokenizer.decode(new_ids) + ended)
+        print(prompt + samples[-1][1])
     print("=" * 80)
+
+    if args.out:
+        out = Path(args.out)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        blocks = [f"# Samples: {args.run}\n\n{header}\n"]
+        for prompt, continuation in samples:
+            # The prompt is wrapped in [[ ]] so the reader sees where the model takes over.
+            blocks.append(f"## {prompt.splitlines()[-1] or prompt!r}\n\n```text\n[[{prompt}]]{continuation}\n```\n")
+        out.write_text("\n".join(blocks), encoding="utf-8")
+        print("wrote", out)
 
 
 if __name__ == "__main__":
