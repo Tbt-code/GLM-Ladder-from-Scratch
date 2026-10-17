@@ -24,6 +24,7 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 # Code containing any of these is not executed and counts as a failure.
 UNSAFE_PATTERNS = (
@@ -142,6 +143,26 @@ def sample_many(
     model.train(was_training)
     return outputs
 
+
+@torch.no_grad()
+def answer_loss(model: nn.Module, prompt_ids: list[int], answer_ids: list[int]) -> float:
+    """Mean cross-entropy (nats per token) the model assigns to answer_ids right after prompt_ids.
+
+    Used with the reference solutions: a continuous measure of coding ability that still moves
+    when every generated sample fails (pass@k has a floor at zero).
+    """
+    ids = prompt_ids + answer_ids
+    if len(ids) > model.config.max_sequence_length:
+        raise ValueError("prompt + answer longer than the model's context")
+    was_training = model.training
+    model.eval()
+    device = next(model.parameters()).device
+    logits = model(torch.tensor([ids], dtype=torch.long, device=device)).logits[0].float()
+    start = len(prompt_ids)
+    # logits at position t predict token t + 1, so the answer is predicted from start - 1 to the end.
+    loss = F.cross_entropy(logits[start - 1:-1], torch.tensor(answer_ids, dtype=torch.long, device=device))
+    model.train(was_training)
+    return loss.item()
 
 def summarize(passes: Sequence[Sequence[bool]], ks: Sequence[int]) -> dict[str, float]:
     """Mean pass@k over tasks, from each task's list of per-sample results."""

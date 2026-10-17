@@ -26,7 +26,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 from glm_ladder.chat import END_TOKEN, prompt_ids, special_id  # noqa: E402
 from glm_ladder.code_eval import (  # noqa: E402
-    extract_from_chat, extract_from_completion, load_tasks, run_tests, sample_many, summarize,
+    answer_loss, extract_from_chat, extract_from_completion, load_tasks, run_tests, sample_many, summarize,
 )
 from glm_ladder.tokenizer import EOS_ID, load_tokenizer  # noqa: E402
 from sample import load_run  # noqa: E402  (scripts/sample.py)
@@ -44,6 +44,9 @@ def main() -> None:
     parser.add_argument("--max-tokens", type=int, default=160)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--limit", type=int, help="only the first N tasks (quick check)")
+    parser.add_argument("--loss-only", action="store_true",
+                        help="only the reference-solution loss (seconds instead of minutes)")
+    parser.add_argument("--verbose", action="store_true", help="print the raw greedy output and the code that was tested")
     args = parser.parse_args()
 
     torch.manual_seed(args.seed)
@@ -66,16 +69,32 @@ def main() -> None:
             return extract_from_completion(task.completion_prompt(), text)
         return extract_from_chat(text, task.name)
 
+    def reference_ids(task, ids):
+        """Token ids of the reference solution, as the model would write it in this mode."""
+        if args.mode == "chat":
+            answer = f"```python\ndef {task.name}({task.args}):\n{task.reference}```"
+            return tokenizer.encode(answer).ids + [end_id]
+        # Encode prompt + body together (as in training text); the prompt's tokens are a prefix.
+        full = [EOS_ID, *tokenizer.encode(task.completion_prompt() + "\n" + task.reference.rstrip("\n")).ids]
+        if full[:len(ids)] != ids:
+            raise ValueError(f"{task.name}: prompt tokens are not a prefix of prompt + reference")
+        return full[len(ids):]
+
     results, started = [], time.perf_counter()
     for index, task in enumerate(tasks):
         if args.mode == "completion":
             ids = [EOS_ID, *tokenizer.encode(task.completion_prompt()).ids]
         else:
             ids = prompt_ids(tokenizer, [{"role": "user", "content": task.chat_prompt()}])
+        reference_loss = answer_loss(model, ids, reference_ids(task, ids))
+        if args.loss_only:
+            results.append({"task": task.name, "reference_loss": reference_loss})
+            print(f"[{index + 1:2d}/{len(tasks)}] {task.name:22s} reference loss {reference_loss:.3f}")
+            continue
         common = dict(max_new_tokens=args.max_tokens, top_k=args.top_k, seed=args.seed + index, stop=stop)
         greedy = sample_many(model, ids, n=1, temperature=0.0, **common)[0]
         sampled = sample_many(model, ids, n=args.n, temperature=args.temperature, **common)
-        entry = {"task": task.name, "greedy": None, "samples": []}
+        entry = {"task": task.name, "reference_loss": reference_loss, "greedy": None, "samples": []}
         for out, target in [(greedy, "greedy"), *[(s, "samples") for s in sampled]]:
             code = to_code(task, out)
             record = {"code": code, "passed": code is not None and run_tests(code, task.tests)}
@@ -84,22 +103,32 @@ def main() -> None:
             else:
                 entry["samples"].append(record)
         results.append(entry)
+        if args.verbose:
+            print(f"--- {task.name}: raw greedy output ---")
+            print(repr(tokenizer.decode(greedy)))
+            print("--- code tested ---")
+            print(entry["greedy"]["code"])
+            print("---")
         hits = sum(s["passed"] for s in entry["samples"])
         print(f"[{index + 1:2d}/{len(tasks)}] {task.name:22s} greedy {'PASS' if entry['greedy']['passed'] else 'fail'}"
               f"  sampled {hits}/{args.n}  ({time.perf_counter() - started:.0f} s)")
 
-    summary = {"greedy_pass@1": sum(r["greedy"]["passed"] for r in results) / len(results),
-               **{f"sampled_{key}": value for key, value in
-                  summarize([[s["passed"] for s in r["samples"]] for r in results], [1, 5, 10]).items()}}
+    summary = {"reference_loss": sum(r["reference_loss"] for r in results) / len(results)}
+    if not args.loss_only:
+        summary["greedy_pass@1"] = sum(r["greedy"]["passed"] for r in results) / len(results)
+        summary.update({f"sampled_{key}": value for key, value in
+                        summarize([[s["passed"] for s in r["samples"]] for r in results], [1, 5, 10]).items()})
     receipt = {
         "schema_version": "1.0", "kind": "code_eval", "run": args.run, "checkpoint": state["checkpoint"],
         "mode": args.mode, "tasks": len(tasks), "n": args.n, "temperature": args.temperature,
-        "top_k": args.top_k, "max_tokens": args.max_tokens, "seed": args.seed, "summary": summary,
+        "top_k": args.top_k, "max_tokens": args.max_tokens, "seed": args.seed, "loss_only": args.loss_only,
+        "summary": summary,
         "results": results,
     }
     print(json.dumps(summary, indent=2))
     if args.limit is None:
-        out = ROOT / "artifacts" / "evals" / f"code-{args.run}-{args.mode}.json"
+        suffix = "-loss" if args.loss_only else ""
+        out = ROOT / "artifacts" / "evals" / f"code-{args.run}-{args.mode}{suffix}.json"
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
         print("wrote", out)

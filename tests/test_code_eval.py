@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 
 from glm_ladder.code_eval import (
-    CodeTask, extract_from_chat, extract_from_completion, is_safe, load_tasks, pass_at_k, run_tests,
+    CodeTask, answer_loss, extract_from_chat, extract_from_completion, is_safe, load_tasks, pass_at_k, run_tests,
     sample_many, summarize,
 )
 
@@ -134,3 +134,11 @@ def test_sample_many_respects_max_tokens_and_is_reproducible() -> None:
     b = sample_many(model, [1, 2], n=4, max_new_tokens=5, temperature=1.0, top_k=5, seed=7, stop=lambda ids: False)
     assert a == b and all(len(out) == 5 for out in a)
     assert a[0] == [3, 4, 5, 6, 7]                    # one token has all the probability, even when sampling
+
+
+def test_answer_loss_is_low_for_the_predicted_answer_and_high_otherwise() -> None:
+    model = Counter()
+    assert answer_loss(model, [3], [4, 5, 6]) == pytest.approx(0.0, abs=1e-6)     # what the model predicts
+    assert answer_loss(model, [3], [9]) > 100                                       # what it never predicts
+    with pytest.raises(ValueError):
+        answer_loss(model, list(range(6)), [6, 7, 8])                               # 9 tokens > window of 8
