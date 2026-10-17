@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "kind": "pretraining_run",
+  "run_name": "sft-m100m-001",
+  "commit": "50f2c09",
+  "preset": "m-100m",
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "parameters": {
+    "total": 96027264,
+    "active_per_token_estimate": 48841344
+  },
+  "pretrain_config": {
+    "balance_coef": 0.01,
+    "batch_rows": 128,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "checkpoint_every_steps": null,
+    "checkpoint_minutes": 15.0,
+    "compile": true,
+    "eval_every": 200,
+    "eval_windows": 128,
+    "grad_clip": 1.0,
+    "log_every": 10,
+    "max_lr": 0.0001,
+    "micro_batch": 32,
+    "min_lr_ratio": 0.1,
+    "run_name": "sft-m100m-001",
+    "seed": 1234,
+    "seq_len": 1024,
+    "total_tokens": 406578176,
+    "warmup_steps": 50,
+    "weight_decay": 0.1
+  },
+  "steps": 3102,
+  "tokens_seen": 406585344,
+  "finished": true,
+  "train_hours": 1.22,
+  "mean_tokens_per_second": 92296,
+  "final_eval_step": 3102,
+  "final_eval": {
+    "english": 1.6599533779921791,
+    "turkish": 2.3481588065267567
+  },
+  "final_eval_mixed": 1.7287740941757368,
+  "final_eval_extra": {
+    "code": 1.9321580231189728,
+    "english": 3.595835864543915,
+    "turkish": 3.492609977722168
+  },
+  "stage": "sft",
+  "init_from": "Tbt-AI/glm-ladder-runs/runs/m100m-001/step-007325",
+  "checkpoints": "Tbt-AI/glm-ladder-runs/runs/sft-m100m-001 @ step-003102"
+}
