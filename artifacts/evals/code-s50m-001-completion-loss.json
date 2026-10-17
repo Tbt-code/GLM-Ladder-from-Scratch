@@ -1,0 +1,179 @@
+{
+  "schema_version": "1.0",
+  "kind": "code_eval",
+  "run": "s50m-001",
+  "checkpoint": "step-004044",
+  "mode": "completion",
+  "tasks": 40,
+  "n": 10,
+  "temperature": 0.8,
+  "top_k": 50,
+  "max_tokens": 160,
+  "seed": 0,
+  "loss_only": true,
+  "summary": {
+    "reference_loss": 1.4005556173622609
+  },
+  "results": [
+    {
+      "task": "is_even",
+      "reference_loss": 1.569178819656372
+    },
+    {
+      "task": "add",
+      "reference_loss": 0.8802592158317566
+    },
+    {
+      "task": "square",
+      "reference_loss": 0.962765097618103
+    },
+    {
+      "task": "max_of_two",
+      "reference_loss": 1.417954444885254
+    },
+    {
+      "task": "sum_list",
+      "reference_loss": 0.6459017992019653
+    },
+    {
+      "task": "average",
+      "reference_loss": 0.7935569286346436
+    },
+    {
+      "task": "reverse_string",
+      "reference_loss": 1.0836527347564697
+    },
+    {
+      "task": "count_vowels",
+      "reference_loss": 2.6324803829193115
+    },
+    {
+      "task": "factorial",
+      "reference_loss": 1.2910386323928833
+    },
+    {
+      "task": "fibonacci",
+      "reference_loss": 1.1862958669662476
+    },
+    {
+      "task": "is_palindrome",
+      "reference_loss": 1.532947301864624
+    },
+    {
+      "task": "first_element",
+      "reference_loss": 0.7528827786445618
+    },
+    {
+      "task": "last_element",
+      "reference_loss": 0.8934431076049805
+    },
+    {
+      "task": "count_positive",
+      "reference_loss": 1.549269676208496
+    },
+    {
+      "task": "celsius_to_fahrenheit",
+      "reference_loss": 4.162522315979004
+    },
+    {
+      "task": "is_prime",
+      "reference_loss": 1.456420660018921
+    },
+    {
+      "task": "find_max",
+      "reference_loss": 0.7570934891700745
+    },
+    {
+      "task": "find_min",
+      "reference_loss": 1.020446538925171
+    },
+    {
+      "task": "remove_duplicates",
+      "reference_loss": 1.442816972732544
+    },
+    {
+      "task": "count_words",
+      "reference_loss": 1.1131805181503296
+    },
+    {
+      "task": "capitalize_words",
+      "reference_loss": 1.9409077167510986
+    },
+    {
+      "task": "double_list",
+      "reference_loss": 1.737047553062439
+    },
+    {
+      "task": "filter_even",
+      "reference_loss": 1.2459437847137451
+    },
+    {
+      "task": "sum_of_digits",
+      "reference_loss": 1.6558642387390137
+    },
+    {
+      "task": "gcd",
+      "reference_loss": 1.7959884405136108
+    },
+    {
+      "task": "power",
+      "reference_loss": 1.6682655811309814
+    },
+    {
+      "task": "absolute_value",
+      "reference_loss": 1.3387738466262817
+    },
+    {
+      "task": "contains",
+      "reference_loss": 1.2236034870147705
+    },
+    {
+      "task": "index_of",
+      "reference_loss": 1.2763988971710205
+    },
+    {
+      "task": "merge_lists",
+      "reference_loss": 0.8811052441596985
+    },
+    {
+      "task": "char_frequency",
+      "reference_loss": 1.1761071681976318
+    },
+    {
+      "task": "is_sorted",
+      "reference_loss": 1.4980350732803345
+    },
+    {
+      "task": "second_largest",
+      "reference_loss": 1.9588251113891602
+    },
+    {
+      "task": "count_occurrences",
+      "reference_loss": 1.465348243713379
+    },
+    {
+      "task": "to_uppercase",
+      "reference_loss": 0.34144023060798645
+    },
+    {
+      "task": "starts_with_vowel",
+      "reference_loss": 1.7288812398910522
+    },
+    {
+      "task": "multiply_list",
+      "reference_loss": 1.5890510082244873
+    },
+    {
+      "task": "range_sum",
+      "reference_loss": 1.428573727607727
+    },
+    {
+      "task": "swap_pair",
+      "reference_loss": 1.167359471321106
+    },
+    {
+      "task": "clamp",
+      "reference_loss": 1.7605973482131958
+    }
+  ]
+}
