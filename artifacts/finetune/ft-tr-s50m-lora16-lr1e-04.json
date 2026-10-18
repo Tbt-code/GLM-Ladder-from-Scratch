@@ -1,0 +1,141 @@
+{
+  "schema_version": "1.0",
+  "kind": "finetune_run",
+  "run_name": "ft-tr-s50m-lora16-lr1e-04",
+  "commit": "628e58f",
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "size": "s50m",
+  "language": "tr",
+  "method": "lora",
+  "lora_rank": 16,
+  "max_lr": 0.0001,
+  "init_from": "Tbt-AI/glm-ladder-runs/runs/sft-s50m-001/step-003102",
+  "trainable_parameters": 3428352,
+  "total_parameters": 53229024,
+  "steps": 142,
+  "tokens_seen": 4653056,
+  "train_seconds": 110.1,
+  "final_eval": {
+    "tr": 0.681849969048579
+  },
+  "final_eval_extra": {
+    "label_en": 1.132035420735677,
+    "sft_english": 1.9414934234722083,
+    "sft_turkish": 2.7558355179422884
+  },
+  "val": {
+    "tr": {
+      "n": 14997,
+      "accuracy": 0.3938120957524838,
+      "macro_f1": 0.31270793764382765,
+      "mae_stars": 1.0355404414216176,
+      "confusion": [
+        [
+          418,
+          78,
+          238,
+          500,
+          669
+        ],
+        [
+          232,
+          77,
+          363,
+          492,
+          547
+        ],
+        [
+          159,
+          56,
+          840,
+          699,
+          875
+        ],
+        [
+          83,
+          14,
+          730,
+          1222,
+          2475
+        ],
+        [
+          77,
+          6,
+          151,
+          647,
+          3349
+        ]
+      ],
+      "label_mass": 0.9968504309654236
+    },
+    "en": {
+      "n": 14997,
+      "accuracy": 0.20204040808161633,
+      "macro_f1": 0.08398364487539617,
+      "mae_stars": 1.992398479695939,
+      "confusion": [
+        [
+          2885,
+          21,
+          4,
+          1,
+          16
+        ],
+        [
+          2896,
+          28,
+          10,
+          0,
+          26
+        ],
+        [
+          2815,
+          22,
+          26,
+          6,
+          66
+        ],
+        [
+          2934,
+          23,
+          23,
+          2,
+          71
+        ],
+        [
+          2994,
+          16,
+          21,
+          2,
+          89
+        ]
+      ],
+      "label_mass": 0.5212762355804443
+    }
+  },
+  "config": {
+    "run_name": "ft-tr-s50m-lora16-lr1e-04",
+    "total_tokens": 4629504,
+    "seq_len": 1024,
+    "batch_rows": 32,
+    "micro_batch": 16,
+    "max_lr": 0.0001,
+    "min_lr_ratio": 0.1,
+    "warmup_steps": 7,
+    "weight_decay": 0.0,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "balance_coef": 0.01,
+    "grad_clip": 1.0,
+    "seed": 1234,
+    "eval_every": 35,
+    "eval_windows": 128,
+    "log_every": 25,
+    "checkpoint_minutes": 1000000000.0,
+    "checkpoint_every_steps": null,
+    "compile": false,
+    "lora_rank": 16,
+    "lora_alpha": 16.0,
+    "lora_targets": "all"
+  }
+}
