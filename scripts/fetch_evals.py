@@ -1,8 +1,9 @@
-"""Download the code-eval receipts that notebooks/04_code_eval.ipynb uploaded to the Hub.
+"""Download receipts that a GPU notebook uploaded to the runs repo, ready to commit.
 
-    python scripts/fetch_evals.py
+    python scripts/fetch_evals.py                                                    # notebook 04: code evals
+    python scripts/fetch_evals.py --pattern "finetune/*.json" --to artifacts/finetune  # notebook 05
 
-Copies evals/*.json from the runs repo into artifacts/evals/, ready to commit.
+Copies the matching files from the runs repo into the target folder (default artifacts/evals/).
 The token is read with a hidden prompt and kept in memory only.
 """
 from __future__ import annotations
@@ -20,13 +21,15 @@ ROOT = Path(__file__).resolve().parent.parent
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--repo", default="Tbt-AI/glm-ladder-runs")
+    parser.add_argument("--pattern", default="evals/*.json", help="files in the runs repo, e.g. finetune/*.json")
+    parser.add_argument("--to", default="artifacts/evals", help="target folder, relative to the repository root")
     args = parser.parse_args()
 
-    folder = Path(snapshot_download(repo_id=args.repo, repo_type="model", allow_patterns=["evals/*.json"],
+    folder = Path(snapshot_download(repo_id=args.repo, repo_type="model", allow_patterns=[args.pattern],
                                     token=getpass("Hugging Face token: ")))
-    target = ROOT / "artifacts" / "evals"
+    target = ROOT / args.to
     target.mkdir(parents=True, exist_ok=True)
-    for path in sorted((folder / "evals").glob("*.json")):
+    for path in sorted(folder.glob(args.pattern)):
         shutil.copyfile(path, target / path.name)
         print("wrote", target / path.name)
 

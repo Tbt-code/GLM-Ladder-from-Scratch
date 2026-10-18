@@ -10,7 +10,7 @@ import math
 import shutil
 import time
 from collections.abc import Callable, Mapping
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 
 import torch
@@ -20,6 +20,7 @@ from .checkpoint import load_checkpoint, save_checkpoint
 from .config import ModelConfig
 from .evaluation import evaluate
 from .loader import MixedLoader, PackedSource
+from .lora import apply_lora, trainable_parameters
 from .model import GLMLadderModel
 from .runs import MetricsLog, RunStore
 from .train import lr_at, param_groups, train_step
@@ -47,6 +48,9 @@ class PretrainConfig:
     checkpoint_minutes: float = 25.0
     checkpoint_every_steps: int | None = None
     compile: bool = False
+    lora_rank: int = 0                 # 0: train every parameter; > 0: freeze the model and train LoRA adapters
+    lora_alpha: float = 16.0
+    lora_targets: str = "all"          # "attention", "experts" or "all" (see glm_ladder/lora.py)
 
     @property
     def tokens_per_step(self) -> int:
@@ -63,15 +67,18 @@ class PretrainConfig:
 RESUME_FIELDS = (
     "run_name", "total_tokens", "seq_len", "batch_rows", "max_lr", "min_lr_ratio",
     "warmup_steps", "weight_decay", "beta1", "beta2", "balance_coef", "grad_clip", "seed",
+    "lora_rank", "lora_alpha", "lora_targets",
 )
+# A checkpoint saved before a field existed is compared with that field's default.
+DEFAULTS = {field.name: field.default for field in fields(PretrainConfig)}
 
 
 def check_resume_compatible(saved: Mapping, current: Mapping) -> None:
     """Raise ValueError naming every RESUME_FIELDS entry whose value differs."""
     # collect the fields in RESUME_FIELDS
-    diffs = [f"{field}: {saved.get(field)!r} -> {current.get(field)!r}"
+    diffs = [f"{field}: {saved.get(field, DEFAULTS[field])!r} -> {current.get(field)!r}"
              for field in RESUME_FIELDS
-             if saved.get(field) != current.get(field)
+             if saved.get(field, DEFAULTS[field]) != current.get(field)
         ]
     if diffs:
         raise ValueError(", ".join(diffs))
@@ -101,6 +108,8 @@ def run_pretraining(
     because the checkpoint already holds the fine-tuned weights.
     `extra_val_sources`: also evaluated at every eval and logged as "eval_extra", e.g. the
     pretraining validation sets during SFT, to measure forgetting.
+    `cfg.lora_rank > 0`: the model is frozen and only LoRA adapters train (see glm_ladder/lora.py);
+    checkpoints then hold the adapters next to the frozen weights.
     `stop_after_steps` stops without saving, to simulate an interrupted session in tests.
     """
     if cfg.batch_rows % cfg.micro_batch:
@@ -118,16 +127,22 @@ def run_pretraining(
     run_dir = workdir / cfg.run_name
     run_dir.mkdir(parents=True, exist_ok=True)
     model = GLMLadderModel(model_config).to(device)
-    optimizer = torch.optim.AdamW(
-        param_groups(model, cfg.weight_decay), lr=0.0, betas=(cfg.beta1, cfg.beta2),
-        fused=device.type == "cuda",
-    )
+    latest = store.latest() if store is not None else None
+    # Order matters for fine-tuning: pretrained weights load into the plain model (their names
+    # match), then LoRA wraps it, then the optimizer sees only the parameters that train.
+    if latest is None and init_from is not None:
+        load_model(model, str(init_from), strict=True, device=str(device))
+        log(f"initialised from {init_from}")
+    if cfg.lora_rank > 0:
+        adapted = apply_lora(model, rank=cfg.lora_rank, alpha=cfg.lora_alpha, targets=cfg.lora_targets)
+        log(f"LoRA rank {cfg.lora_rank}, alpha {cfg.lora_alpha} on {len(adapted)} layers ({cfg.lora_targets})")
+    groups = [group for group in param_groups(model, cfg.weight_decay) if group["params"]]
+    optimizer = torch.optim.AdamW(groups, lr=0.0, betas=(cfg.beta1, cfg.beta2), fused=device.type == "cuda")
     # The loader yields whole optimizer steps, so the data order does not depend on micro_batch.
     loader = MixedLoader(train_sources, weights, batch_size=cfg.batch_rows, seed=cfg.seed)
     metrics = MetricsLog(run_dir / "metrics.jsonl")
     step, tokens_seen = 0, 0
 
-    latest = store.latest() if store is not None else None
     if latest is not None:
         pulled = workdir / "pulled"
         if pulled.exists():
@@ -148,12 +163,9 @@ def run_pretraining(
     else:
         if metrics.path.exists():
             metrics.path.unlink()                         # leftovers from a run that never checkpointed
-        if init_from is not None:
-            load_model(model, str(init_from), strict=True, device=str(device))
-            log(f"initialised from {init_from}")
         counts = model.parameter_counts()
-        log(f"new run {cfg.run_name}: {counts['total']:,} params, {cfg.total_steps} steps "
-            f"x {cfg.tokens_per_step:,} tokens")
+        log(f"new run {cfg.run_name}: {counts['total']:,} params ({trainable_parameters(model):,} trained), "
+            f"{cfg.total_steps} steps x {cfg.tokens_per_step:,} tokens")
 
     if cfg.compile:
         torch._dynamo.config.recompile_limit = 64

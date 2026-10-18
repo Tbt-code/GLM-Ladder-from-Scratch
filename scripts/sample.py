@@ -26,6 +26,7 @@ sys.path.insert(0, str(ROOT))
 from glm_ladder import GLMLadderModel, ModelConfig  # noqa: E402
 from glm_ladder.checkpoint import MODEL_FILE, STATE_FILE, sha256_file  # noqa: E402
 from glm_ladder.generate import generate  # noqa: E402
+from glm_ladder.lora import apply_lora, merge_lora  # noqa: E402
 from glm_ladder.runs import RunStore  # noqa: E402
 from glm_ladder.tokenizer import EOS_ID, load_tokenizer  # noqa: E402
 
@@ -56,7 +57,15 @@ def load_run(api: HfApi, repo_id: str, run_name: str, checkpoint: str | None) ->
     if sha256_file(weights) != state["model_sha256"]:
         raise SystemExit("model.safetensors does not match the SHA-256 in trainer.json")
     model = GLMLadderModel(ModelConfig.from_dict(state["model_config"]))
-    load_model(model, str(weights), strict=True)
+    config = state.get("pretrain_config", {})
+    if config.get("lora_rank", 0) > 0:
+        # A LoRA run's checkpoint holds the frozen weights plus the adapters: rebuild the same
+        # adapters, load, then fold them into the weights so the result is a plain model.
+        apply_lora(model, rank=config["lora_rank"], alpha=config["lora_alpha"], targets=config["lora_targets"])
+        load_model(model, str(weights), strict=True)
+        merge_lora(model)
+    else:
+        load_model(model, str(weights), strict=True)
     model.eval()
     return model, {**state, "checkpoint": name}
 
