@@ -71,8 +71,29 @@ def to_stars(labels: list, names: list[str] | None = None) -> list[int]:
 
 def load_sentiturca() -> dict[str, list[tuple[str, int]]]:
     from datasets import load_dataset
+    from huggingface_hub import HfApi
 
-    files = {split: f"hf://datasets/{SENTITURCA}/e-commerce/{split}*.jsonl" for split in ("train", "validation", "test")}
+    # File names are read from the repo instead of guessed (the validation file is not "validation*").
+    names = [name for name in HfApi().list_repo_files(SENTITURCA, repo_type="dataset")
+             if name.startswith("e-commerce/") and name.endswith(".jsonl")]
+    print("  files:", names)
+
+    def split_of(name: str) -> str | None:
+        stem = name.rsplit("/", 1)[-1].lower()
+        if stem.startswith("train"):
+            return "train"
+        if stem.startswith("test"):
+            return "test"
+        if stem.startswith(("val", "dev")):
+            return "validation"
+        return None
+
+    files: dict[str, list[str]] = {}
+    for name in names:
+        if split_of(name):
+            files.setdefault(split_of(name), []).append(f"hf://datasets/{SENTITURCA}/{name}")
+    if set(files) != {"train", "validation", "test"}:
+        raise SystemExit(f"expected train / validation / test files under e-commerce/, found {names}")
     data = load_dataset("json", data_files=files)
     out = {}
     for split, name in (("train", "train"), ("validation", "val"), ("test", "test")):
@@ -127,25 +148,29 @@ def encodable(tokenizer, text: str, stars: int, language: str, max_prompt_tokens
 
 def select(tokenizer, rows, language: str, max_prompt_tokens: int, *, limit: int | None = None,
            shuffle: bool = False, exclude: set[int] | None = None):
-    """Keep encodable rows (optionally a seeded shuffle, at most `limit`). Returns (kept, used row ids, stats)."""
+    """Keep encodable rows (optionally a seeded shuffle, at most `limit`). Returns (kept, seen row ids, stats).
+
+    `seen` holds every row this call looked at, kept or skipped, so a later call with
+    exclude=seen neither reuses a kept row nor counts a skipped one a second time.
+    """
     order = np.random.default_rng([SEED, len(rows)]).permutation(len(rows)) if shuffle else range(len(rows))
     stats: Counter = Counter()
-    kept, used = [], set()
+    kept, seen = [], set()
     for index in order:
         index = int(index)
         if exclude and index in exclude:
             continue
+        seen.add(index)
         text, stars = rows[index]
         encoded = encodable(tokenizer, text, stars, language, max_prompt_tokens, stats)
         if encoded is None:
             continue
         kept.append((text, stars, *encoded))
-        used.add(index)
         if limit is not None and len(kept) == limit:
             break
     if limit is not None and len(kept) < limit:
         raise SystemExit(f"{language}: only {len(kept):,} usable rows, {limit:,} needed")
-    return kept, used, stats
+    return kept, seen, stats
 
 
 def write_split(out: Path, language: str, split: str, kept, stats: Counter, window: int, *, packed: bool,
@@ -207,9 +232,9 @@ def main() -> None:
 
     print("English (Yelp), sampled to the Turkish sizes", sizes)
     yelp = load_yelp()
-    train, used, stats = select(tokenizer, yelp["train"], "en", cap, limit=sizes["train"], shuffle=True)
+    train, seen, stats = select(tokenizer, yelp["train"], "en", cap, limit=sizes["train"], shuffle=True)
     manifest["languages"]["en"]["train"] = write_split(out, "en", "train", train, stats, window, packed=True, examples=False)
-    val, _, stats = select(tokenizer, yelp["train"], "en", cap, limit=sizes["val"], shuffle=True, exclude=used)
+    val, _, stats = select(tokenizer, yelp["train"], "en", cap, limit=sizes["val"], shuffle=True, exclude=seen)
     manifest["languages"]["en"]["val"] = write_split(out, "en", "val", val, stats, window, packed=True, examples=True)
     test, _, stats = select(tokenizer, yelp["test"], "en", cap, limit=sizes["test"], shuffle=True)
     manifest["languages"]["en"]["test"] = write_split(out, "en", "test", test, stats, window, packed=False, examples=True)
