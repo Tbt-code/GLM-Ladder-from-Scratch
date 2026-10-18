@@ -13,8 +13,7 @@ Decisions are recorded with their reasons so the final report can explain why th
 | 2026-10-12 | Code and receipts on GitHub; checkpoints and token shards on Hugging Face Hub (free tier) | GitHub rejects files over 100 MB; a 200M resume checkpoint is about 2.4 GB |
 | 2026-10-12 | No paid services beyond the existing Colab Pro subscription | Owner constraint |
 | 2026-10-12 | Everything in the repository is written in English | Owner preference |
-| 2026-10-12 | Only the owner pushes to GitHub | Owner preference 
-
+| 2026-10-12 | Only the owner pushes to GitHub | Owner preference |
 | 2026-10-13 | Phase 0 benchmarks measured MFU of 4–11% (L4 and A100), not the assumed ~30% | Profiling showed ~80% of GPU time in elementwise ops and dtype copies; the model is memory- and launch-bound at this scale |
 | 2026-10-13 | Enable TF32 and `torch.compile` for all training | Measured 1.41× on L4 from compile; TF32 moves the float32 linear-attention core onto tensor cores |
 | 2026-10-13 | Stop throughput optimisation for now | One more round (graph-break fix) gave +10% on m-100m only; further gains need deeper rewrites |
@@ -30,7 +29,18 @@ Decisions are recorded with their reasons so the final report can explain why th
 | 2026-10-15 | Kill stale kernels at the top of the training notebook; checkpoint every 15 minutes | In VS Code + Colab, interrupt did not stop cells and Restart Kernel left the old process on the GPU (out-of-memory in the new kernel) |
 | 2026-10-15 | Report validation in bits per byte as well as nats per token | Nats per token are not comparable across languages or tokenizers |
 | 2026-10-16 | Pretraining of `s-50m` and `m-100m` complete; next phase is SFT on both | Results in README; `baseline-25m` reproduction and `l-200m` stay deferred |
-| open | Fine-tuning task | To be decided before Phase 4 |
+| 2026-10-16 | SFT data: `smol-smoltalk` (English) plus ~10% `InstrucTurca` (Turkish) | Made for small models and includes coding requests; the Turkish share matches pretraining. InstrucTurca is machine-translated, so its Turkish quality is limited |
+| 2026-10-16 | Loss only on assistant tokens and the end-of-turn token; whole conversations packed next-fit into 1,025-token windows | The model should learn to answer and to stop, not to imitate the user; a split conversation would ask it to answer a question it cannot see |
+| 2026-10-16 | Cut over-long conversations after their last complete assistant turn instead of dropping them | Dropping lost 46% of English conversations, biased towards long answers; cutting skips ~2.5% |
+| 2026-10-16 | SFT reuses the pretraining loop (`init_from`, fresh AdamW) and evaluates the pretraining validation sets too | One tested, resumable loop; the extra validation measures forgetting |
+| 2026-10-17 | SFT recipe: LR 1e-4, 50 warmup steps, 128 × 1024-token batches, one epoch, not tuned | Common fine-tuning defaults; a sweep is an ablation candidate |
+| 2026-10-17 | Executable code eval: 40 own tasks with unit tests, completion and chat prompts, greedy + 10 samples, reference-solution loss | pass@k is near zero for base models; the reference loss still separates them |
+| 2026-10-17 | Generated code runs behind a deny-list, in a subprocess, in a temp dir, with a timeout | Enough for 40 short functions from our own models; not a sandbox, so RL at scale moves to a container |
+| 2026-10-17 | Scripts get names that no library module has (`talk.py`, `run_code_eval.py`) | Same-named files let the editor rewrite imports and overwrite library code twice |
+| 2026-10-18 | No replay of pretraining data in SFT | Python validation loss rose ~30%, but the reference loss on the coding tasks fell on 33/40 (`s-50m`) and 37/40 (`m-100m`) tasks: the rise is a distribution shift, not lost coding ability |
+| 2026-10-18 | Code eval on an A100, not an L4 | Without a KV cache, generation is launch-bound; one evaluation took ~10 min on an A100 and was too slow on an L4 |
+| 2026-10-18 | Phase 3 complete on `s-50m` and `m-100m` | Results in README |
+| open | Fine-tuning task (Phase 4), and whether batched, KV-cached generation comes first | RL needs far more generation than the code eval |
 
 ## Pretraining, measured (A100 40 GB, full training loop with gradient accumulation)
 
@@ -40,6 +50,15 @@ Decisions are recorded with their reasons so the final report can explain why th
 | `m-100m` | 99,714 | 1.92B | 5.35 | 2.636 |
 
 The full loop ran 1.2–1.4× faster than the Phase 0 benchmark below (8-way gradient accumulation amortises per-step overhead), so the estimates below were conservative. Pretraining both rungs used roughly 45–50 units including setup, evaluation, uploads, and one restart (estimate from session hours).
+
+## SFT, measured (A100 40 GB)
+
+| Rung | Tokens | Steps | Training hours | Tokens/s |
+|---|---:|---:|---:|---:|
+| `s-50m` | 406.6M | 3,102 | 0.68 | 167,311 |
+| `m-100m` | 406.6M | 3,102 | 1.22 | 92,296 |
+
+About 95 of 300 units were used through Phase 3 (Colab balance), including pretraining, SFT, the code evaluation, and failed or slow sessions (the L4 evaluation attempt).
 
 ## Compute budget (Phase 0 estimate, A100 40 GB, torch.compile + TF32, commit 181c686)
 
@@ -75,6 +94,8 @@ Raw measurements: [`artifacts/receipts/`](artifacts/receipts/).
 - All checkpoints are reproducible from configs and seeds in this repository.
 
 ## Open research questions
+
+- **Replay and SFT learning rate.** Does mixing a little pretraining data into SFT, or a lower LR, reduce forgetting without losing the coding gains?
 
 - **Double residual.** HybridBlock returns `x + delta` and HyperConnection adds it to the
   stream again, so the input is counted twice per layer (inherited from the original model,

@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0",
+  "kind": "sft_data",
+  "seq_len": 1024,
+  "tokenizer_sha256": "631f5da9e93fac546dca6666a1c212f08f953fa3e3477beb23a6fec25e0db40a",
+  "sources": {
+    "english": {
+      "val": {
+        "dataset": "HuggingFaceTB/smol-smoltalk",
+        "split": "val",
+        "windows": 1538,
+        "conversations": 1953,
+        "truncated_at_turn": 877,
+        "skipped": {
+          "skipped_invalid": 0,
+          "skipped_too_long": 47,
+          "skipped_nothing_to_learn": 0
+        },
+        "tokens": 1194570,
+        "learned_tokens": 954171,
+        "fill": 0.7578,
+        "sha256": {
+          "tokens.npy": "a43177a26a794036bb8bbf01b7e80d10545d5f656ec627432c9f0c6ee18c7cef",
+          "mask.npy": "388b3acef3d202ca83a5de607782fda7de82c7f82eed2a752b53eaf62fbe35ce"
+        }
+      },
+      "train": {
+        "dataset": "HuggingFaceTB/smol-smoltalk",
+        "split": "train",
+        "windows": 357344,
+        "conversations": 450443,
+        "truncated_at_turn": 199315,
+        "skipped": {
+          "skipped_invalid": 259,
+          "skipped_too_long": 9639,
+          "skipped_nothing_to_learn": 0
+        },
+        "tokens": 277307030,
+        "learned_tokens": 221264815,
+        "fill": 0.7571,
+        "sha256": {
+          "tokens.npy": "e06da9941fb51e0bb59466f0730d00d7c4c9eb273946211d2768168e506ab896",
+          "mask.npy": "4f83cfb25e83fcc2a6ec48b962771e75fa4534873c526be94e63678ec85cf89d"
+        }
+      }
+    },
+    "turkish": {
+      "val": {
+        "dataset": "turkish-nlp-suite/InstrucTurca",
+        "split": "val",
+        "windows": 485,
+        "conversations": 911,
+        "truncated_at_turn": 0,
+        "skipped": {
+          "skipped_invalid": 0,
+          "skipped_too_long": 89,
+          "skipped_nothing_to_learn": 0
+        },
+        "tokens": 374653,
+        "learned_tokens": 218204,
+        "fill": 0.7536,
+        "sha256": {
+          "tokens.npy": "2d514c52705d15e9438a39950c0c3943e78ce6ce8e22723de0b0a1e35da6ae13",
+          "mask.npy": "b6e55d0a0226ba23f605dcf77a47adbf62847db11795a41212aa5ad731e2baba"
+        }
+      },
+      "train": {
+        "dataset": "turkish-nlp-suite/InstrucTurca",
+        "split": "train",
+        "windows": 39705,
+        "conversations": 72916,
+        "truncated_at_turn": 0,
+        "skipped": {
+          "skipped_invalid": 2,
+          "skipped_too_long": 4788,
+          "skipped_nothing_to_learn": 0
+        },
+        "tokens": 30606800,
+        "learned_tokens": 17743385,
+        "fill": 0.7521,
+        "sha256": {
+          "tokens.npy": "f9afaa96656650ca1fcef6cfbaf7b962dbe8de916627d5d3c74e6d11e449ac35",
+          "mask.npy": "48a3c48e5ad0212e79bbde7035e35c64073e0415b6bb382b4e151f4ac2d0e45a"
+        }
+      }
+    }
+  }
+}
