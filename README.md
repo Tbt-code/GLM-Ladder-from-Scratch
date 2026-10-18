@@ -168,8 +168,8 @@ The 90 / 10 split matches the share of Turkish in pretraining. Every conversatio
 
 - **Only the assistant learns.** The loss is computed on the assistant's tokens and its closing `<|end|>`, and nowhere else (targets set to -100). The model learns to answer, and to stop, but not to imitate the user.
 - **Whole conversations are packed** into 1,025-token windows (1,024 inputs + 1 shifted target), next-fit, separated by the document token and padded at the end. A conversation is never split across windows, so the model never has to answer a question it cannot see.
-- **Long conversations are cut at a turn boundary**, after the last complete assistant answer that fits. Dropping every conversation longer than a window would have thrown away 46% of the English data, biased towards the long, detailed answers; with the cut, about 2.5% are skipped and 43% are shortened.
-- The result is 397,049 training windows (406.6M tokens), one epoch. Token ids and masks are stored as uint16 / uint8 arrays with SHA-256 hashes in the dataset repo.
+- **Long conversations are cut at a turn boundary**, after the last complete assistant answer that fits. Dropping every conversation longer than a window would have thrown away 46% of the English data, biased towards the long, detailed answers; with the cut, about 2% are skipped and 43% are shortened. Turkish conversations are single-turn, so they cannot be cut; 6% were skipped as too long.
+- The result is 397,049 training windows (357,344 English, 39,705 Turkish), one epoch. Windows are 76% full: they hold 307.9M conversation tokens, of which 239.0M are learned assistant tokens; the rest is padding. Token ids and masks are stored as uint16 / uint8 arrays with SHA-256 hashes in the dataset repo.
 
 Reproduce: `python scripts/prepare_sft.py`. Counts and hashes: [`artifacts/receipts/sft-data.json`](artifacts/receipts/sft-data.json).
 
@@ -272,7 +272,7 @@ Talk to a model on CPU: `python scripts/talk.py --run sft-m100m-001` (multi-turn
 | 1. Data | BPE tokenizer, mixed English + Python + Turkish corpus, sharded and hashed | Deterministic, resumable data stream | Done |
 | 2. Pretraining | S → M; baseline reproduction and L deferred | Loss curves, held-out loss, receipts | Done for S and M |
 | 3. Post-training | Supervised fine-tuning on chat data | Eval before vs after | Done for S and M: forgetting, executable code eval, chat samples |
-| 4. Fine-tuning | Full fine-tuning vs LoRA on one task (task to be chosen) | Matched-compute comparison | Next |
+| 4. Fine-tuning | Full fine-tuning vs LoRA on review rating (1-5 stars) in Turkish and English | Matched-data comparison on held-out test sets | In progress |
 | 5. Reinforcement learning | Reproduce RLOO, then GRPO, DPO, reward and KL ablations at every rung | Locked confirmation-set results with paired statistics | |
 | 6. Report | Scaling analysis, negative results, limitations | `REPORT.md` | |
 

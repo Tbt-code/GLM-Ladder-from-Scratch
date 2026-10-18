@@ -40,7 +40,12 @@ Decisions are recorded with their reasons so the final report can explain why th
 | 2026-10-18 | No replay of pretraining data in SFT | Python validation loss rose ~30%, but the reference loss on the coding tasks fell on 33/40 (`s-50m`) and 37/40 (`m-100m`) tasks: the rise is a distribution shift, not lost coding ability |
 | 2026-10-18 | Code eval on an A100, not an L4 | Without a KV cache, generation is launch-bound; one evaluation took ~10 min on an A100 and was too slow on an L4 |
 | 2026-10-18 | Phase 3 complete on `s-50m` and `m-100m` | Results in README |
-| open | Fine-tuning task (Phase 4), and whether batched, KV-cached generation comes first | RL needs far more generation than the code eval |
+| 2026-10-18 | Phase 4 task: review rating, 1-5 stars, in Turkish (SentiTurca e-commerce, CC-BY-SA-4.0) and English (Yelp Review Full, Yelp Dataset Agreement) | Measurable without generation, unrelated to the RL code rewards, and the same task in a language the model saw 60% of and one it saw 10% of. Yelp is a different domain (businesses vs products), so absolute scores are not compared across languages, only differences between methods and sizes |
+| 2026-10-18 | English sets sampled to the Turkish sizes; the same 512-token prompt limit in both | Data size and length filter are not variables |
+| 2026-10-18 | Start from the SFT models; answer is one digit in the chat format; score by the most likely digit token | RL starts from the same models; one forward pass per review, exact and fast |
+| 2026-10-18 | Full fine-tuning vs LoRA (all attention and expert layers, alpha 16): LR grid of 3 each on Turkish validation macro-F1, then ranks 4 / 16 / 64, then English with the Turkish LRs; test sets opened once | Matched data and steps; the selection metric is fixed before the runs; English reuses the Turkish LRs so only the language changes |
+| 2026-10-18 | Packed fine-tuning windows hold several reviews, which attend to earlier reviews in the same window | Same packing as SFT; scoring sees one review alone. A train/test difference to keep in mind; per-document attention masks are not implemented |
+| open | Batched, KV-cached generation before RL | RL needs far more generation than the code eval |
 
 ## Pretraining, measured (A100 40 GB, full training loop with gradient accumulation)
 
@@ -95,6 +100,7 @@ Raw measurements: [`artifacts/receipts/`](artifacts/receipts/).
 
 ## Open research questions
 
+- **Padding in SFT.** Packed SFT windows are 76% full; a quarter of SFT compute goes to padding. Best-fit packing or variable-length batches would recover most of it.
 - **Replay and SFT learning rate.** Does mixing a little pretraining data into SFT, or a lower LR, reduce forgetting without losing the coding gains?
 
 - **Double residual.** HybridBlock returns `x + delta` and HyperConnection adds it to the
