@@ -4,6 +4,7 @@
   "run": "sft-s50m-001",
   "checkpoint": "step-003102",
   "mode": "chat",
+  "device": "NVIDIA A100-SXM4-40GB",
   "tasks": 40,
   "n": 10,
   "temperature": 0.8,
@@ -12,7 +13,7 @@
   "seed": 0,
   "loss_only": false,
   "summary": {
-    "reference_loss": 0.4714052230119705,
+    "reference_loss": 0.47125558108091353,
     "greedy_pass@1": 0.375,
     "sampled_pass@1": 0.13999999999999999,
     "sampled_pass@5": 0.38273809523809527,
@@ -21,7 +22,7 @@
   "results": [
     {
       "task": "is_even",
-      "reference_loss": 0.2973642945289612,
+      "reference_loss": 0.29717594385147095,
       "greedy": {
         "code": "def is_even(n):\n    return n == 0\n",
         "passed": false
@@ -71,7 +72,7 @@
     },
     {
       "task": "add",
-      "reference_loss": 0.20765677094459534,
+      "reference_loss": 0.2074461728334427,
       "greedy": {
         "code": "def add(a, b):\n    return a + b\n",
         "passed": true
@@ -121,7 +122,7 @@
     },
     {
       "task": "square",
-      "reference_loss": 0.49252817034721375,
+      "reference_loss": 0.4921470284461975,
       "greedy": {
         "code": "def square(x):\n    return x * x\n\n# Example usage:\nprint(square(5))  # Output: 5\nprint(square(5))  # Output: 5\n",
         "passed": true
@@ -171,7 +172,7 @@
     },
     {
       "task": "max_of_two",
-      "reference_loss": 0.45495352149009705,
+      "reference_loss": 0.4548652768135071,
       "greedy": {
         "code": "def max_of_two(a, b):\n    return a + b\n",
         "passed": false
@@ -221,7 +222,7 @@
     },
     {
       "task": "sum_list",
-      "reference_loss": 0.18544821441173553,
+      "reference_loss": 0.1853421926498413,
       "greedy": {
         "code": "def sum_list(numbers):\n    return sum(numbers)\n",
         "passed": true
@@ -271,7 +272,7 @@
     },
     {
       "task": "average",
-      "reference_loss": 0.19238843023777008,
+      "reference_loss": 0.1922789365053177,
       "greedy": {
         "code": "def average(numbers):\n    \"\"\"\n    Returns the average of a non-empty list of numbers.\n\n    Args:\n        numbers (list): A list of numbers.\n\n    Returns:\n        float: The average of the input list.\n    \"\"\"\n    if not numbers:\n        return None\n\n    return sum(numbers) / len(numbers)\n",
         "passed": true
@@ -321,7 +322,7 @@
     },
     {
       "task": "reverse_string",
-      "reference_loss": 0.2452872395515442,
+      "reference_loss": 0.2451622486114502,
       "greedy": {
         "code": "def reverse_string(s):\n    return s[::-1]\n",
         "passed": true
@@ -371,7 +372,7 @@
     },
     {
       "task": "count_vowels",
-      "reference_loss": 0.38344818353652954,
+      "reference_loss": 0.38331639766693115,
       "greedy": {
         "code": "def count_vowels(s):\n    vowels = 'aeiouAEIOU'\n    return sum(1 for char in s if char in vowels)\n",
         "passed": true
@@ -421,7 +422,7 @@
     },
     {
       "task": "factorial",
-      "reference_loss": 0.3095654845237732,
+      "reference_loss": 0.30950215458869934,
       "greedy": {
         "code": "def factorial(n):\n    if n < 0:\n        raise ValueError(\"Factorial is not defined for negative numbers\")\n    elif n == 0 or n == 1:\n        return 1\n    else:\n        return n * factorial(n-1)\n",
         "passed": true
@@ -471,7 +472,7 @@
     },
     {
       "task": "fibonacci",
-      "reference_loss": 0.4246159493923187,
+      "reference_loss": 0.4243584871292114,
       "greedy": {
         "code": "def fibonacci(n):\n    if n <= 0:\n        return 0\n    elif n == 1:\n        return 1\n    else:\n        return fibonacci(n-1) + fibonacci(1)\n",
         "passed": false
@@ -521,7 +522,7 @@
     },
     {
       "task": "is_palindrome",
-      "reference_loss": 0.22078458964824677,
+      "reference_loss": 0.2206481695175171,
       "greedy": {
         "code": "def is_palindrome(s):\n    s = ''.join(c for c in s if c.isalnum()).lower()\n    return s == s[::-1]\n",
         "passed": true
@@ -571,7 +572,7 @@
     },
     {
       "task": "first_element",
-      "reference_loss": 0.45928460359573364,
+      "reference_loss": 0.45927220582962036,
       "greedy": {
         "code": "def first_element(items):\n    return [item for item in items if item in items]\n",
         "passed": false
@@ -621,7 +622,7 @@
     },
     {
       "task": "last_element",
-      "reference_loss": 0.5902032256126404,
+      "reference_loss": 0.5899614691734314,
       "greedy": {
         "code": "def last_element(items):\n    \"\"\"\n    Returns the last element of a non-empty list.\n\n    Args:\n        items (list): A list of items to be removed.\n\n    Returns:\n        list: A list of all elements in the list.\n    \"\"\"\n    return [item for item in items if item not in items]\n",
         "passed": false
@@ -671,7 +672,7 @@
     },
     {
       "task": "count_positive",
-      "reference_loss": 0.4163661599159241,
+      "reference_loss": 0.41556456685066223,
       "greedy": {
         "code": "def count_positive(numbers):\n    return len(numbers)\n",
         "passed": false
@@ -721,7 +722,7 @@
     },
     {
       "task": "celsius_to_fahrenheit",
-      "reference_loss": 0.8139111399650574,
+      "reference_loss": 0.8143458366394043,
       "greedy": {
         "code": "def celsius_to_fahrenheit(celsius):\n    \"\"\"\n    Convert a temperature of celsius to degrees Fahrenheit.\n\n    Args:\n        celsius (float): The temperature of celsius to degrees Fahrenheit.\n\n    Returns:\n        float: The temperature of celsius to degrees Fahrenheit.\n    \"\"\"\n    return celsius * (celsius * 9/5)\n",
         "passed": false
@@ -771,7 +772,7 @@
     },
     {
       "task": "is_prime",
-      "reference_loss": 0.23999546468257904,
+      "reference_loss": 0.23997944593429565,
       "greedy": {
         "code": "def is_prime(n):\n    if n < 2:\n        return False\n    for i in range(2, int(n ** 0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n",
         "passed": true
@@ -821,7 +822,7 @@
     },
     {
       "task": "find_max",
-      "reference_loss": 0.2769528925418854,
+      "reference_loss": 0.27695757150650024,
       "greedy": {
         "code": "def find_max(numbers):\n    return max(numbers)\n",
         "passed": true
@@ -871,7 +872,7 @@
     },
     {
       "task": "find_min",
-      "reference_loss": 0.39738932251930237,
+      "reference_loss": 0.3973487913608551,
       "greedy": {
         "code": "def find_min(numbers):\n    if not numbers:\n        return None\n    return numbers[0]\n",
         "passed": false
@@ -894,7 +895,7 @@
           "passed": false
         },
         {
-          "code": "def find_min(numbers):\n    max_num = numbers[0]\n    for num in numbers:\n        if num > max_num:\n            max_num = num\n        elif num > max_num:\n            return num\n    return None\n\ndef find_min(numbers):\n    if not all(isinstance(num, int) for num in numbers):\n        raise ValueError('The list must have at least two elements' + list(numbers))\n    if len(numbers) > 1:\n        return None\n\n    return min(numbers)\n",
+          "code": "def find_min(numbers):\n    max_num = numbers[0]\n    for num in numbers:\n        if num > max_num:\n            max_num = num\n        elif num > max_num:\n            return num\n    return None\n",
           "passed": false
         },
         {
@@ -902,7 +903,7 @@
           "passed": false
         },
         {
-          "code": "def find_min(numbers):\n    if not numbers:\n        return 0\n\n    max_size = float('-inf')\n    max_num = max_num\n    while max_num != max_num:\n        if numbers[max_num] < min_size:\n            max_num = numbers[max_num]\n            max_num = numbers[max_num]\n        else:\n            max_num = numbers[max_num]\n\n    return max_num\n",
+          "code": "def find_min(numbers):\n    if not numbers:\n        return 0\n\n    max_size = float('-inf')\n    max_num = max_num\n    while max_num != max_num:\n        if numbers[max_num] < min_size:\n            max_num = numbers[max_num]\n            max_num = numbers[max_num]\n        return max_num\n    return max_num\n",
           "passed": false
         },
         {
@@ -921,7 +922,7 @@
     },
     {
       "task": "remove_duplicates",
-      "reference_loss": 1.0404421091079712,
+      "reference_loss": 1.040381669998169,
       "greedy": {
         "code": "def remove_duplicates(items):\n    removed_items = []\n    for item in items:\n        if item in removed_items:\n            removed_items.append(item)\n    return removed_items\n",
         "passed": false
@@ -971,7 +972,7 @@
     },
     {
       "task": "count_words",
-      "reference_loss": 0.33691900968551636,
+      "reference_loss": 0.33705654740333557,
       "greedy": {
         "code": "def count_words(s):\n    words = s.split()\n    return len(words)\n",
         "passed": true
@@ -1021,7 +1022,7 @@
     },
     {
       "task": "capitalize_words",
-      "reference_loss": 1.2837564945220947,
+      "reference_loss": 1.2837333679199219,
       "greedy": {
         "code": "def capitalize_words(s):\n    words = s.split()\n    words = [word.capitalize() for word in words]\n    return [word.capitalize() for word in words]\n",
         "passed": false
@@ -1071,7 +1072,7 @@
     },
     {
       "task": "double_list",
-      "reference_loss": 0.2798541784286499,
+      "reference_loss": 0.27982190251350403,
       "greedy": {
         "code": "def double_list(numbers):\n    return [num for num in numbers if num % 2 == 0]\n",
         "passed": false
@@ -1121,7 +1122,7 @@
     },
     {
       "task": "filter_even",
-      "reference_loss": 0.27803531289100647,
+      "reference_loss": 0.2781303822994232,
       "greedy": {
         "code": "def filter_even(numbers):\n    return [num for num in numbers if num % 2 == 0]\n",
         "passed": true
@@ -1171,7 +1172,7 @@
     },
     {
       "task": "sum_of_digits",
-      "reference_loss": 0.5329351425170898,
+      "reference_loss": 0.5328714847564697,
       "greedy": {
         "code": "def sum_of_digits(n):\n    return sum(int(digit) for digit in str(n))\n",
         "passed": true
@@ -1221,7 +1222,7 @@
     },
     {
       "task": "gcd",
-      "reference_loss": 0.2750345766544342,
+      "reference_loss": 0.27494096755981445,
       "greedy": {
         "code": "def gcd(a, b):\n    if a == 0 or b == 0:\n        return 0\n    elif a == 0 or b == 0:\n        return 0\n    else:\n        return gcd(a, b)\n",
         "passed": false
@@ -1271,7 +1272,7 @@
     },
     {
       "task": "power",
-      "reference_loss": 0.4882121682167053,
+      "reference_loss": 0.4881558418273926,
       "greedy": {
         "code": null,
         "passed": false
@@ -1302,7 +1303,7 @@
           "passed": false
         },
         {
-          "code": "def power(base, exp):\n    return log(base, exp) / power(base, exp)\n",
+          "code": "def power(base, exp):\n    result = 1 / exp\n    return result\n",
           "passed": false
         },
         {
@@ -1321,7 +1322,7 @@
     },
     {
       "task": "absolute_value",
-      "reference_loss": 0.7273807525634766,
+      "reference_loss": 0.7273248434066772,
       "greedy": {
         "code": "def absolute_value(x):\n    if x < 0:\n        return x\n    else:\n        return abs(x)\n",
         "passed": false
@@ -1371,7 +1372,7 @@
     },
     {
       "task": "contains",
-      "reference_loss": 0.4589405655860901,
+      "reference_loss": 0.45888638496398926,
       "greedy": {
         "code": "def contains(items, value):\n    return any(item in items for item in items)\n",
         "passed": false
@@ -1421,14 +1422,14 @@
     },
     {
       "task": "index_of",
-      "reference_loss": 0.40869468450546265,
+      "reference_loss": 0.4057515263557434,
       "greedy": {
         "code": "def index_of(items, value):\n    \"\"\"\n    Returns the index of the first occurrence of a given item in a list.\n\n    Args:\n        items (list): A list of items to be indexed.\n        value (list): A list of items to be indexed.\n\n    Returns:\n        int: The index of the first occurrence of the first occurrence of the first occurrence of the second occurrence of the second occurrence of the second occurrence of the second occurrence of the second occurrence of the second occurrence of the second occurrence of the second occurrence of the second occurrence of the second occurrence of the second occurrence of the second occurrence of",
         "passed": false
       },
       "samples": [
         {
-          "code": "def index_of(items, value):\n    if value < 0:\n        return None\n    return item + index + value\n",
+          "code": "def index_of(items, value):\n    return item.index(value)\n",
           "passed": false
         },
         {
@@ -1456,7 +1457,7 @@
           "passed": false
         },
         {
-          "code": "def index_of(items, value):\n    return `index_of(items, value)`\n",
+          "code": "def index_of(items, value):\n    index_of(items, value) = value\n    if index_of(item) is not None:\n        return index_of(item)\n\n    return index_of(items, level=1)\n",
           "passed": false
         },
         {
@@ -1471,7 +1472,7 @@
     },
     {
       "task": "merge_lists",
-      "reference_loss": 0.4484162926673889,
+      "reference_loss": 0.44836610555648804,
       "greedy": {
         "code": "def merge_lists(a, b):\n    \"\"\"\n    Merges a given element from a given element in a list.\n\n    Args:\n        a (int): The first element of the list.\n        b (int): The second element of the list.\n\n    Returns:\n        list: A new list with the elements of the first element of the list.\n    \"\"\"\n    merged = []\n    for element in a:\n        merged.append(element)\n    return merged\n",
         "passed": false
@@ -1514,14 +1515,14 @@
           "passed": false
         },
         {
-          "code": "def merge_lists(a, b):\n    result = []\n\n    def inner(*args, **kwargs):\n        result.extend(args(args, **kwargs))\n        result.extend(f'{a}->{b}->{b}->{b}')\n\n    result = []\n    n = len(args)\n    while n not in result:\n        result.append(n)\n        n = n // 2\n\n    result.extend(result)\n\n    return result\n",
+          "code": "def merge_lists(a, b):\n    result = []\n\n    def inner(*args, **kwargs):\n        result.extend(args + args + dp_dict)\n\n    return result\n",
           "passed": false
         }
       ]
     },
     {
       "task": "char_frequency",
-      "reference_loss": 0.31729334592819214,
+      "reference_loss": 0.3173138201236725,
       "greedy": {
         "code": "def char_frequency(s):\n    return {char: 0 for char in s}\n",
         "passed": false
@@ -1544,7 +1545,7 @@
           "passed": false
         },
         {
-          "code": "def char_frequency(s):\n    return f'{s}{s}'\n",
+          "code": null,
           "passed": false
         },
         {
@@ -1571,7 +1572,7 @@
     },
     {
       "task": "is_sorted",
-      "reference_loss": 0.4707939922809601,
+      "reference_loss": 0.4707856774330139,
       "greedy": {
         "code": "def is_sorted(numbers):\n    return len(numbers) == len(set(numbers))\n",
         "passed": false
@@ -1621,7 +1622,7 @@
     },
     {
       "task": "second_largest",
-      "reference_loss": 0.6777809858322144,
+      "reference_loss": 0.6777023077011108,
       "greedy": {
         "code": "def second_largest(numbers):\n    return max(numbers)\n",
         "passed": false
@@ -1671,7 +1672,7 @@
     },
     {
       "task": "count_occurrences",
-      "reference_loss": 0.5678622126579285,
+      "reference_loss": 0.5677392482757568,
       "greedy": {
         "code": "def count_occurrences(items, value):\n    count = 0\n    for item in items:\n        if item == value:\n            count += 1\n    return count\n",
         "passed": true
@@ -1710,7 +1711,7 @@
           "passed": false
         },
         {
-          "code": "def count_occurrences(items, value):\n    count = {}\n    for item in items:\n        if item in count:\n            count[item] += 1\n        else:\n            count[item] = 1\n    count[item] = 1\n\ncount_occurrences(items, value)\nprint(count_occurrences(count_occurrences(items, value)))\n",
+          "code": "def count_occurrences(items, value):\n    count = {}\n    for item in items:\n        if item in count:\n            count[item] += 1\n        else:\n            count[item] = 1\n    count[item] = 1\n\ncount_occurrences(items, value)\n",
           "passed": false
         },
         {
@@ -1721,7 +1722,7 @@
     },
     {
       "task": "to_uppercase",
-      "reference_loss": 0.26947668194770813,
+      "reference_loss": 0.2692772448062897,
       "greedy": {
         "code": "def to_uppercase(s):\n    return s.upper()\n",
         "passed": true
@@ -1771,7 +1772,7 @@
     },
     {
       "task": "starts_with_vowel",
-      "reference_loss": 0.9880630373954773,
+      "reference_loss": 0.9879756569862366,
       "greedy": {
         "code": null,
         "passed": false
@@ -1821,7 +1822,7 @@
     },
     {
       "task": "multiply_list",
-      "reference_loss": 0.4945843815803528,
+      "reference_loss": 0.4944821894168854,
       "greedy": {
         "code": "def multiply_list(numbers):\n    return [num for num in numbers if num % 2 == 0]\n",
         "passed": false
@@ -1871,7 +1872,7 @@
     },
     {
       "task": "range_sum",
-      "reference_loss": 0.5358454585075378,
+      "reference_loss": 0.5357641577720642,
       "greedy": {
         "code": null,
         "passed": false
@@ -1921,7 +1922,7 @@
     },
     {
       "task": "swap_pair",
-      "reference_loss": 0.49219420552253723,
+      "reference_loss": 0.49239158630371094,
       "greedy": {
         "code": "def swap_pair(pair):\n    return tuple(pair)\n",
         "passed": false
@@ -1971,7 +1972,7 @@
     },
     {
       "task": "clamp",
-      "reference_loss": 0.8755496740341187,
+      "reference_loss": 0.8756974339485168,
       "greedy": {
         "code": "def clamp(x, low, high):\n    \"\"\"\n    Clamp a value between x and high.\n\n    Args:\n        x (float): The x-coordinate of the value.\n\n    Returns:\n        int: The range from low to high.\n    \"\"\"\n    return x + high\n",
         "passed": false
@@ -2019,5 +2020,6 @@
         }
       ]
     }
-  ]
+  ],
+  "commit": "efa2976"
 }

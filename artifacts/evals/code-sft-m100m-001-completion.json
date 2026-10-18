@@ -1,0 +1,2025 @@
+{
+  "schema_version": "1.0",
+  "kind": "code_eval",
+  "run": "sft-m100m-001",
+  "checkpoint": "step-003102",
+  "mode": "completion",
+  "device": "NVIDIA A100-SXM4-40GB",
+  "tasks": 40,
+  "n": 10,
+  "temperature": 0.8,
+  "top_k": 50,
+  "max_tokens": 160,
+  "seed": 0,
+  "loss_only": false,
+  "summary": {
+    "reference_loss": 0.5858972435817122,
+    "greedy_pass@1": 0.35,
+    "sampled_pass@1": 0.215,
+    "sampled_pass@5": 0.4479166666666667,
+    "sampled_pass@10": 0.55
+  },
+  "results": [
+    {
+      "task": "is_even",
+      "reference_loss": 0.12776190042495728,
+      "greedy": {
+        "code": "def is_even(n):\n    \"\"\"Return True if n is even, otherwise False.\"\"\"\n    return n % 2 == 0\n",
+        "passed": true
+      },
+      "samples": [
+        {
+          "code": "def is_even(n):\n    \"\"\"Return True if n is even, otherwise False.\"\"\"\n    return n > 1\n",
+          "passed": false
+        },
+        {
+          "code": "def is_even(n):\n    \"\"\"Return True if n is even, otherwise False.\"\"\"\n    return n > 0\n",
+          "passed": false
+        },
+        {
+          "code": "def is_even(n):\n    \"\"\"Return True if n is even, otherwise False.\"\"\"\n    return n % 2 == 0\n",
+          "passed": true
+        },
+        {
+          "code": "def is_even(n):\n    \"\"\"Return True if n is even, otherwise False.\"\"\"\n    return n % 2 == 0\n",
+          "passed": true
+        },
+        {
+          "code": "def is_even(n):\n    \"\"\"Return True if n is even, otherwise False.\"\"\"\n    return n % 2 == 0\n",
+          "passed": true
+        },
+        {
+          "code": "def is_even(n):\n    \"\"\"Return True if n is even, otherwise False.\"\"\"\n    return n % 2 == 0\n",
+          "passed": true
+        },
+        {
+          "code": "def is_even(n):\n    \"\"\"Return True if n is even, otherwise False.\"\"\"\n    return n <= n - 1\n",
+          "passed": false
+        },
+        {
+          "code": "def is_even(n):\n    \"\"\"Return True if n is even, otherwise False.\"\"\"\n    return n % 2 == 0\n",
+          "passed": true
+        },
+        {
+          "code": "def is_even(n):\n    \"\"\"Return True if n is even, otherwise False.\"\"\"\n    return n % 2 == 0\n",
+          "passed": true
+        },
+        {
+          "code": "def is_even(n):\n    \"\"\"Return True if n is even, otherwise False.\"\"\"\n    return n % 2 == 0\n",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "task": "add",
+      "reference_loss": 0.1676829755306244,
+      "greedy": {
+        "code": "def add(a, b):\n    \"\"\"Return the sum of a and b.\"\"\"\n    return a + b\n",
+        "passed": true
+      },
+      "samples": [
+        {
+          "code": "def add(a, b):\n    \"\"\"Return the sum of a and b.\"\"\"\n\n    return a + b\n",
+          "passed": true
+        },
+        {
+          "code": "def add(a, b):\n    \"\"\"Return the sum of a and b.\"\"\"\n    if not a:\n        return a\n    return a\n",
+          "passed": false
+        },
+        {
+          "code": "def add(a, b):\n    \"\"\"Return the sum of a and b.\"\"\"\n    return a + b\n",
+          "passed": true
+        },
+        {
+          "code": "def add(a, b):\n    \"\"\"Return the sum of a and b.\"\"\"\n    return a + b\n",
+          "passed": true
+        },
+        {
+          "code": "def add(a, b):\n    \"\"\"Return the sum of a and b.\"\"\"\n    return a + b\n",
+          "passed": true
+        },
+        {
+          "code": "def add(a, b):\n    \"\"\"Return the sum of a and b.\"\"\"\n    return a + b\n",
+          "passed": true
+        },
+        {
+          "code": "def add(a, b):\n    \"\"\"Return the sum of a and b.\"\"\"\n    return a + b\n",
+          "passed": true
+        },
+        {
+          "code": "def add(a, b):\n    \"\"\"Return the sum of a and b.\"\"\"\n    return max(a, b)\n",
+          "passed": false
+        },
+        {
+          "code": "def add(a, b):\n    \"\"\"Return the sum of a and b.\"\"\"\n    return a**2 - b**2\n",
+          "passed": false
+        },
+        {
+          "code": "def add(a, b):\n    \"\"\"Return the sum of a and b.\"\"\"\n    return a / b\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "square",
+      "reference_loss": 0.5105785727500916,
+      "greedy": {
+        "code": "def square(x):\n    \"\"\"Return x squared.\"\"\"\n    return x**2\n",
+        "passed": true
+      },
+      "samples": [
+        {
+          "code": "def square(x):\n    \"\"\"Return x squared.\"\"\"\n    return x**2\n",
+          "passed": true
+        },
+        {
+          "code": "def square(x):\n    \"\"\"Return x squared.\"\"\"\n    return x * x ** 2\n",
+          "passed": false
+        },
+        {
+          "code": "def square(x):\n    \"\"\"Return x squared.\"\"\"\n    return x ** 2\n",
+          "passed": true
+        },
+        {
+          "code": "def square(x):\n    \"\"\"Return x squared.\"\"\"\n    if x < 0 or x < 0:\n        return x\n    else:\n        return x**2\n",
+          "passed": false
+        },
+        {
+          "code": "def square(x):\n    \"\"\"Return x squared.\"\"\"\n    return x / squared(x)\n",
+          "passed": false
+        },
+        {
+          "code": "def square(x):\n    \"\"\"Return x squared.\"\"\"\n    return x / x\n",
+          "passed": false
+        },
+        {
+          "code": "def square(x):\n    \"\"\"Return x squared.\"\"\"\n    return x**2\n",
+          "passed": true
+        },
+        {
+          "code": "def square(x):\n    \"\"\"Return x squared.\"\"\"\n    return x ** 2\n",
+          "passed": true
+        },
+        {
+          "code": "def square(x):\n    \"\"\"Return x squared.\"\"\"\n\n    return x ** 2\n",
+          "passed": true
+        },
+        {
+          "code": "def square(x):\n    \"\"\"Return x squared.\"\"\"\n    return x * x ** 3\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "max_of_two",
+      "reference_loss": 0.5987204313278198,
+      "greedy": {
+        "code": "def max_of_two(a, b):\n    \"\"\"Return the larger of a and b.\"\"\"\n    return a + b\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def max_of_two(a, b):\n    \"\"\"Return the larger of a and b.\"\"\"\n    return a * b\n",
+          "passed": false
+        },
+        {
+          "code": "def max_of_two(a, b):\n    \"\"\"Return the larger of a and b.\"\"\"\n    if not a:\n        return \"One of the two numbers must be equal.\"\n    return (a - b) % 2\n",
+          "passed": false
+        },
+        {
+          "code": "def max_of_two(a, b):\n    \"\"\"Return the larger of a and b.\"\"\"\n    return a - b\n",
+          "passed": false
+        },
+        {
+          "code": "def max_of_two(a, b):\n    \"\"\"Return the larger of a and b.\"\"\"\n    return a + b\n",
+          "passed": false
+        },
+        {
+          "code": "def max_of_two(a, b):\n    \"\"\"Return the larger of a and b.\"\"\"\n    return a ** 2\n",
+          "passed": false
+        },
+        {
+          "code": "def max_of_two(a, b):\n    \"\"\"Return the larger of a and b.\"\"\"\n    if not a or not b:\n        return None\n    return a + b\n",
+          "passed": false
+        },
+        {
+          "code": "def max_of_two(a, b):\n    \"\"\"Return the larger of a and b.\"\"\"\n    return a * b\n",
+          "passed": false
+        },
+        {
+          "code": "def max_of_two(a, b):\n    \"\"\"Return the larger of a and b.\"\"\"\n    return a / b\n",
+          "passed": false
+        },
+        {
+          "code": "def max_of_two(a, b):\n    \"\"\"Return the larger of a and b.\"\"\"\n    return (a + b) // 2\n",
+          "passed": false
+        },
+        {
+          "code": "def max_of_two(a, b):\n    \"\"\"Return the larger of a and b.\"\"\"\n    return a * b\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "sum_list",
+      "reference_loss": 0.07738126814365387,
+      "greedy": {
+        "code": "def sum_list(numbers):\n    \"\"\"Return the sum of a list of numbers.\"\"\"\n    return sum(numbers)\n",
+        "passed": true
+      },
+      "samples": [
+        {
+          "code": "def sum_list(numbers):\n    \"\"\"Return the sum of a list of numbers.\"\"\"\n    return sum(numbers) / len(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def sum_list(numbers):\n    \"\"\"Return the sum of a list of numbers.\"\"\"\n    return sum(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def sum_list(numbers):\n    \"\"\"Return the sum of a list of numbers.\"\"\"\n    return [sum(numbers) for num in numbers]\n",
+          "passed": false
+        },
+        {
+          "code": "def sum_list(numbers):\n    \"\"\"Return the sum of a list of numbers.\"\"\"\n    return sum(numbers) / len(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def sum_list(numbers):\n    \"\"\"Return the sum of a list of numbers.\"\"\"\n    return sum(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def sum_list(numbers):\n    \"\"\"Return the sum of a list of numbers.\"\"\"\n    return sum(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def sum_list(numbers):\n    \"\"\"Return the sum of a list of numbers.\"\"\"\n    return sum(numbers) / len(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def sum_list(numbers):\n    \"\"\"Return the sum of a list of numbers.\"\"\"\n    return sum(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def sum_list(numbers):\n    \"\"\"Return the sum of a list of numbers.\"\"\"\n    return sum(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def sum_list(numbers):\n    \"\"\"Return the sum of a list of numbers.\"\"\"\n    return sum(numbers)\n",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "task": "average",
+      "reference_loss": 0.11214958876371384,
+      "greedy": {
+        "code": "def average(numbers):\n    \"\"\"Return the average of a non-empty list of numbers.\"\"\"\n    return sum(numbers) / len(numbers)\n",
+        "passed": true
+      },
+      "samples": [
+        {
+          "code": "def average(numbers):\n    \"\"\"Return the average of a non-empty list of numbers.\"\"\"\n    return sum(numbers) / len(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def average(numbers):\n    \"\"\"Return the average of a non-empty list of numbers.\"\"\"\n    return sum(numbers) / len(numbers) if numbers else 0\n",
+          "passed": true
+        },
+        {
+          "code": "def average(numbers):\n    \"\"\"Return the average of a non-empty list of numbers.\"\"\"\n    return [num for num in numbers if num % 2 == 0]\n",
+          "passed": false
+        },
+        {
+          "code": "def average(numbers):\n    \"\"\"Return the average of a non-empty list of numbers.\"\"\"\n    if len(numbers) != 2:\n        raise ValueError(\"The list has out of bounds\")\n    max_num = sum(numbers) / len(numbers)\n    return [numbers]\n",
+          "passed": false
+        },
+        {
+          "code": "def average(numbers):\n    \"\"\"Return the average of a non-empty list of numbers.\"\"\"\n    return [num for num in numbers if num != 0]\n",
+          "passed": false
+        },
+        {
+          "code": "def average(numbers):\n    \"\"\"Return the average of a non-empty list of numbers.\"\"\"\n    return sum(numbers) / len(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def average(numbers):\n    \"\"\"Return the average of a non-empty list of numbers.\"\"\"\n    if not numbers:\n        return []\n\n    if not numbers:\n        return []\n\n    total = sum(numbers)\n    if not total:\n        return []\n\n    return average(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def average(numbers):\n    \"\"\"Return the average of a non-empty list of numbers.\"\"\"\n    if not numbers:\n        return []\n    return sum(numbers) / len(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def average(numbers):\n    \"\"\"Return the average of a non-empty list of numbers.\"\"\"\n    return sum(numbers) / len(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def average(numbers):\n    \"\"\"Return the average of a non-empty list of numbers.\"\"\"\n    return sum(numbers) / len(numbers)\n",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "task": "reverse_string",
+      "reference_loss": 0.0885043740272522,
+      "greedy": {
+        "code": "def reverse_string(s):\n    \"\"\"Return the string s reversed.\"\"\"\n    return s[::-1]\n",
+        "passed": true
+      },
+      "samples": [
+        {
+          "code": "def reverse_string(s):\n    \"\"\"Return the string s reversed.\"\"\"\n    return s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def reverse_string(s):\n    \"\"\"Return the string s reversed.\"\"\"\n    return s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def reverse_string(s):\n    \"\"\"Return the string s reversed.\"\"\"\n    return s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def reverse_string(s):\n    \"\"\"Return the string s reversed.\"\"\"\n    return s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def reverse_string(s):\n    \"\"\"Return the string s reversed.\"\"\"\n    return s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def reverse_string(s):\n    \"\"\"Return the string s reversed.\"\"\"\n    return s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def reverse_string(s):\n    \"\"\"Return the string s reversed.\"\"\"\n    return s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def reverse_string(s):\n    \"\"\"Return the string s reversed.\"\"\"\n    return s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def reverse_string(s):\n    \"\"\"Return the string s reversed.\"\"\"\n    return s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def reverse_string(s):\n    \"\"\"Return the string s reversed.\"\"\"\n    return s[::2]\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "count_vowels",
+      "reference_loss": 0.43603476881980896,
+      "greedy": {
+        "code": "def count_vowels(s):\n    \"\"\"Return the number of vowels (a, e, i, o, u, in lower or upper case) in s.\"\"\"\n    return sum(1 for char in s if char in 'aeiou')\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def count_vowels(s):\n    \"\"\"Return the number of vowels (a, e, i, o, u, in lower or upper case) in s.\"\"\"\n    if not s:\n        return 0\n    s = s.lower()\n    if s == 'a':\n        return -1\n    else:\n        return len(s)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_vowels(s):\n    \"\"\"Return the number of vowels (a, e, i, o, u, in lower or upper case) in s.\"\"\"\n    return sum(1 for _ in range(2, s+1) if s+1 == 0)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_vowels(s):\n    \"\"\"Return the number of vowels (a, e, i, o, u, in lower or upper case) in s.\"\"\"\n    return sum(1 for char in s if char in a) if char in a else 0\n",
+          "passed": false
+        },
+        {
+          "code": "def count_vowels(s):\n    \"\"\"Return the number of vowels (a, e, i, o, u, in lower or upper case) in s.\"\"\"\n    vowels = 'aeiouAEIOU'\n    for i in range(1, s):\n        if s[i] == vowels:\n            return i\n    return ''.join(chr(i) for i in range(s, s))\n",
+          "passed": false
+        },
+        {
+          "code": "def count_vowels(s):\n    \"\"\"Return the number of vowels (a, e, i, o, u, in lower or upper case) in s.\"\"\"\n    return sum(1 for char in s if char == s)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_vowels(s):\n    \"\"\"Return the number of vowels (a, e, i, o, u, in lower or upper case) in s.\"\"\"\n    return s.count(':')\n",
+          "passed": false
+        },
+        {
+          "code": "def count_vowels(s):\n    \"\"\"Return the number of vowels (a, e, i, o, u, in lower or upper case) in s.\"\"\"\n    return 2 * (s - 1) * 2 * s * 2 * 2 * 2 * 2\n",
+          "passed": false
+        },
+        {
+          "code": "def count_vowels(s):\n    \"\"\"Return the number of vowels (a, e, i, o, u, in lower or upper case) in s.\"\"\"\n    return sum(1 for s in s if s in s.split()[::-1])\n",
+          "passed": false
+        },
+        {
+          "code": "def count_vowels(s):\n    \"\"\"Return the number of vowels (a, e, i, o, u, in lower or upper case) in s.\"\"\"\n    vowels_count = 1\n    for char in s:\n        if char in 'aeiou':\n            vowels_count += 1\n        elif char in 'aeiou':\n            vowels_count += 1\n\n    return vowels_count\n",
+          "passed": false
+        },
+        {
+          "code": "def count_vowels(s):\n    \"\"\"Return the number of vowels (a, e, i, o, u, in lower or upper case) in s.\"\"\"\n    vowels = 'aeiouAEIOU'\n    if s.startswith('a'):\n        vowels = 'aeiouAEIOU'\n    else:\n        vowels = s.split()\n    return ''.join(char for char in vowels if char in vowels)\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "factorial",
+      "reference_loss": 0.2831696569919586,
+      "greedy": {
+        "code": "def factorial(n):\n    \"\"\"Return n factorial for a non-negative integer n.\"\"\"\n    if n < 0:\n        raise ValueError(\"n must be a non-negative integer\")\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n - 1)\n",
+        "passed": true
+      },
+      "samples": [
+        {
+          "code": "def factorial(n):\n    \"\"\"Return n factorial for a non-negative integer n.\"\"\"\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n - 1)\n",
+          "passed": true
+        },
+        {
+          "code": "def factorial(n):\n    \"\"\"Return n factorial for a non-negative integer n.\"\"\"\n    if n < 0:\n        raise ValueError(\"n must be a non-negative integer\")\n\n    if n == 0 or n == 1:\n        return 1\n    else:\n        return n * factorial(n-1)\n",
+          "passed": true
+        },
+        {
+          "code": "def factorial(n):\n    \"\"\"Return n factorial for a non-negative integer n.\"\"\"\n    if not isinstance(n, int):\n        raise TypeError(\"Input must be an integer\")\n    if n < 0:\n        raise ValueError(\"Input must be a non-negative integer\")\n    try:\n        return n * (n + 1)\n    except ZeroDivisionError as e:\n        raise ValueError(\"Input must be a non-negative integer\")\n",
+          "passed": false
+        },
+        {
+          "code": "def factorial(n):\n    \"\"\"Return n factorial for a non-negative integer n.\"\"\"\n    if n < 0:\n        return \"Incorrect\"\n    elif n == 0:\n        return \"Not a positive integer\"\n    elif n == 1:\n        return \"Incorrect\"\n    elif n == 2:\n        return \"Incorrect\"\n    elif n == 3:\n        return \"Incorrect\"\n    else:\n        return \"Fail\"\n",
+          "passed": false
+        },
+        {
+          "code": "def factorial(n):\n    \"\"\"Return n factorial for a non-negative integer n.\"\"\"\n    if n < 0:\n        raise ValueError(\"Negative factorial is not allowed\")\n    return n * factorial(n)\n",
+          "passed": false
+        },
+        {
+          "code": "def factorial(n):\n    \"\"\"Return n factorial for a non-negative integer n.\"\"\"\n    result = 1\n    i = 0\n    while i < n:\n        result *= i\n        i += 1\n        n //= i\n    return result\n",
+          "passed": false
+        },
+        {
+          "code": "def factorial(n):\n    \"\"\"Return n factorial for a non-negative integer n.\"\"\"\n    return n * factorial(n)\n",
+          "passed": false
+        },
+        {
+          "code": "def factorial(n):\n    \"\"\"Return n factorial for a non-negative integer n.\"\"\"\n    if n < 0:\n        return 1\n    else:\n        return n * factorial(n - 1)\n",
+          "passed": false
+        },
+        {
+          "code": "def factorial(n):\n    \"\"\"Return n factorial for a non-negative integer n.\"\"\"\n    if n < 1:\n        raise ValueError(\"n must be a positive integer\")\n    return n\n",
+          "passed": false
+        },
+        {
+          "code": "def factorial(n):\n    \"\"\"Return n factorial for a non-negative integer n.\"\"\"\n    if n < 0:\n        raise ValueError(\"n must be a positive integer\")\n    if n < 0:\n        raise ValueError(\"n must be a positive integer\")\n    elif n == 0:\n        return 1\n    else:\n        return n * factorial(n-1)\n",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "task": "fibonacci",
+      "reference_loss": 0.4088904857635498,
+      "greedy": {
+        "code": "def fibonacci(n):\n    \"\"\"Return the n-th Fibonacci number, where fibonacci(0) is 0 and fibonacci(1) is 1.\"\"\"\n    return n * fibonacci(n - 1)\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def fibonacci(n):\n    \"\"\"Return the n-th Fibonacci number, where fibonacci(0) is 0 and fibonacci(1) is 1.\"\"\"\n    return n * fibonacci(n - 1)\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    \"\"\"Return the n-th Fibonacci number, where fibonacci(0) is 0 and fibonacci(1) is 1.\"\"\"\n    return n - fibonacci(n - 1)\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    \"\"\"Return the n-th Fibonacci number, where fibonacci(0) is 0 and fibonacci(1) is 1.\"\"\"\n    if n == 0:\n        return 1\n    else:\n        return fibonacci(n - 1) + fibonacci(n - 1)\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    \"\"\"Return the n-th Fibonacci number, where fibonacci(0) is 0 and fibonacci(1) is 1.\"\"\"\n    return n + fibonacci(n-1)\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    \"\"\"Return the n-th Fibonacci number, where fibonacci(0) is 0 and fibonacci(1) is 1.\"\"\"\n    return fibonacci(n-1) + fibonacci(n-2)\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    \"\"\"Return the n-th Fibonacci number, where fibonacci(0) is 0 and fibonacci(1) is 1.\"\"\"\n    return n + fibonacci(n - 1)\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    \"\"\"Return the n-th Fibonacci number, where fibonacci(0) is 0 and fibonacci(1) is 1.\"\"\"\n    return n\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    \"\"\"Return the n-th Fibonacci number, where fibonacci(0) is 0 and fibonacci(1) is 1.\"\"\"\n    n = 0\n    fib_recursive = 0\n    for _ in range(10):\n        fib_recursive += 1\n        fib_recursive += 1\n        fib_recursive = 1\n    fib_recursive += 1\n    return fib_recursive\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    \"\"\"Return the n-th Fibonacci number, where fibonacci(0) is 0 and fibonacci(1) is 1.\"\"\"\n    return n\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    \"\"\"Return the n-th Fibonacci number, where fibonacci(0) is 0 and fibonacci(1) is 1.\"\"\"\n    if n == 0 or n == 1:\n        return 1\n    elif n == 1:\n        return n\n\n    fib_sequence = [0, 1]\n    fib_sequence.extend([0, 1])\n    fib_sequence.extend([0, 1])\n    fib_sequence.extend([0, 1])\n    fib_sequence.extend([1, 1])\n\n    return fib_sequence\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "is_palindrome",
+      "reference_loss": 0.11095397174358368,
+      "greedy": {
+        "code": "def is_palindrome(s):\n    \"\"\"Return True if the string s reads the same forwards and backwards, otherwise False.\"\"\"\n    return s == s[::-1]\n",
+        "passed": true
+      },
+      "samples": [
+        {
+          "code": "def is_palindrome(s):\n    \"\"\"Return True if the string s reads the same forwards and backwards, otherwise False.\"\"\"\n    return s == s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def is_palindrome(s):\n    \"\"\"Return True if the string s reads the same forwards and backwards, otherwise False.\"\"\"\n    return s == s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def is_palindrome(s):\n    \"\"\"Return True if the string s reads the same forwards and backwards, otherwise False.\"\"\"\n    return s == s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def is_palindrome(s):\n    \"\"\"Return True if the string s reads the same forwards and backwards, otherwise False.\"\"\"\n    return s.is_palindrome()\n",
+          "passed": false
+        },
+        {
+          "code": "def is_palindrome(s):\n    \"\"\"Return True if the string s reads the same forwards and backwards, otherwise False.\"\"\"\n    return s.lower().replace(' ', '') == s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def is_palindrome(s):\n    \"\"\"Return True if the string s reads the same forwards and backwards, otherwise False.\"\"\"\n    return s == s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def is_palindrome(s):\n    \"\"\"Return True if the string s reads the same forwards and backwards, otherwise False.\"\"\"\n    return s == s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def is_palindrome(s):\n    \"\"\"Return True if the string s reads the same forwards and backwards, otherwise False.\"\"\"\n    return s == s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def is_palindrome(s):\n    \"\"\"Return True if the string s reads the same forwards and backwards, otherwise False.\"\"\"\n    return s == s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def is_palindrome(s):\n    \"\"\"Return True if the string s reads the same forwards and backwards, otherwise False.\"\"\"\n    return s == s[::-1]\n",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "task": "first_element",
+      "reference_loss": 0.3290247917175293,
+      "greedy": {
+        "code": "def first_element(items):\n    \"\"\"Return the first element of a non-empty list.\"\"\"\n    return items[0]\n",
+        "passed": true
+      },
+      "samples": [
+        {
+          "code": "def first_element(items):\n    \"\"\"Return the first element of a non-empty list.\"\"\"\n    return [x for x in items if x]\n",
+          "passed": false
+        },
+        {
+          "code": "def first_element(items):\n    \"\"\"Return the first element of a non-empty list.\"\"\"\n    return items\n",
+          "passed": false
+        },
+        {
+          "code": "def first_element(items):\n    \"\"\"Return the first element of a non-empty list.\"\"\"\n    return items\n",
+          "passed": false
+        },
+        {
+          "code": "def first_element(items):\n    \"\"\"Return the first element of a non-empty list.\"\"\"\n    return items\n",
+          "passed": false
+        },
+        {
+          "code": "def first_element(items):\n    \"\"\"Return the first element of a non-empty list.\"\"\"\n    return items[0]\n",
+          "passed": true
+        },
+        {
+          "code": "def first_element(items):\n    \"\"\"Return the first element of a non-empty list.\"\"\"\n    return items[1] if items else -1\n",
+          "passed": false
+        },
+        {
+          "code": "def first_element(items):\n    \"\"\"Return the first element of a non-empty list.\"\"\"\n    return items[0]\n",
+          "passed": true
+        },
+        {
+          "code": "def first_element(items):\n    \"\"\"Return the first element of a non-empty list.\"\"\"\n    return items\n",
+          "passed": false
+        },
+        {
+          "code": "def first_element(items):\n    \"\"\"Return the first element of a non-empty list.\"\"\"\n    return items\n",
+          "passed": false
+        },
+        {
+          "code": "def first_element(items):\n    \"\"\"Return the first element of a non-empty list.\"\"\"\n    return items\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "last_element",
+      "reference_loss": 0.3555257320404053,
+      "greedy": {
+        "code": "def last_element(items):\n    \"\"\"Return the last element of a non-empty list.\"\"\"\n    return items\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def last_element(items):\n    \"\"\"Return the last element of a non-empty list.\"\"\"\n    last_element = items[0]\n    if items[0]:\n        last_element = items[1]\n    return last_element\n",
+          "passed": false
+        },
+        {
+          "code": "def last_element(items):\n    \"\"\"Return the last element of a non-empty list.\"\"\"\n    return items[0] if len(items) == 1 else []\n",
+          "passed": false
+        },
+        {
+          "code": "def last_element(items):\n    \"\"\"Return the last element of a non-empty list.\"\"\"\n    return items.index(items.pop())\n",
+          "passed": false
+        },
+        {
+          "code": "def last_element(items):\n    \"\"\"Return the last element of a non-empty list.\"\"\"\n    return sorted(items)\n",
+          "passed": false
+        },
+        {
+          "code": "def last_element(items):\n    \"\"\"Return the last element of a non-empty list.\"\"\"\n    return items[-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def last_element(items):\n    \"\"\"Return the last element of a non-empty list.\"\"\"\n    return items[::-1]\n",
+          "passed": false
+        },
+        {
+          "code": "def last_element(items):\n    \"\"\"Return the last element of a non-empty list.\"\"\"\n    return [item for item in items if item]\n",
+          "passed": false
+        },
+        {
+          "code": "def last_element(items):\n    \"\"\"Return the last element of a non-empty list.\"\"\"\n    return items[0]\n",
+          "passed": false
+        },
+        {
+          "code": "def last_element(items):\n    \"\"\"Return the last element of a non-empty list.\"\"\"\n    return items[-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def last_element(items):\n    \"\"\"Return the last element of a non-empty list.\"\"\"\n    return [item for item in items if item]\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "count_positive",
+      "reference_loss": 0.6268349289894104,
+      "greedy": {
+        "code": "def count_positive(numbers):\n    \"\"\"Return how many numbers in the list are greater than zero.\"\"\"\n    return sum(num for num in numbers if num > 0)\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def count_positive(numbers):\n    \"\"\"Return how many numbers in the list are greater than zero.\"\"\"\n    return numbers - count_positive(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_positive(numbers):\n    \"\"\"Return how many numbers in the list are greater than zero.\"\"\"\n    return max(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_positive(numbers):\n    \"\"\"Return how many numbers in the list are greater than zero.\"\"\"\n    return len(numbers) - 1\n",
+          "passed": false
+        },
+        {
+          "code": "def count_positive(numbers):\n    \"\"\"Return how many numbers in the list are greater than zero.\"\"\"\n    numbers_positive = numbers[0]\n    for num in numbers_positive:\n        if num > 0:\n            return num\n    return sum(numbers_positive) / len(numbers_positive)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_positive(numbers):\n    \"\"\"Return how many numbers in the list are greater than zero.\"\"\"\n    return sum(num for num in numbers if num == 0)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_positive(numbers):\n    \"\"\"Return how many numbers in the list are greater than zero.\"\"\"\n    return len(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_positive(numbers):\n    \"\"\"Return how many numbers in the list are greater than zero.\"\"\"\n    return (num ** 2 for num in numbers) if num == 0 else (num for num in numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_positive(numbers):\n    \"\"\"Return how many numbers in the list are greater than zero.\"\"\"\n    return sum(count(num) for num in numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_positive(numbers):\n    \"\"\"Return how many numbers in the list are greater than zero.\"\"\"\n    return len(numbers) - self.positive\n",
+          "passed": false
+        },
+        {
+          "code": "def count_positive(numbers):\n    \"\"\"Return how many numbers in the list are greater than zero.\"\"\"\n    return len(numbers)\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "celsius_to_fahrenheit",
+      "reference_loss": 1.2077052593231201,
+      "greedy": {
+        "code": "def celsius_to_fahrenheit(c):\n    \"\"\"Convert a temperature of c degrees Celsius to degrees Fahrenheit.\"\"\"\n    return (c - 32) * 5/9\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def celsius_to_fahrenheit(c):\n    \"\"\"Convert a temperature of c degrees Celsius to degrees Fahrenheit.\"\"\"\n    celsius = (c / 5) * 5/9  # degrees Celsius to Fahrenheit\n    return celsius\n",
+          "passed": false
+        },
+        {
+          "code": "def celsius_to_fahrenheit(c):\n    \"\"\"Convert a temperature of c degrees Celsius to degrees Fahrenheit.\"\"\"\n    c = 1.0\n    c /= 5.0\n",
+          "passed": false
+        },
+        {
+          "code": "def celsius_to_fahrenheit(c):\n    \"\"\"Convert a temperature of c degrees Celsius to degrees Fahrenheit.\"\"\"\n    return c * (c - 32) * C * (f - 32)\n",
+          "passed": false
+        },
+        {
+          "code": "def celsius_to_fahrenheit(c):\n    \"\"\"Convert a temperature of c degrees Celsius to degrees Fahrenheit.\"\"\"\n    return (c - 32) * (10) + 32 * (1 + 32) + 32 * (1 + 32)\n",
+          "passed": false
+        },
+        {
+          "code": "def celsius_to_fahrenheit(c):\n    \"\"\"Convert a temperature of c degrees Celsius to degrees Fahrenheit.\"\"\"\n    return (c - 32) * 5 * 9648  # (\u00b0F - 32) to Celsius\n",
+          "passed": false
+        },
+        {
+          "code": "def celsius_to_fahrenheit(c):\n    \"\"\"Convert a temperature of c degrees Celsius to degrees Fahrenheit.\"\"\"\n    c = (0.5 * 0.5) + 1.5 * 0.3 + 1.025\n",
+          "passed": false
+        },
+        {
+          "code": "def celsius_to_fahrenheit(c):\n    \"\"\"Convert a temperature of c degrees Celsius to degrees Fahrenheit.\"\"\"\n    return (c - 32) * Celsius_to_fahrenheit(c)\n",
+          "passed": false
+        },
+        {
+          "code": "def celsius_to_fahrenheit(c):\n    \"\"\"Convert a temperature of c degrees Celsius to degrees Fahrenheit.\"\"\"\n    return (c/2 * c / 2) + 32\n",
+          "passed": false
+        },
+        {
+          "code": "def celsius_to_fahrenheit(c):\n    \"\"\"Convert a temperature of c degrees Celsius to degrees Fahrenheit.\"\"\"\n    return celsius_to_fahrenheit(c)\n",
+          "passed": false
+        },
+        {
+          "code": "def celsius_to_fahrenheit(c):\n    \"\"\"Convert a temperature of c degrees Celsius to degrees Fahrenheit.\"\"\"\n    return (c / 5.0) * 5.0\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "is_prime",
+      "reference_loss": 0.361813485622406,
+      "greedy": {
+        "code": "def is_prime(n):\n    \"\"\"Return True if the integer n is a prime number, otherwise False.\"\"\"\n    return n % 2 == 0\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def is_prime(n):\n    \"\"\"Return True if the integer n is a prime number, otherwise False.\"\"\"\n    return n <= 1\n",
+          "passed": false
+        },
+        {
+          "code": "def is_prime(n):\n    \"\"\"Return True if the integer n is a prime number, otherwise False.\"\"\"\n    return n > 0\n",
+          "passed": false
+        },
+        {
+          "code": "def is_prime(n):\n    \"\"\"Return True if the integer n is a prime number, otherwise False.\"\"\"\n    if n < 0:\n        return False\n    return n % (n + 1) == 0\n",
+          "passed": false
+        },
+        {
+          "code": "def is_prime(n):\n    \"\"\"Return True if the integer n is a prime number, otherwise False.\"\"\"\n    if n < 2:\n        return False\n    if n > 2:\n        return True\n    if n == 2:\n        return True\n    if n % 2 == 0:\n        return True\n    if n % 3 == 0 or n % 5 == 0:\n        return False\n    return True\n",
+          "passed": false
+        },
+        {
+          "code": "def is_prime(n):\n    \"\"\"Return True if the integer n is a prime number, otherwise False.\"\"\"\n    return n > 0 and n % 2 == 0\n",
+          "passed": false
+        },
+        {
+          "code": "def is_prime(n):\n    \"\"\"Return True if the integer n is a prime number, otherwise False.\"\"\"\n    if n < 2:\n        return False\n    for i in range(2, n + 1):\n        if n % i == 0:\n            return False\n    return True\n",
+          "passed": false
+        },
+        {
+          "code": "def is_prime(n):\n    \"\"\"Return True if the integer n is a prime number, otherwise False.\"\"\"\n    return n > 1\n",
+          "passed": false
+        },
+        {
+          "code": "def is_prime(n):\n    \"\"\"Return True if the integer n is a prime number, otherwise False.\"\"\"\n\n    # Check prime number and prime number\n    if n < 2:\n        return False\n    # Check prime number and prime number\n    if n < 2:\n        return False\n    # Check prime number and prime number\n    if n + 1 in 1 and n + 2 == 2:\n        return False\n    # Check prime number and prime number\n    if n**2 < n:\n        return False\n    # Check prime number and prime number\n    if n + 2 > pi/2:\n        return False\n    # Check prime number and prime number\n    if n % i == 0:\n        return False\n    # Check prime number and prime number\n    if n + i < n + i(n - i)/2:\n        return False\n    # Check prime number and prime number, prime number\n    if n\n",
+          "passed": false
+        },
+        {
+          "code": "def is_prime(n):\n    \"\"\"Return True if the integer n is a prime number, otherwise False.\"\"\"\n    return n % 2 == 0\n",
+          "passed": false
+        },
+        {
+          "code": "def is_prime(n):\n    \"\"\"Return True if the integer n is a prime number, otherwise False.\"\"\"\n    return n > 0\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "find_max",
+      "reference_loss": 0.12908004224300385,
+      "greedy": {
+        "code": "def find_max(numbers):\n    \"\"\"Return the largest number in a non-empty list.\"\"\"\n    return max(numbers)\n",
+        "passed": true
+      },
+      "samples": [
+        {
+          "code": "def find_max(numbers):\n    \"\"\"Return the largest number in a non-empty list.\"\"\"\n    max_num = None\n    for num in numbers:\n        if num > max_num:\n            max_num = num\n            break\n    return max_num\n",
+          "passed": false
+        },
+        {
+          "code": "def find_max(numbers):\n    \"\"\"Return the largest number in a non-empty list.\"\"\"\n    return max(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def find_max(numbers):\n    \"\"\"Return the largest number in a non-empty list.\"\"\"\n    if numbers[0] > numbers[1]:\n        return None\n    else:\n        return max(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def find_max(numbers):\n    \"\"\"Return the largest number in a non-empty list.\"\"\"\n    return max(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def find_max(numbers):\n    \"\"\"Return the largest number in a non-empty list.\"\"\"\n    if not numbers:\n        return 0\n    return max(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def find_max(numbers):\n    \"\"\"Return the largest number in a non-empty list.\"\"\"\n    return max(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def find_max(numbers):\n    \"\"\"Return the largest number in a non-empty list.\"\"\"\n    return max(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def find_max(numbers):\n    \"\"\"Return the largest number in a non-empty list.\"\"\"\n    return max(numbers) - max(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def find_max(numbers):\n    \"\"\"Return the largest number in a non-empty list.\"\"\"\n    if not numbers:\n        return 0\n    else:\n        return max(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def find_max(numbers):\n    \"\"\"Return the largest number in a non-empty list.\"\"\"\n    if numbers:\n        return max(numbers)\n    else:\n        raise ValueError(\"Both numbers in the list cannot be larger.\")\n",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "task": "find_min",
+      "reference_loss": 0.2204427719116211,
+      "greedy": {
+        "code": "def find_min(numbers):\n    \"\"\"Return the smallest number in a non-empty list.\"\"\"\n    return min(numbers)\n",
+        "passed": true
+      },
+      "samples": [
+        {
+          "code": "def find_min(numbers):\n    \"\"\"Return the smallest number in a non-empty list.\"\"\"\n    return min(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def find_min(numbers):\n    \"\"\"Return the smallest number in a non-empty list.\"\"\"\n    return min(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def find_min(numbers):\n    \"\"\"Return the smallest number in a non-empty list.\"\"\"\n    if not numbers:\n        raise ValueError(\"Input list is empty\")\n    return min(numations)\n",
+          "passed": false
+        },
+        {
+          "code": "def find_min(numbers):\n    \"\"\"Return the smallest number in a non-empty list.\"\"\"\n    return min(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def find_min(numbers):\n    \"\"\"Return the smallest number in a non-empty list.\"\"\"\n    return number if num % 2 == 0 else -1\n",
+          "passed": false
+        },
+        {
+          "code": "def find_min(numbers):\n    \"\"\"Return the smallest number in a non-empty list.\"\"\"\n    return max(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def find_min(numbers):\n    \"\"\"Return the smallest number in a non-empty list.\"\"\"\n    return min(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def find_min(numbers):\n    \"\"\"Return the smallest number in a non-empty list.\"\"\"\n    return min(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def find_min(numbers):\n    \"\"\"Return the smallest number in a non-empty list.\"\"\"\n    return min(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def find_min(numbers):\n    \"\"\"Return the smallest number in a non-empty list.\"\"\"\n    return min(numbers)\n",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "task": "remove_duplicates",
+      "reference_loss": 1.136690616607666,
+      "greedy": {
+        "code": "def remove_duplicates(items):\n    \"\"\"Return a new list with duplicates removed, keeping the first occurrence of each element in its original order.\"\"\"\n    seen = set()\n    for item in items:\n        if item in seen:\n            seen.add(item)\n        seen.add(item)\n    return seen\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def remove_duplicates(items):\n    \"\"\"Return a new list with duplicates removed, keeping the first occurrence of each element in its original order.\"\"\"\n    seen = set()\n    for obj in items:\n        if obj in seen:\n            seen.add(obj)\n            seen.add(obj)\n            seen.add(obj)\n    return seen\n",
+          "passed": false
+        },
+        {
+          "code": "def remove_duplicates(items):\n    \"\"\"Return a new list with duplicates removed, keeping the first occurrence of each element in its original order.\"\"\"\n    return [item for item in items if item == item]\n",
+          "passed": false
+        },
+        {
+          "code": "def remove_duplicates(items):\n    \"\"\"Return a new list with duplicates removed, keeping the first occurrence of each element in its original order.\"\"\"\n    seen = set()\n    for item in items:\n        seen.add(item)\n        seen.add(item)\n    return seen\n",
+          "passed": false
+        },
+        {
+          "code": "def remove_duplicates(items):\n    \"\"\"Return a new list with duplicates removed, keeping the first occurrence of each element in its original order.\"\"\"\n    seen = set()\n    for key, value in items:\n        if key in item:\n            seen.add(item[key])\n            seen.add(key)\n            seen.add(key)\n    return seen\n",
+          "passed": false
+        },
+        {
+          "code": "def remove_duplicates(items):\n    \"\"\"Return a new list with duplicates removed, keeping the first occurrence of each element in its original order.\"\"\"\n    seen = set()\n    seen.add(items)\n    return [item for item, count in seen.items() if count == 0]\n",
+          "passed": false
+        },
+        {
+          "code": "def remove_duplicates(items):\n    \"\"\"Return a new list with duplicates removed, keeping the first occurrence of each element in its original order.\"\"\"\n    seen = set()\n    for item in items:\n        seen.add(item)\n        seen.add(item)\n    return seen\n",
+          "passed": false
+        },
+        {
+          "code": "def remove_duplicates(items):\n    \"\"\"Return a new list with duplicates removed, keeping the first occurrence of each element in its original order.\"\"\"\n    seen = set()\n    for item in items:\n        if item not in seen:\n            return [item]\n        seen.add(item)\n    return []\n",
+          "passed": false
+        },
+        {
+          "code": "def remove_duplicates(items):\n    \"\"\"Return a new list with duplicates removed, keeping the first occurrence of each element in its original order.\"\"\"\n    return [item for item in items if item not in item]\n",
+          "passed": false
+        },
+        {
+          "code": "def remove_duplicates(items):\n    \"\"\"Return a new list with duplicates removed, keeping the first occurrence of each element in its original order.\"\"\"\n    seen = set()\n    for item in items:\n        if item in seen:\n            return item\n        seen.add(item)\n    return list(seen)\n",
+          "passed": false
+        },
+        {
+          "code": "def remove_duplicates(items):\n    \"\"\"Return a new list with duplicates removed, keeping the first occurrence of each element in its original order.\"\"\"\n    for item in items:\n        if item not in item:\n            return item\n\n    return item\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "count_words",
+      "reference_loss": 0.4321014881134033,
+      "greedy": {
+        "code": "def count_words(s):\n    \"\"\"Return the number of words in the string s, where words are separated by whitespace.\"\"\"\n    return sum(1 for word in s.split() if word.isalpha())\n",
+        "passed": true
+      },
+      "samples": [
+        {
+          "code": "def count_words(s):\n    \"\"\"Return the number of words in the string s, where words are separated by whitespace.\"\"\"\n    return sum(1 for word in s.split() if word not in word_count[word] and len(word) == SUM_WHITESPACE.count())\n",
+          "passed": false
+        },
+        {
+          "code": "def count_words(s):\n    \"\"\"Return the number of words in the string s, where words are separated by whitespace.\"\"\"\n    return len(sentence.split())\n",
+          "passed": false
+        },
+        {
+          "code": "def count_words(s):\n    \"\"\"Return the number of words in the string s, where words are separated by whitespace.\"\"\"\n    return len(s)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_words(s):\n    \"\"\"Return the number of words in the string s, where words are separated by whitespace.\"\"\"\n    words = s.split()\n    return words[0], len(words)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_words(s):\n    \"\"\"Return the number of words in the string s, where words are separated by whitespace.\"\"\"\n    word_counts = {}\n    for word in s:\n        if word in word_counts:\n            word_counts[word] += 1\n        else:\n            word_counts[word] = 1\n    return word_counts\n",
+          "passed": false
+        },
+        {
+          "code": "def count_words(s):\n    \"\"\"Return the number of words in the string s, where words are separated by whitespace.\"\"\"\n    return sum(int(word) for word in s.split())\n",
+          "passed": false
+        },
+        {
+          "code": "def count_words(s):\n    \"\"\"Return the number of words in the string s, where words are separated by whitespace.\"\"\"\n    return len(s.split())\n",
+          "passed": true
+        },
+        {
+          "code": "def count_words(s):\n    \"\"\"Return the number of words in the string s, where words are separated by whitespace.\"\"\"\n    return sum(1 for char in s if char in ' ' and char in ' ' and char in ')]\n",
+          "passed": false
+        },
+        {
+          "code": "def count_words(s):\n    \"\"\"Return the number of words in the string s, where words are separated by whitespace.\"\"\"\n    return sum(1 for _ in range(len(s)) if s.isalpha())\n",
+          "passed": false
+        },
+        {
+          "code": "def count_words(s):\n    \"\"\"Return the number of words in the string s, where words are separated by whitespace.\"\"\"\n    words = s.split()\n    words.sort()\n    return words[::-1]\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "capitalize_words",
+      "reference_loss": 1.5057059526443481,
+      "greedy": {
+        "code": "def capitalize_words(s):\n    \"\"\"Return s with the first letter of every word in upper case.\"\"\"\n    return s.lower()\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def capitalize_words(s):\n    \"\"\"Return s with the first letter of every word in upper case.\"\"\"\n    return s.capitalize()\n",
+          "passed": false
+        },
+        {
+          "code": "def capitalize_words(s):\n    \"\"\"Return s with the first letter of every word in upper case.\"\"\"\n    return s[0]\n",
+          "passed": false
+        },
+        {
+          "code": "def capitalize_words(s):\n    \"\"\"Return s with the first letter of every word in upper case.\"\"\"\n    return ' '.join(word.capitalize() for word in s.split())\n",
+          "passed": true
+        },
+        {
+          "code": "def capitalize_words(s):\n    \"\"\"Return s with the first letter of every word in upper case.\"\"\"\n    return s[len(s):]\n",
+          "passed": false
+        },
+        {
+          "code": "def capitalize_words(s):\n    \"\"\"Return s with the first letter of every word in upper case.\"\"\"\n    return s[0]\n",
+          "passed": false
+        },
+        {
+          "code": "def capitalize_words(s):\n    \"\"\"Return s with the first letter of every word in upper case.\"\"\"\n    return s.lower()\n",
+          "passed": false
+        },
+        {
+          "code": "def capitalize_words(s):\n    \"\"\"Return s with the first letter of every word in upper case.\"\"\"\n    return s[0]\n",
+          "passed": false
+        },
+        {
+          "code": "def capitalize_words(s):\n    \"\"\"Return s with the first letter of every word in upper case.\"\"\"\n    return s.lower()\n",
+          "passed": false
+        },
+        {
+          "code": "def capitalize_words(s):\n    \"\"\"Return s with the first letter of every word in upper case.\"\"\"\n    return s.lower()\n",
+          "passed": false
+        },
+        {
+          "code": "def capitalize_words(s):\n    \"\"\"Return s with the first letter of every word in upper case.\"\"\"\n    words = s.split()\n    return ' '.join(words)\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "double_list",
+      "reference_loss": 0.42360779643058777,
+      "greedy": {
+        "code": "def double_list(numbers):\n    \"\"\"Return a new list with every number multiplied by 2.\"\"\"\n    return [num ** 2 for num in numbers]\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def double_list(numbers):\n    \"\"\"Return a new list with every number multiplied by 2.\"\"\"\n    return numbers.filter(numbers).count(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def double_list(numbers):\n    \"\"\"Return a new list with every number multiplied by 2.\"\"\"\n    return [num ** 2]\n",
+          "passed": false
+        },
+        {
+          "code": "def double_list(numbers):\n    \"\"\"Return a new list with every number multiplied by 2.\"\"\"\n    return [num for num in numbers if num % 2 == 0]\n",
+          "passed": false
+        },
+        {
+          "code": "def double_list(numbers):\n    \"\"\"Return a new list with every number multiplied by 2.\"\"\"\n    return [num ** 2 for num in numbers]\n",
+          "passed": false
+        },
+        {
+          "code": "def double_list(numbers):\n    \"\"\"Return a new list with every number multiplied by 2.\"\"\"\n    return [num ** 2 for num in numbers] + [num ** 2]\n",
+          "passed": false
+        },
+        {
+          "code": "def double_list(numbers):\n    \"\"\"Return a new list with every number multiplied by 2.\"\"\"\n    return [num for num in numbers if num % 2 == 0]\n",
+          "passed": false
+        },
+        {
+          "code": "def double_list(numbers):\n    \"\"\"Return a new list with every number multiplied by 2.\"\"\"\n    return [num * 2 for num in numbers]\n",
+          "passed": true
+        },
+        {
+          "code": "def double_list(numbers):\n    \"\"\"Return a new list with every number multiplied by 2.\"\"\"\n    return [num for num in numbers if num % 2 == 0]\n",
+          "passed": false
+        },
+        {
+          "code": "def double_list(numbers):\n    \"\"\"Return a new list with every number multiplied by 2.\"\"\"\n    return [num ** 2 for num in numbers]\n",
+          "passed": false
+        },
+        {
+          "code": "def double_list(numbers):\n    \"\"\"Return a new list with every number multiplied by 2.\"\"\"\n    return [num for num in numbers if num % 2 == 0]\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "filter_even",
+      "reference_loss": 0.4282030761241913,
+      "greedy": {
+        "code": "def filter_even(numbers):\n    \"\"\"Return a list of the even numbers in numbers, in their original order.\"\"\"\n    return [num for num in numbers if num % 2 == 0]\n",
+        "passed": true
+      },
+      "samples": [
+        {
+          "code": "def filter_even(numbers):\n    \"\"\"Return a list of the even numbers in numbers, in their original order.\"\"\"\n    return [num for num in nums if num % 2 != 0]\n",
+          "passed": false
+        },
+        {
+          "code": "def filter_even(numbers):\n    \"\"\"Return a list of the even numbers in numbers, in their original order.\"\"\"\n    return [num for num in numbers if num % 2 == 0]\n",
+          "passed": true
+        },
+        {
+          "code": "def filter_even(numbers):\n    \"\"\"Return a list of the even numbers in numbers, in their original order.\"\"\"\n    return [num for num in numbers if num % 2 == 0]\n",
+          "passed": true
+        },
+        {
+          "code": "def filter_even(numbers):\n    \"\"\"Return a list of the even numbers in numbers, in their original order.\"\"\"\n    return sorted(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def filter_even(numbers):\n    \"\"\"Return a list of the even numbers in numbers, in their original order.\"\"\"\n    return [num for num in numbers if num % 2 == 0]\n",
+          "passed": true
+        },
+        {
+          "code": "def filter_even(numbers):\n    \"\"\"Return a list of the even numbers in numbers, in their original order.\"\"\"\n    return [num for num in numbers if num % 2 == 0 and num % 3 == 0]\n",
+          "passed": false
+        },
+        {
+          "code": "def filter_even(numbers):\n    \"\"\"Return a list of the even numbers in numbers, in their original order.\"\"\"\n    return [num for num in numbers if num % 2 != 0]\n",
+          "passed": false
+        },
+        {
+          "code": "def filter_even(numbers):\n    \"\"\"Return a list of the even numbers in numbers, in their original order.\"\"\"\n    return [num for num in numbers if num % 2 != 0]\n",
+          "passed": false
+        },
+        {
+          "code": "def filter_even(numbers):\n    \"\"\"Return a list of the even numbers in numbers, in their original order.\"\"\"\n    return [num for num in numbers if num % 2 == 1]\n",
+          "passed": false
+        },
+        {
+          "code": "def filter_even(numbers):\n    \"\"\"Return a list of the even numbers in numbers, in their original order.\"\"\"\n    return [num for num in numbers if num % 2 != 1]\n",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "task": "sum_of_digits",
+      "reference_loss": 0.7221998572349548,
+      "greedy": {
+        "code": "def sum_of_digits(n):\n    \"\"\"Return the sum of the decimal digits of a non-negative integer n.\"\"\"\n    return n * (n + 1) // 2\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def sum_of_digits(n):\n    \"\"\"Return the sum of the decimal digits of a non-negative integer n.\"\"\"\n    return sum(p for p in range(1, n+1) if n % 2 != 0)\n",
+          "passed": false
+        },
+        {
+          "code": "def sum_of_digits(n):\n    \"\"\"Return the sum of the decimal digits of a non-negative integer n.\"\"\"\n    return ''.join(str(i) for i in range(1, n + 1))\n",
+          "passed": false
+        },
+        {
+          "code": "def sum_of_digits(n):\n    \"\"\"Return the sum of the decimal digits of a non-negative integer n.\"\"\"\n    return n ** 2\n",
+          "passed": false
+        },
+        {
+          "code": "def sum_of_digits(n):\n    \"\"\"Return the sum of the decimal digits of a non-negative integer n.\"\"\"\n    return n ** 2\n",
+          "passed": false
+        },
+        {
+          "code": "def sum_of_digits(n):\n    \"\"\"Return the sum of the decimal digits of a non-negative integer n.\"\"\"\n    if n <= 0:\n        raise ValueError(\"Negative integer n is not positive\")\n    return n * (n - 1) * (-1)\n",
+          "passed": false
+        },
+        {
+          "code": "def sum_of_digits(n):\n    \"\"\"Return the sum of the decimal digits of a non-negative integer n.\"\"\"\n    return n / (n - 1)\n",
+          "passed": false
+        },
+        {
+          "code": "def sum_of_digits(n):\n    \"\"\"Return the sum of the decimal digits of a non-negative integer n.\"\"\"\n    return n * (n - 1) + n * (n - 1)\n",
+          "passed": false
+        },
+        {
+          "code": "def sum_of_digits(n):\n    \"\"\"Return the sum of the decimal digits of a non-negative integer n.\"\"\"\n    if n == 0:\n        return '0'\n    return n*(n - 1)//2\n",
+          "passed": false
+        },
+        {
+          "code": "def sum_of_digits(n):\n    \"\"\"Return the sum of the decimal digits of a non-negative integer n.\"\"\"\n    return n / (2 * (n - 1) * 2)\n",
+          "passed": false
+        },
+        {
+          "code": "def sum_of_digits(n):\n    \"\"\"Return the sum of the decimal digits of a non-negative integer n.\"\"\"\n    return n // (n + 1)\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "gcd",
+      "reference_loss": 0.323717325925827,
+      "greedy": {
+        "code": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers a and b.\"\"\"\n    return a - b\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers a and b.\"\"\"\n    if not a:\n        return 0\n\n    p = a + b\n    print(f\"The greatest common divisor of {a} and {b} is {p}\")\n",
+          "passed": false
+        },
+        {
+          "code": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers a and b.\"\"\"\n    return a / b\n",
+          "passed": false
+        },
+        {
+          "code": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers a and b.\"\"\"\n    a, b = b, a % b\n    return a\n",
+          "passed": false
+        },
+        {
+          "code": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers a and b.\"\"\"\n    if a == b:\n        return 0\n    else:\n        return a % b\n",
+          "passed": false
+        },
+        {
+          "code": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers a and b.\"\"\"\n    a, b = a, b\n    for i in range(len(a) - 2, -1, -2):\n        if a - b > a and b - a > b:\n            return a\n    return a\n",
+          "passed": false
+        },
+        {
+          "code": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers a and b.\"\"\"\n    if a != b:\n        return a\n    else:\n        return b + gcd(b, a % b)\n",
+          "passed": false
+        },
+        {
+          "code": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers a and b.\"\"\"\n    if a == b:\n        return a\n    else:\n        return b\n",
+          "passed": false
+        },
+        {
+          "code": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers a and b.\"\"\"\n    if a > a and b > a:\n        raise ValueError(\"Both a and b must be positive integers.\")\n\n    return a ** a\n",
+          "passed": false
+        },
+        {
+          "code": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers a and b.\"\"\"\n    if a > b:\n        if b == 0:\n            return None\n        return a - b\n\n    return a\n",
+          "passed": false
+        },
+        {
+          "code": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers a and b.\"\"\"\n    return a * b\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "power",
+      "reference_loss": 0.6376135945320129,
+      "greedy": {
+        "code": "def power(base, exp):\n    \"\"\"Return base raised to the power exp, for a non-negative integer exp.\"\"\"\n    return base * exp\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def power(base, exp):\n    \"\"\"Return base raised to the power exp, for a non-negative integer exp.\"\"\"\n    return base * exp\n",
+          "passed": false
+        },
+        {
+          "code": "def power(base, exp):\n    \"\"\"Return base raised to the power exp, for a non-negative integer exp.\"\"\"\n    if base > exp:\n        return base\n    else:\n        return base\n",
+          "passed": false
+        },
+        {
+          "code": "def power(base, exp):\n    \"\"\"Return base raised to the power exp, for a non-negative integer exp.\"\"\"\n    return exp - exp\n",
+          "passed": false
+        },
+        {
+          "code": "def power(base, exp):\n    \"\"\"Return base raised to the power exp, for a non-negative integer exp.\"\"\"\n    return base * (1 - exp ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **** ** ** ****** ****** ****** **** ** ******\n    return _f\"(a * b) * ** ************ ******** ** ** ** ******************** **** **** ******** ****  ************ ** **** ** ** ** ** ******************************\n",
+          "passed": false
+        },
+        {
+          "code": "def power(base, exp):\n    \"\"\"Return base raised to the power exp, for a non-negative integer exp.\"\"\"\n    return base ** exp\n",
+          "passed": true
+        },
+        {
+          "code": "def power(base, exp):\n    \"\"\"Return base raised to the power exp, for a non-negative integer exp.\"\"\"\n    return base * exp\n",
+          "passed": false
+        },
+        {
+          "code": "def power(base, exp):\n    \"\"\"Return base raised to the power exp, for a non-negative integer exp.\"\"\"\n    if exp == 0:\n        return 1\n    return base * exp\n",
+          "passed": false
+        },
+        {
+          "code": "def power(base, exp):\n    \"\"\"Return base raised to the power exp, for a non-negative integer exp.\"\"\"\n    if base > 2:\n        return base\n    else:\n        return base * exp\n",
+          "passed": false
+        },
+        {
+          "code": "def power(base, exp):\n    \"\"\"Return base raised to the power exp, for a non-negative integer exp.\"\"\"\n    if base == exp:\n        return base\n    elif base > 1:\n        return base\n    else:\n        return exp\n",
+          "passed": false
+        },
+        {
+          "code": "def power(base, exp):\n    \"\"\"Return base raised to the power exp, for a non-negative integer exp.\"\"\"\n    return base * exp\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "absolute_value",
+      "reference_loss": 1.6975231170654297,
+      "greedy": {
+        "code": "def absolute_value(x):\n    \"\"\"Return the absolute value of x.\"\"\"\n    return x\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def absolute_value(x):\n    \"\"\"Return the absolute value of x.\"\"\"\n    return x\n",
+          "passed": false
+        },
+        {
+          "code": "def absolute_value(x):\n    \"\"\"Return the absolute value of x.\"\"\"\n    return x.abs()\n",
+          "passed": false
+        },
+        {
+          "code": "def absolute_value(x):\n    \"\"\"Return the absolute value of x.\"\"\"\n    return x\n",
+          "passed": false
+        },
+        {
+          "code": "def absolute_value(x):\n    \"\"\"Return the absolute value of x.\"\"\"\n    return x\n",
+          "passed": false
+        },
+        {
+          "code": "def absolute_value(x):\n    \"\"\"Return the absolute value of x.\"\"\"\n    return x\n",
+          "passed": false
+        },
+        {
+          "code": "def absolute_value(x):\n    \"\"\"Return the absolute value of x.\"\"\"\n    return x\n",
+          "passed": false
+        },
+        {
+          "code": "def absolute_value(x):\n    \"\"\"Return the absolute value of x.\"\"\"\n    return x\n",
+          "passed": false
+        },
+        {
+          "code": "def absolute_value(x):\n    \"\"\"Return the absolute value of x.\"\"\"\n    return x\n",
+          "passed": false
+        },
+        {
+          "code": "def absolute_value(x):\n    \"\"\"Return the absolute value of x.\"\"\"\n    return x\n",
+          "passed": false
+        },
+        {
+          "code": "def absolute_value(x):\n    \"\"\"Return the absolute value of x.\"\"\"\n    return x\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "contains",
+      "reference_loss": 1.0512953996658325,
+      "greedy": {
+        "code": "def contains(items, value):\n    \"\"\"Return True if value is in the list items, otherwise False.\"\"\"\n    return items == value\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def contains(items, value):\n    \"\"\"Return True if value is in the list items, otherwise False.\"\"\"\n    if items:\n        return True\n    else:\n        return False\n",
+          "passed": false
+        },
+        {
+          "code": "def contains(items, value):\n    \"\"\"Return True if value is in the list items, otherwise False.\"\"\"\n    return items is not None\n",
+          "passed": false
+        },
+        {
+          "code": "def contains(items, value):\n    \"\"\"Return True if value is in the list items, otherwise False.\"\"\"\n    return True\n",
+          "passed": false
+        },
+        {
+          "code": "def contains(items, value):\n    \"\"\"Return True if value is in the list items, otherwise False.\"\"\"\n    return len(items) == len(items)\n",
+          "passed": false
+        },
+        {
+          "code": "def contains(items, value):\n    \"\"\"Return True if value is in the list items, otherwise False.\"\"\"\n    return items.index(key) == value\n",
+          "passed": false
+        },
+        {
+          "code": "def contains(items, value):\n    \"\"\"Return True if value is in the list items, otherwise False.\"\"\"\n    return items in items\n",
+          "passed": false
+        },
+        {
+          "code": "def contains(items, value):\n    \"\"\"Return True if value is in the list items, otherwise False.\"\"\"\n    return items == value\n",
+          "passed": false
+        },
+        {
+          "code": "def contains(items, value):\n    \"\"\"Return True if value is in the list items, otherwise False.\"\"\"\n    return len(items) == 0\n",
+          "passed": false
+        },
+        {
+          "code": "def contains(items, value):\n    \"\"\"Return True if value is in the list items, otherwise False.\"\"\"\n    return True\n",
+          "passed": false
+        },
+        {
+          "code": "def contains(items, value):\n    \"\"\"Return True if value is in the list items, otherwise False.\"\"\"\n    return len(items) == 0\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "index_of",
+      "reference_loss": 0.4903795123100281,
+      "greedy": {
+        "code": "def index_of(items, value):\n    \"\"\"Return the index of the first occurrence of value in items, or -1 if it is not present.\"\"\"\n    return items[value]\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def index_of(items, value):\n    \"\"\"Return the index of the first occurrence of value in items, or -1 if it is not present.\"\"\"\n    if items[value] is not None:\n        return index\n    elif len(items) > 1:\n        return index\n    else:\n        return -1\n",
+          "passed": false
+        },
+        {
+          "code": "def index_of(items, value):\n    \"\"\"Return the index of the first occurrence of value in items, or -1 if it is not present.\"\"\"\n    return items[value]\n",
+          "passed": false
+        },
+        {
+          "code": "def index_of(items, value):\n    \"\"\"Return the index of the first occurrence of value in items, or -1 if it is not present.\"\"\"\n    return items.index(value)\n",
+          "passed": false
+        },
+        {
+          "code": "def index_of(items, value):\n    \"\"\"Return the index of the first occurrence of value in items, or -1 if it is not present.\"\"\"\n    if isinstance(items, list):\n        return items[0]\n    else:\n        return 0\n",
+          "passed": false
+        },
+        {
+          "code": "def index_of(items, value):\n    \"\"\"Return the index of the first occurrence of value in items, or -1 if it is not present.\"\"\"\n    return items.index(value)\n",
+          "passed": false
+        },
+        {
+          "code": "def index_of(items, value):\n    \"\"\"Return the index of the first occurrence of value in items, or -1 if it is not present.\"\"\"\n    if not items or value == value:\n        return -1\n    return -1\n",
+          "passed": false
+        },
+        {
+          "code": "def index_of(items, value):\n    \"\"\"Return the index of the first occurrence of value in items, or -1 if it is not present.\"\"\"\n    return items[value]\n",
+          "passed": false
+        },
+        {
+          "code": "def index_of(items, value):\n    \"\"\"Return the index of the first occurrence of value in items, or -1 if it is not present.\"\"\"\n    return items[value]\n",
+          "passed": false
+        },
+        {
+          "code": "def index_of(items, value):\n    \"\"\"Return the index of the first occurrence of value in items, or -1 if it is not present.\"\"\"\n    if len(items) == 0:\n        return None\n    for item in items:\n        if item[0] > value:\n            return None\n    return item\n",
+          "passed": false
+        },
+        {
+          "code": "def index_of(items, value):\n    \"\"\"Return the index of the first occurrence of value in items, or -1 if it is not present.\"\"\"\n    if items is None:\n        return -1\n    else:\n        return 0\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "merge_lists",
+      "reference_loss": 0.8659551739692688,
+      "greedy": {
+        "code": "def merge_lists(a, b):\n    \"\"\"Return a new list with the elements of a followed by the elements of b.\"\"\"\n    return [a, b]\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def merge_lists(a, b):\n    \"\"\"Return a new list with the elements of a followed by the elements of b.\"\"\"\n    return [a, b]\n",
+          "passed": false
+        },
+        {
+          "code": "def merge_lists(a, b):\n    \"\"\"Return a new list with the elements of a followed by the elements of b.\"\"\"\n    return [a for a, b in zip(a, b)]\n",
+          "passed": false
+        },
+        {
+          "code": "def merge_lists(a, b):\n    \"\"\"Return a new list with the elements of a followed by the elements of b.\"\"\"\n    return [element for element in a if element == b]\n",
+          "passed": false
+        },
+        {
+          "code": "def merge_lists(a, b):\n    \"\"\"Return a new list with the elements of a followed by the elements of b.\"\"\"\n    result = []\n\n    for i in range(len(a) - 2):\n        result.append(a)\n\n    return result\n",
+          "passed": false
+        },
+        {
+          "code": "def merge_lists(a, b):\n    \"\"\"Return a new list with the elements of a followed by the elements of b.\"\"\"\n    left_element = a.left\n    right_element = b.right\n    right_element = b.right\n\n    return a, b\n",
+          "passed": false
+        },
+        {
+          "code": "def merge_lists(a, b):\n    \"\"\"Return a new list with the elements of a followed by the elements of b.\"\"\"\n    return a + b\n",
+          "passed": true
+        },
+        {
+          "code": "def merge_lists(a, b):\n    \"\"\"Return a new list with the elements of a followed by the elements of b.\"\"\"\n    return [element for element in a if isinstance(element, list) and isinstance(element, list)]\n",
+          "passed": false
+        },
+        {
+          "code": "def merge_lists(a, b):\n    \"\"\"Return a new list with the elements of a followed by the elements of b.\"\"\"\n    return sorted(a, reverse=True)\n",
+          "passed": false
+        },
+        {
+          "code": "def merge_lists(a, b):\n    \"\"\"Return a new list with the elements of a followed by the elements of b.\"\"\"\n    n = len(a)\n    n //= len(set(range(n)))\n    result = [a[n:] for a in a]\n    result.extend(sublist(n, a, b))\n    return result\n",
+          "passed": false
+        },
+        {
+          "code": "def merge_lists(a, b):\n    \"\"\"Return a new list with the elements of a followed by the elements of b.\"\"\"\n    return a + b\n",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "task": "char_frequency",
+      "reference_loss": 0.33271512389183044,
+      "greedy": {
+        "code": "def char_frequency(s):\n    \"\"\"Return a dictionary that maps each character in s to the number of times it appears.\"\"\"\n    return {char: count for char in s}\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def char_frequency(s):\n    \"\"\"Return a dictionary that maps each character in s to the number of times it appears.\"\"\"\n    if s in s:\n        return s[s]\n    else:\n        return s\n",
+          "passed": false
+        },
+        {
+          "code": "def char_frequency(s):\n    \"\"\"Return a dictionary that maps each character in s to the number of times it appears.\"\"\"\n    return {char: value for char, value in s.items()}\n",
+          "passed": false
+        },
+        {
+          "code": "def char_frequency(s):\n    \"\"\"Return a dictionary that maps each character in s to the number of times it appears.\"\"\"\n    return {char: int(s.count(char)) for char in s}\n",
+          "passed": true
+        },
+        {
+          "code": "def char_frequency(s):\n    \"\"\"Return a dictionary that maps each character in s to the number of times it appears.\"\"\"\n    return {char: count for char in s}\n",
+          "passed": false
+        },
+        {
+          "code": "def char_frequency(s):\n    \"\"\"Return a dictionary that maps each character in s to the number of times it appears.\"\"\"\n    return {char: num for char, num in s if num > 0}\n",
+          "passed": false
+        },
+        {
+          "code": "def char_frequency(s):\n    \"\"\"Return a dictionary that maps each character in s to the number of times it appears.\"\"\"\n    return {char: count for char in s}\n",
+          "passed": false
+        },
+        {
+          "code": "def char_frequency(s):\n    \"\"\"Return a dictionary that maps each character in s to the number of times it appears.\"\"\"\n    char_freq = {}\n    for char in s:\n        char_freq[char] = 2\n    return char_freq\n",
+          "passed": false
+        },
+        {
+          "code": "def char_frequency(s):\n    \"\"\"Return a dictionary that maps each character in s to the number of times it appears.\"\"\"\n    return s.count(char)\n",
+          "passed": false
+        },
+        {
+          "code": "def char_frequency(s):\n    \"\"\"Return a dictionary that maps each character in s to the number of times it appears.\"\"\"\n    return sum(char) / len(s)\n",
+          "passed": false
+        },
+        {
+          "code": "def char_frequency(s):\n    \"\"\"Return a dictionary that maps each character in s to the number of times it appears.\"\"\"\n    return {char: count[char] for char in s}\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "is_sorted",
+      "reference_loss": 0.46615779399871826,
+      "greedy": {
+        "code": "def is_sorted(numbers):\n    \"\"\"Return True if the list numbers is sorted in non-decreasing order, otherwise False.\"\"\"\n    return sorted(numbers) == sorted(numbers)\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def is_sorted(numbers):\n    \"\"\"Return True if the list numbers is sorted in non-decreasing order, otherwise False.\"\"\"\n    return sorted(numbers) == sorted(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def is_sorted(numbers):\n    \"\"\"Return True if the list numbers is sorted in non-decreasing order, otherwise False.\"\"\"\n    return sorted(numbers) == sorted(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def is_sorted(numbers):\n    \"\"\"Return True if the list numbers is sorted in non-decreasing order, otherwise False.\"\"\"\n    num_list = sorted(numbers)\n    return num_list == num_list\n",
+          "passed": false
+        },
+        {
+          "code": "def is_sorted(numbers):\n    \"\"\"Return True if the list numbers is sorted in non-decreasing order, otherwise False.\"\"\"\n    \"\"\"Return True if the list is sorted in order.\"\"\"\n    return sorted(numbers) == sorted(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def is_sorted(numbers):\n    \"\"\"Return True if the list numbers is sorted in non-decreasing order, otherwise False.\"\"\"\n    # Recursive approach with a sample list of numbers\n    sorted_numbers = sorted(numbers)\n\n    # Check if the list is sorted\n    if sorted_numbers == sorted_numbers:\n        return True\n\n    # Compare the sorted numbers.\n    return sorted_numbers == sorted_numbers\n",
+          "passed": false
+        },
+        {
+          "code": "def is_sorted(numbers):\n    \"\"\"Return True if the list numbers is sorted in non-decreasing order, otherwise False.\"\"\"\n    return sorted(numbers) == sorted(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def is_sorted(numbers):\n    \"\"\"Return True if the list numbers is sorted in non-decreasing order, otherwise False.\"\"\"\n    # Create a flag that will allow the function to be called when the list is sorted\n    swapped = 0\n    \n    # Iterate through the list\n    for num in range(numbers):\n        # Check if the list is sorted\n        if num not in swapped:\n            # Check if the list is sorted\n                swapped += 1\n    \n    # Check if the list is sorted\n    if len(sorted(numbers)) < len(numbers):\n        # If the list is sorted, return True\n        return False\n    \n    # Return True if the list is sorted\n    return sorted(numbers) == sorted(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def is_sorted(numbers):\n    \"\"\"Return True if the list numbers is sorted in non-decreasing order, otherwise False.\"\"\"\n    return sorted(numbers) == sorted(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def is_sorted(numbers):\n    \"\"\"Return True if the list numbers is sorted in non-decreasing order, otherwise False.\"\"\"\n    return sorted(numbers) == sorted(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def is_sorted(numbers):\n    \"\"\"Return True if the list numbers is sorted in non-decreasing order, otherwise False.\"\"\"\n    return sorted(numbers) == sorted(numbers)\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "second_largest",
+      "reference_loss": 1.1269851922988892,
+      "greedy": {
+        "code": "def second_largest(numbers):\n    \"\"\"Return the second largest distinct number in a list that contains at least two distinct numbers.\"\"\"\n    return num % 2 == 0\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def second_largest(numbers):\n    \"\"\"Return the second largest distinct number in a list that contains at least two distinct numbers.\"\"\"\n    return max(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def second_largest(numbers):\n    \"\"\"Return the second largest distinct number in a list that contains at least two distinct numbers.\"\"\"\n    return num % 2 == 0\n",
+          "passed": false
+        },
+        {
+          "code": "def second_largest(numbers):\n    \"\"\"Return the second largest distinct number in a list that contains at least two distinct numbers.\"\"\"\n    if not numbers:\n        return 0\n    else:\n        max_num = max(nums, key=len)\n        max_num = max_num\n        return max_num\n",
+          "passed": false
+        },
+        {
+          "code": "def second_largest(numbers):\n    \"\"\"Return the second largest distinct number in a list that contains at least two distinct numbers.\"\"\"\n    return num % 2 == 0\n",
+          "passed": false
+        },
+        {
+          "code": "def second_largest(numbers):\n    \"\"\"Return the second largest distinct number in a list that contains at least two distinct numbers.\"\"\"\n    if nums:\n        return 1\n    else:\n        return nums[0]\n",
+          "passed": false
+        },
+        {
+          "code": "def second_largest(numbers):\n    \"\"\"Return the second largest distinct number in a list that contains at least two distinct numbers.\"\"\"\n    if len(numbers) == 1:\n        return numbers[0]\n    else:\n        return numbers.count(numbers[1])\n",
+          "passed": false
+        },
+        {
+          "code": "def second_largest(numbers):\n    \"\"\"Return the second largest distinct number in a list that contains at least two distinct numbers.\"\"\"\n    return max(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def second_largest(numbers):\n    \"\"\"Return the second largest distinct number in a list that contains at least two distinct numbers.\"\"\"\n    return num_set.size()\n",
+          "passed": false
+        },
+        {
+          "code": "def second_largest(numbers):\n    \"\"\"Return the second largest distinct number in a list that contains at least two distinct numbers.\"\"\"\n    if not numbers:\n        return 0\n    else:\n        return numbers[0]\n",
+          "passed": false
+        },
+        {
+          "code": "def second_largest(numbers):\n    \"\"\"Return the second largest distinct number in a list that contains at least two distinct numbers.\"\"\"\n    return max(numbers)\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "count_occurrences",
+      "reference_loss": 0.7960057854652405,
+      "greedy": {
+        "code": "def count_occurrences(items, value):\n    \"\"\"Return how many times value appears in the list items.\"\"\"\n    return len(items)\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def count_occurrences(items, value):\n    \"\"\"Return how many times value appears in the list items.\"\"\"\n    return len(items)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    \"\"\"Return how many times value appears in the list items.\"\"\"\n    return items[:value]\n",
+          "passed": false
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    \"\"\"Return how many times value appears in the list items.\"\"\"\n    return len(items)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    \"\"\"Return how many times value appears in the list items.\"\"\"\n    return len(items) == len(items)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    \"\"\"Return how many times value appears in the list items.\"\"\"\n    return len(items)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    \"\"\"Return how many times value appears in the list items.\"\"\"\n    return items.count(value)\n",
+          "passed": true
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    \"\"\"Return how many times value appears in the list items.\"\"\"\n    return items.count(value)\n",
+          "passed": true
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    \"\"\"Return how many times value appears in the list items.\"\"\"\n    return len(items)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    \"\"\"Return how many times value appears in the list items.\"\"\"\n    return sum(items)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    \"\"\"Return how many times value appears in the list items.\"\"\"\n    return max(items, key=value)\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "to_uppercase",
+      "reference_loss": 0.22671373188495636,
+      "greedy": {
+        "code": "def to_uppercase(s):\n    \"\"\"Return the string s converted to upper case.\"\"\"\n    return s.upper()\n",
+        "passed": true
+      },
+      "samples": [
+        {
+          "code": "def to_uppercase(s):\n    \"\"\"Return the string s converted to upper case.\"\"\"\n    return f\"{s} = {s} & \"\n",
+          "passed": false
+        },
+        {
+          "code": "def to_uppercase(s):\n    \"\"\"Return the string s converted to upper case.\"\"\"\n    return s[::-1]\n",
+          "passed": false
+        },
+        {
+          "code": "def to_uppercase(s):\n    \"\"\"Return the string s converted to upper case.\"\"\"\n    return s[::-1]\n",
+          "passed": false
+        },
+        {
+          "code": "def to_uppercase(s):\n    \"\"\"Return the string s converted to upper case.\"\"\"\n    return s.upper()\n",
+          "passed": true
+        },
+        {
+          "code": "def to_uppercase(s):\n    \"\"\"Return the string s converted to upper case.\"\"\"\n    return s.lower()\n",
+          "passed": false
+        },
+        {
+          "code": "def to_uppercase(s):\n    \"\"\"Return the string s converted to upper case.\"\"\"\n    return s\n",
+          "passed": false
+        },
+        {
+          "code": "def to_uppercase(s):\n    \"\"\"Return the string s converted to upper case.\"\"\"\n    return s.lower()\n",
+          "passed": false
+        },
+        {
+          "code": "def to_uppercase(s):\n    \"\"\"Return the string s converted to upper case.\"\"\"\n    return s[::-1]\n",
+          "passed": false
+        },
+        {
+          "code": "def to_uppercase(s):\n    \"\"\"Return the string s converted to upper case.\"\"\"\n    return s.upper()\n",
+          "passed": true
+        },
+        {
+          "code": "def to_uppercase(s):\n    \"\"\"Return the string s converted to upper case.\"\"\"\n    return s.upper()\n",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "task": "starts_with_vowel",
+      "reference_loss": 0.9648540019989014,
+      "greedy": {
+        "code": "def starts_with_vowel(word):\n    \"\"\"Return True if word starts with a vowel (a, e, i, o, u, in any case), otherwise False.\"\"\"\n    return word in word\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def starts_with_vowel(word):\n    \"\"\"Return True if word starts with a vowel (a, e, i, o, u, in any case), otherwise False.\"\"\"\n    return word in word[::-1]\n",
+          "passed": false
+        },
+        {
+          "code": "def starts_with_vowel(word):\n    \"\"\"Return True if word starts with a vowel (a, e, i, o, u, in any case), otherwise False.\"\"\"\n    return word in word\n",
+          "passed": false
+        },
+        {
+          "code": "def starts_with_vowel(word):\n    \"\"\"Return True if word starts with a vowel (a, e, i, o, u, in any case), otherwise False.\"\"\"\n    return word in word\n",
+          "passed": false
+        },
+        {
+          "code": "def starts_with_vowel(word):\n    \"\"\"Return True if word starts with a vowel (a, e, i, o, u, in any case), otherwise False.\"\"\"\n    return word.lower() == word.lower()\n",
+          "passed": false
+        },
+        {
+          "code": "def starts_with_vowel(word):\n    \"\"\"Return True if word starts with a vowel (a, e, i, o, u, in any case), otherwise False.\"\"\"\n    return word == \"vowels\".lower()\n",
+          "passed": false
+        },
+        {
+          "code": "def starts_with_vowel(word):\n    \"\"\"Return True if word starts with a vowel (a, e, i, o, u, in any case), otherwise False.\"\"\"\n    if word in word:\n        return True\n    else:\n        return False\n",
+          "passed": false
+        },
+        {
+          "code": "def starts_with_vowel(word):\n    \"\"\"Return True if word starts with a vowel (a, e, i, o, u, in any case), otherwise False.\"\"\"\n    try:\n        return (word in word for word in words)\n    except ValueError:\n        return False\n",
+          "passed": false
+        },
+        {
+          "code": "def starts_with_vowel(word):\n    \"\"\"Return True if word starts with a vowel (a, e, i, o, u, in any case), otherwise False.\"\"\"\n    return word == word[::-1]\n",
+          "passed": false
+        },
+        {
+          "code": "def starts_with_vowel(word):\n    \"\"\"Return True if word starts with a vowel (a, e, i, o, u, in any case), otherwise False.\"\"\"\n    return word == word[::-1]\n",
+          "passed": false
+        },
+        {
+          "code": "def starts_with_vowel(word):\n    \"\"\"Return True if word starts with a vowel (a, e, i, o, u, in any case), otherwise False.\"\"\"\n    return word in [\"a\", \"ed\", \"i\"]\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "multiply_list",
+      "reference_loss": 0.7302191257476807,
+      "greedy": {
+        "code": "def multiply_list(numbers):\n    \"\"\"Return the product of all numbers in a list, or 1 for an empty list.\"\"\"\n    return [num for num in numbers if num % 2 == 0]\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def multiply_list(numbers):\n    \"\"\"Return the product of all numbers in a list, or 1 for an empty list.\"\"\"\n    return [x * i for x in numbers]\n",
+          "passed": false
+        },
+        {
+          "code": "def multiply_list(numbers):\n    \"\"\"Return the product of all numbers in a list, or 1 for an empty list.\"\"\"\n    return sum(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def multiply_list(numbers):\n    \"\"\"Return the product of all numbers in a list, or 1 for an empty list.\"\"\"\n    return sum(x ** 2 for x in numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def multiply_list(numbers):\n    \"\"\"Return the product of all numbers in a list, or 1 for an empty list.\"\"\"\n    result = 0\n    for num in numbers:\n        if num != 0:\n            result += num\n",
+          "passed": false
+        },
+        {
+          "code": "def multiply_list(numbers):\n    \"\"\"Return the product of all numbers in a list, or 1 for an empty list.\"\"\"\n    return [n * size for n in numbers]\n",
+          "passed": false
+        },
+        {
+          "code": "def multiply_list(numbers):\n    \"\"\"Return the product of all numbers in a list, or 1 for an empty list.\"\"\"\n    return [num for num in numbers if num > 0]\n",
+          "passed": false
+        },
+        {
+          "code": "def multiply_list(numbers):\n    \"\"\"Return the product of all numbers in a list, or 1 for an empty list.\"\"\"\n    if not numbers:\n        return 0\n    else:\n        return sorted(numbers)[::-1]\n",
+          "passed": false
+        },
+        {
+          "code": "def multiply_list(numbers):\n    \"\"\"Return the product of all numbers in a list, or 1 for an empty list.\"\"\"\n    return [num for num in numbers if num > 0]\n",
+          "passed": false
+        },
+        {
+          "code": "def multiply_list(numbers):\n    \"\"\"Return the product of all numbers in a list, or 1 for an empty list.\"\"\"\n    return [num * 2 for num in numbers]\n",
+          "passed": false
+        },
+        {
+          "code": "def multiply_list(numbers):\n    \"\"\"Return the product of all numbers in a list, or 1 for an empty list.\"\"\"\n    # Convert the list to a list\n    return [list(num) for num in numbers]\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "range_sum",
+      "reference_loss": 0.5778326392173767,
+      "greedy": {
+        "code": "def range_sum(a, b):\n    \"\"\"Return the sum of all integers from a to b inclusive, where a <= b.\"\"\"\n    return a + b\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def range_sum(a, b):\n    \"\"\"Return the sum of all integers from a to b inclusive, where a <= b.\"\"\"\n    return a if b >= 0 else b if b > 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b < 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if b >= 0 else b if\n",
+          "passed": false
+        },
+        {
+          "code": "def range_sum(a, b):\n    \"\"\"Return the sum of all integers from a to b inclusive, where a <= b.\"\"\"\n    return a - b\n",
+          "passed": false
+        },
+        {
+          "code": "def range_sum(a, b):\n    \"\"\"Return the sum of all integers from a to b inclusive, where a <= b.\"\"\"\n    return a + b\n",
+          "passed": false
+        },
+        {
+          "code": "def range_sum(a, b):\n    \"\"\"Return the sum of all integers from a to b inclusive, where a <= b.\"\"\"\n    return a + b\n",
+          "passed": false
+        },
+        {
+          "code": "def range_sum(a, b):\n    \"\"\"Return the sum of all integers from a to b inclusive, where a <= b.\"\"\"\n    return b % a\n",
+          "passed": false
+        },
+        {
+          "code": "def range_sum(a, b):\n    \"\"\"Return the sum of all integers from a to b inclusive, where a <= b.\"\"\"\n    return max(a for a in b if b != a else a)\n",
+          "passed": false
+        },
+        {
+          "code": "def range_sum(a, b):\n    \"\"\"Return the sum of all integers from a to b inclusive, where a <= b.\"\"\"\n    if a < b:\n        return b\n    else:\n        return b\n",
+          "passed": false
+        },
+        {
+          "code": "def range_sum(a, b):\n    \"\"\"Return the sum of all integers from a to b inclusive, where a <= b.\"\"\"\n    return [(a + b) / 2 for a in range(a,b)]\n",
+          "passed": false
+        },
+        {
+          "code": "def range_sum(a, b):\n    \"\"\"Return the sum of all integers from a to b inclusive, where a <= b.\"\"\"\n    return a - b\n",
+          "passed": false
+        },
+        {
+          "code": "def range_sum(a, b):\n    \"\"\"Return the sum of all integers from a to b inclusive, where a <= b.\"\"\"\n    return (a + b) // 2\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "swap_pair",
+      "reference_loss": 0.7674726247787476,
+      "greedy": {
+        "code": "def swap_pair(pair):\n    \"\"\"Given a tuple (a, b), return the tuple (b, a).\"\"\"\n    if not pair:\n        return None\n    else:\n        return tuple (pair[0], tuple[1])\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def swap_pair(pair):\n    \"\"\"Given a tuple (a, b), return the tuple (b, a).\"\"\"\n    return tuple(pair)\n",
+          "passed": false
+        },
+        {
+          "code": "def swap_pair(pair):\n    \"\"\"Given a tuple (a, b), return the tuple (b, a).\"\"\"\n    if not isinstance(pair, tuple):\n        # Error: tuple not in tuple\n        raise TypeError(\"pair must be a tuple of integers\")\n\n    return tuple(pair)\n",
+          "passed": false
+        },
+        {
+          "code": "def swap_pair(pair):\n    \"\"\"Given a tuple (a, b), return the tuple (b, a).\"\"\"\n    return tuple(reversed(pair))\n",
+          "passed": true
+        },
+        {
+          "code": "def swap_pair(pair):\n    \"\"\"Given a tuple (a, b), return the tuple (b, a).\"\"\"\n    if len(pair[0]) == 2:\n        return (pair[0], pair[0])\n    else:\n        return (pair[1], pair[1])\n",
+          "passed": false
+        },
+        {
+          "code": "def swap_pair(pair):\n    \"\"\"Given a tuple (a, b), return the tuple (b, a).\"\"\"\n    return tuple (b, a)\n",
+          "passed": false
+        },
+        {
+          "code": "def swap_pair(pair):\n    \"\"\"Given a tuple (a, b), return the tuple (b, a).\"\"\"\n    if not isinstance(pair, tuple):\n        raise TypeError(\"pairs must be a tuple\")\n\n    for i in range(1, len(pair)):\n        if pair[i] != pair[i-1]:\n            return tuple(pair[i], pair[i-1])\n\n    return tuple(pair)\n",
+          "passed": false
+        },
+        {
+          "code": "def swap_pair(pair):\n    \"\"\"Given a tuple (a, b), return the tuple (b, a).\"\"\"\n    if len(pair) < 2:\n        return \"B\"\n    elif len(pair) < 2:\n        return \"C\"\n    else:\n        return \"D\"\n",
+          "passed": false
+        },
+        {
+          "code": "def swap_pair(pair):\n    \"\"\"Given a tuple (a, b), return the tuple (b, a).\"\"\"\n    if not pair:\n        return None\n    return tuple (pair[0], b)\n",
+          "passed": false
+        },
+        {
+          "code": "def swap_pair(pair):\n    \"\"\"Given a tuple (a, b), return the tuple (b, a).\"\"\"\n    return (pair[0], pair[1])\n",
+          "passed": false
+        },
+        {
+          "code": "def swap_pair(pair):\n    \"\"\"Given a tuple (a, b), return the tuple (b, a).\"\"\"\n    if not pair:\n        return None\n    return tuple(pair).zfill(b)\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "clamp",
+      "reference_loss": 1.5796858072280884,
+      "greedy": {
+        "code": "def clamp(x, low, high):\n    \"\"\"Return x limited to the range from low to high inclusive.\"\"\"\n    return x < low and x < high\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def clamp(x, low, high):\n    \"\"\"Return x limited to the range from low to high inclusive.\"\"\"\n    return x\n",
+          "passed": false
+        },
+        {
+          "code": "def clamp(x, low, high):\n    \"\"\"Return x limited to the range from low to high inclusive.\"\"\"\n    return [x for x, low in range(low, high)}\n",
+          "passed": false
+        },
+        {
+          "code": "def clamp(x, low, high):\n    \"\"\"Return x limited to the range from low to high inclusive.\"\"\"\n    # Check if the x is small\n    if not (x <= low or x <= low):\n        print(\"Invalid value\")\n    # Check if x is not larger\n    if x > high:\n        print(\"Invalid value\")\n    # Check if x is less than high\n    else:\n        print(f\"{x}: {x}\")\n",
+          "passed": false
+        },
+        {
+          "code": "def clamp(x, low, high):\n    \"\"\"Return x limited to the range from low to high inclusive.\"\"\"\n    return x - low\n",
+          "passed": false
+        },
+        {
+          "code": "def clamp(x, low, high):\n    \"\"\"Return x limited to the range from low to high inclusive.\"\"\"\n    return x + high <= high\n",
+          "passed": false
+        },
+        {
+          "code": "def clamp(x, low, high):\n    \"\"\"Return x limited to the range from low to high inclusive.\"\"\"\n    return x\n",
+          "passed": false
+        },
+        {
+          "code": "def clamp(x, low, high):\n    \"\"\"Return x limited to the range from low to high inclusive.\"\"\"\n    return x < high\n",
+          "passed": false
+        },
+        {
+          "code": "def clamp(x, low, high):\n    \"\"\"Return x limited to the range from low to high inclusive.\"\"\"\n    return 1\n",
+          "passed": false
+        },
+        {
+          "code": "def clamp(x, low, high):\n    \"\"\"Return x limited to the range from low to high inclusive.\"\"\"\n    return 0\n",
+          "passed": false
+        },
+        {
+          "code": "def clamp(x, low, high):\n    \"\"\"Return x limited to the range from low to high inclusive.\"\"\"\n    return (x >= low and x > high)\n",
+          "passed": false
+        }
+      ]
+    }
+  ],
+  "commit": "efa2976"
+}

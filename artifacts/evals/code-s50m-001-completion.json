@@ -4,6 +4,7 @@
   "run": "s50m-001",
   "checkpoint": "step-004044",
   "mode": "completion",
+  "device": "NVIDIA A100-SXM4-40GB",
   "tasks": 40,
   "n": 10,
   "temperature": 0.8,
@@ -12,7 +13,7 @@
   "seed": 0,
   "loss_only": false,
   "summary": {
-    "reference_loss": 1.4005556173622609,
+    "reference_loss": 1.4005648866295815,
     "greedy_pass@1": 0.05,
     "sampled_pass@1": 0.004999999999999999,
     "sampled_pass@5": 0.025,
@@ -21,7 +22,7 @@
   "results": [
     {
       "task": "is_even",
-      "reference_loss": 1.569178819656372,
+      "reference_loss": 1.5694695711135864,
       "greedy": {
         "code": "def is_even(n):\n    \"\"\"Return True if n is even, otherwise False.\"\"\"\n    return False\n",
         "passed": false
@@ -71,7 +72,7 @@
     },
     {
       "task": "add",
-      "reference_loss": 0.8802592158317566,
+      "reference_loss": 0.8801280856132507,
       "greedy": {
         "code": "def add(a, b):\n    \"\"\"Return the sum of a and b.\"\"\"\n    return a.sum()\n",
         "passed": false
@@ -121,7 +122,7 @@
     },
     {
       "task": "square",
-      "reference_loss": 0.962765097618103,
+      "reference_loss": 0.9630662202835083,
       "greedy": {
         "code": "def square(x):\n    \"\"\"Return x squared.\"\"\"\n    return x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**2 - x**\n",
         "passed": false
@@ -171,7 +172,7 @@
     },
     {
       "task": "max_of_two",
-      "reference_loss": 1.417954444885254,
+      "reference_loss": 1.4180550575256348,
       "greedy": {
         "code": "def max_of_two(a, b):\n    \"\"\"Return the larger of a and b.\"\"\"\n    return a * b\n",
         "passed": false
@@ -221,7 +222,7 @@
     },
     {
       "task": "sum_list",
-      "reference_loss": 0.6459017992019653,
+      "reference_loss": 0.645752489566803,
       "greedy": {
         "code": "def sum_list(numbers):\n    \"\"\"Return the sum of a list of numbers.\"\"\"\n    return sum_list(numbers)\n",
         "passed": false
@@ -271,7 +272,7 @@
     },
     {
       "task": "average",
-      "reference_loss": 0.7935569286346436,
+      "reference_loss": 0.7926362752914429,
       "greedy": {
         "code": "def average(numbers):\n    \"\"\"Return the average of a non-empty list of numbers.\"\"\"\n    return [0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8\n",
         "passed": false
@@ -282,7 +283,7 @@
           "passed": false
         },
         {
-          "code": "def average(numbers):\n    \"\"\"Return the average of a non-empty list of numbers.\"\"\"\n    from numpy import asinp\n    return asinp(numbers)\n",
+          "code": "def average(numbers):\n    \"\"\"Return the average of a non-empty list of numbers.\"\"\"\n    from numpy import asset\n    return asset(*(d if d is not None else d)\n                     for d in range(numbers))\n",
           "passed": false
         },
         {
@@ -321,7 +322,7 @@
     },
     {
       "task": "reverse_string",
-      "reference_loss": 1.0836527347564697,
+      "reference_loss": 1.0838024616241455,
       "greedy": {
         "code": "def reverse_string(s):\n    \"\"\"Return the string s reversed.\"\"\"\n    return s.replace(' ', '&')\n",
         "passed": false
@@ -371,7 +372,7 @@
     },
     {
       "task": "count_vowels",
-      "reference_loss": 2.6324803829193115,
+      "reference_loss": 2.632350206375122,
       "greedy": {
         "code": "def count_vowels(s):\n    \"\"\"Return the number of vowels (a, e, i, o, u, in lower or upper case) in s.\"\"\"\n    return s.count_vowels(s)\n",
         "passed": false
@@ -421,7 +422,7 @@
     },
     {
       "task": "factorial",
-      "reference_loss": 1.2910386323928833,
+      "reference_loss": 1.2903828620910645,
       "greedy": {
         "code": "def factorial(n):\n    \"\"\"Return n factorial for a non-negative integer n.\"\"\"\n    return n.factor()\n",
         "passed": false
@@ -471,7 +472,7 @@
     },
     {
       "task": "fibonacci",
-      "reference_loss": 1.1862958669662476,
+      "reference_loss": 1.186440348625183,
       "greedy": {
         "code": "def fibonacci(n):\n    \"\"\"Return the n-th Fibonacci number, where fibonacci(0) is 0 and fibonacci(1) is 1.\"\"\"\n    return n*(n-th Fibonacci[n])\n",
         "passed": false
@@ -521,7 +522,7 @@
     },
     {
       "task": "is_palindrome",
-      "reference_loss": 1.532947301864624,
+      "reference_loss": 1.5330532789230347,
       "greedy": {
         "code": "def is_palindrome(s):\n    \"\"\"Return True if the string s reads the same forwards and backwards, otherwise False.\"\"\"\n    return s.startswith('palindrome')\n",
         "passed": false
@@ -571,7 +572,7 @@
     },
     {
       "task": "first_element",
-      "reference_loss": 0.7528827786445618,
+      "reference_loss": 0.7531668543815613,
       "greedy": {
         "code": "def first_element(items):\n    \"\"\"Return the first element of a non-empty list.\"\"\"\n    return items[0]\n",
         "passed": true
@@ -621,7 +622,7 @@
     },
     {
       "task": "last_element",
-      "reference_loss": 0.8934431076049805,
+      "reference_loss": 0.893786609172821,
       "greedy": {
         "code": "def last_element(items):\n    \"\"\"Return the last element of a non-empty list.\"\"\"\n    return items[0]\n",
         "passed": false
@@ -664,14 +665,14 @@
           "passed": false
         },
         {
-          "code": "def last_element(items):\n    \"\"\"Return the last element of a non-empty list.\"\"\"\n    # if the first element is a long string, then the first element matches\n    if not isinstance(items, (list, list)):\n        if isinstance(items[0], list):\n            items = []\n        if isinstance(items[0], list):\n            items = [items[0] for items in items[1:] if items[0] in items]\n        if len(items) == 1:\n            items = [items]\n        return [items]\n    else:\n        return items\n",
+          "code": "def last_element(items):\n    \"\"\"Return the last element of a non-empty list.\"\"\"\n    # if the first element is a long string, then the first element matches\n    if not isinstance(items, (list, list)):\n        if not isinstance(items, list):\n            raise TypeError(\"items must be a list or list\")\n        items = sorted(items, reverse=True)\n    return items[-1][0]\n",
           "passed": false
         }
       ]
     },
     {
       "task": "count_positive",
-      "reference_loss": 1.549269676208496,
+      "reference_loss": 1.5494805574417114,
       "greedy": {
         "code": "def count_positive(numbers):\n    \"\"\"Return how many numbers in the list are greater than zero.\"\"\"\n    return len(numbers) - 1\n",
         "passed": false
@@ -721,7 +722,7 @@
     },
     {
       "task": "celsius_to_fahrenheit",
-      "reference_loss": 4.162522315979004,
+      "reference_loss": 4.162071228027344,
       "greedy": {
         "code": "def celsius_to_fahrenheit(c):\n    \"\"\"Convert a temperature of c degrees Celsius to degrees Fahrenheit.\"\"\"\n    return celsius_to_fahrenheit(celsius_to_fahrenheit(celsius_to_fahrenheit(celsius_to_fahrenheit(celsius_to_fahrenheit(celsius_to_fahrenheit(celsius_to_fahrenheit(celsius_to_fahrenheit(celsius_to_fahrenheit(celsius_to_fahrenheit(celsius_to_fahrenheit(celsius_to_fahrenheit(celsius_to_fahrenheit(cels\n",
         "passed": false
@@ -744,7 +745,7 @@
           "passed": false
         },
         {
-          "code": "def celsius_to_fahrenheit(c):\n    \"\"\"Convert a temperature of c degrees Celsius to degrees Fahrenheit.\"\"\"\n    celsius = np.floor(celsius_to_fahrenheit)\n    # print celsius.coords, (x, y, z)\n\n    # A celsius along the x-axis\n    x = celsius * y\n    return celsius.coords, (x, y)\n",
+          "code": "def celsius_to_fahrenheit(c):\n    \"\"\"Convert a temperature of c degrees Celsius to degrees Fahrenheit.\"\"\"\n    celsius = np.floor(celsius_to_fahrenheit)\n    # print celsius.coords, (x,y,z)\n\n    # A celsius along the x-axis\n    x = celsius * y\n    return celsius * x\n",
           "passed": false
         },
         {
@@ -771,7 +772,7 @@
     },
     {
       "task": "is_prime",
-      "reference_loss": 1.456420660018921,
+      "reference_loss": 1.4563974142074585,
       "greedy": {
         "code": "def is_prime(n):\n    \"\"\"Return True if the integer n is a prime number, otherwise False.\"\"\"\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n        return False\n    if n < n:\n",
         "passed": false
@@ -821,7 +822,7 @@
     },
     {
       "task": "find_max",
-      "reference_loss": 0.7570934891700745,
+      "reference_loss": 0.757085919380188,
       "greedy": {
         "code": "def find_max(numbers):\n    \"\"\"Return the largest number in a non-empty list.\"\"\"\n    return [numbers[0] for num in numbers]\n",
         "passed": false
@@ -871,7 +872,7 @@
     },
     {
       "task": "find_min",
-      "reference_loss": 1.020446538925171,
+      "reference_loss": 1.0202206373214722,
       "greedy": {
         "code": "def find_min(numbers):\n    \"\"\"Return the smallest number in a non-empty list.\"\"\"\n    return [numbers[0] for num in numbers]\n",
         "passed": false
@@ -921,7 +922,7 @@
     },
     {
       "task": "remove_duplicates",
-      "reference_loss": 1.442816972732544,
+      "reference_loss": 1.442828893661499,
       "greedy": {
         "code": "def remove_duplicates(items):\n    \"\"\"Return a new list with duplicates removed, keeping the first occurrence of each element in its original order.\"\"\"\n    for item in items:\n        if item.name == item.name:\n            return item\n    return None\n",
         "passed": false
@@ -964,14 +965,14 @@
           "passed": false
         },
         {
-          "code": "def remove_duplicates(items):\n    \"\"\"Return a new list with duplicates removed, keeping the first occurrence of each element in its original order.\"\"\"\n    for element in items:\n        assert element.startswith('#')\n        assert element in items\n\n    for element in items:\n        if items:\n            yield element\n",
+          "code": "def remove_duplicates(items):\n    \"\"\"Return a new list with duplicates removed, keeping the first occurrence of each element in its original order.\"\"\"\n    for element in items:\n        assert element.startswith('#')\n        assert element in items\n        assert len(items) == 1\n        assert len(items) == 1\n        assert items[0] == '#'\n        assert len(items) == 2\n        assert len(items) == 2\n    assert items[0] == '#'\n    return items[1:-1] + '#' + '#' + '#' + '#' + '#' + '#' + '#' + \\\n                '#' + '#' + '#' + '#' + '#' + '#' + \\\n                '#' + '#' + '#' + '#' + '#' + '#' +\n",
           "passed": false
         }
       ]
     },
     {
       "task": "count_words",
-      "reference_loss": 1.1131805181503296,
+      "reference_loss": 1.1129379272460938,
       "greedy": {
         "code": "def count_words(s):\n    \"\"\"Return the number of words in the string s, where words are separated by whitespace.\"\"\"\n    return s.count_words(s)\n",
         "passed": false
@@ -1021,7 +1022,7 @@
     },
     {
       "task": "capitalize_words",
-      "reference_loss": 1.9409077167510986,
+      "reference_loss": 1.940916895866394,
       "greedy": {
         "code": "def capitalize_words(s):\n    \"\"\"Return s with the first letter of every word in upper case.\"\"\"\n    return s.replace(' ', '_')\n",
         "passed": false
@@ -1071,7 +1072,7 @@
     },
     {
       "task": "double_list",
-      "reference_loss": 1.737047553062439,
+      "reference_loss": 1.737208604812622,
       "greedy": {
         "code": "def double_list(numbers):\n    \"\"\"Return a new list with every number multiplied by 2.\"\"\"\n    return [int(x) for x in numbers]\n",
         "passed": false
@@ -1121,7 +1122,7 @@
     },
     {
       "task": "filter_even",
-      "reference_loss": 1.2459437847137451,
+      "reference_loss": 1.2461920976638794,
       "greedy": {
         "code": "def filter_even(numbers):\n    \"\"\"Return a list of the even numbers in numbers, in their original order.\"\"\"\n    return [int(x) for x in numbers]\n",
         "passed": false
@@ -1171,7 +1172,7 @@
     },
     {
       "task": "sum_of_digits",
-      "reference_loss": 1.6558642387390137,
+      "reference_loss": 1.6555806398391724,
       "greedy": {
         "code": "def sum_of_digits(n):\n    \"\"\"Return the sum of the decimal digits of a non-negative integer n.\"\"\"\n    return sum_of_digits(n)\n",
         "passed": false
@@ -1221,7 +1222,7 @@
     },
     {
       "task": "gcd",
-      "reference_loss": 1.7959884405136108,
+      "reference_loss": 1.79849112033844,
       "greedy": {
         "code": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers a and b.\"\"\"\n    return a * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b * b *\n",
         "passed": false
@@ -1256,7 +1257,7 @@
           "passed": false
         },
         {
-          "code": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers a and b.\"\"\"\n    if a is a single float or a = int(b) + a < a*b**2:\n        return a & b\n\n    if a < b:\n        return a & b\n    if a < b:\n        return a\n    unsigned = b & b\n    if b==b:\n        return b & b\n    if not unsigned:\n        return b & b\n    return b & b\n",
+          "code": "def gcd(a, b):\n    \"\"\"Return the greatest common divisor of two positive integers a and b.\"\"\"\n    if a is a single float or a = int(b) + a < a*b**2:\n        return a + b\n    return a * b + b > a * b\n",
           "passed": false
         },
         {
@@ -1271,7 +1272,7 @@
     },
     {
       "task": "power",
-      "reference_loss": 1.6682655811309814,
+      "reference_loss": 1.6678619384765625,
       "greedy": {
         "code": "def power(base, exp):\n    \"\"\"Return base raised to the power exp, for a non-negative integer exp.\"\"\"\n    return base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.power(base.\n",
         "passed": false
@@ -1321,7 +1322,7 @@
     },
     {
       "task": "absolute_value",
-      "reference_loss": 1.3387738466262817,
+      "reference_loss": 1.338719129562378,
       "greedy": {
         "code": "def absolute_value(x):\n    \"\"\"Return the absolute value of x.\"\"\"\n    return x.value\n",
         "passed": false
@@ -1371,7 +1372,7 @@
     },
     {
       "task": "contains",
-      "reference_loss": 1.2236034870147705,
+      "reference_loss": 1.2230536937713623,
       "greedy": {
         "code": "def contains(items, value):\n    \"\"\"Return True if value is in the list items, otherwise False.\"\"\"\n    if isinstance(items, list):\n        return True\n    return False\n",
         "passed": false
@@ -1421,7 +1422,7 @@
     },
     {
       "task": "index_of",
-      "reference_loss": 1.2763988971710205,
+      "reference_loss": 1.2763184309005737,
       "greedy": {
         "code": "def index_of(items, value):\n    \"\"\"Return the index of the first occurrence of value in items, or -1 if it is not present.\"\"\"\n    return item.index(item)\n",
         "passed": false
@@ -1471,7 +1472,7 @@
     },
     {
       "task": "merge_lists",
-      "reference_loss": 0.8811052441596985,
+      "reference_loss": 0.8808202147483826,
       "greedy": {
         "code": "def merge_lists(a, b):\n    \"\"\"Return a new list with the elements of a followed by the elements of b.\"\"\"\n    return [a, b]\n",
         "passed": false
@@ -1521,7 +1522,7 @@
     },
     {
       "task": "char_frequency",
-      "reference_loss": 1.1761071681976318,
+      "reference_loss": 1.1759212017059326,
       "greedy": {
         "code": "def char_frequency(s):\n    \"\"\"Return a dictionary that maps each character in s to the number of times it appears.\"\"\"\n    return s.replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace\n",
         "passed": false
@@ -1571,7 +1572,7 @@
     },
     {
       "task": "is_sorted",
-      "reference_loss": 1.4980350732803345,
+      "reference_loss": 1.4978827238082886,
       "greedy": {
         "code": "def is_sorted(numbers):\n    \"\"\"Return True if the list numbers is sorted in non-decreasing order, otherwise False.\"\"\"\n    return len(numbers) > 1 and numbers[0] == numbers[0] and numbers[1] == numbers[1] and numbers[1] == numbers[1] and numbers[2] == numbers[2] and numbers[3] == numbers[3] and numbers[4] == numbers[1] and numbers[5] == numbers[1] and numbers[6] == numbers[1] and numbers[7] == numbers[1] and numbers[8] == numbers[1] and numbers[9] == numbers[1] and numbers[10] == numbers[1] and numbers[11] ==\n",
         "passed": false
@@ -1621,7 +1622,7 @@
     },
     {
       "task": "second_largest",
-      "reference_loss": 1.9588251113891602,
+      "reference_loss": 1.9590047597885132,
       "greedy": {
         "code": "def second_largest(numbers):\n    \"\"\"Return the second largest distinct number in a list that contains at least two distinct numbers.\"\"\"\n    return len(numbers) - 1\n",
         "passed": false
@@ -1671,7 +1672,7 @@
     },
     {
       "task": "count_occurrences",
-      "reference_loss": 1.465348243713379,
+      "reference_loss": 1.4656753540039062,
       "greedy": {
         "code": "def count_occurrences(items, value):\n    \"\"\"Return how many times value appears in the list items.\"\"\"\n    return items[0] if items else []\n",
         "passed": false
@@ -1721,7 +1722,7 @@
     },
     {
       "task": "to_uppercase",
-      "reference_loss": 0.34144023060798645,
+      "reference_loss": 0.34153568744659424,
       "greedy": {
         "code": "def to_uppercase(s):\n    \"\"\"Return the string s converted to upper case.\"\"\"\n    return s.upper()\n",
         "passed": true
@@ -1771,7 +1772,7 @@
     },
     {
       "task": "starts_with_vowel",
-      "reference_loss": 1.7288812398910522,
+      "reference_loss": 1.7289420366287231,
       "greedy": {
         "code": "def starts_with_vowel(word):\n    \"\"\"Return True if word starts with a vowel (a, e, i, o, u, in any case), otherwise False.\"\"\"\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n    if word not in word:\n        return False\n",
         "passed": false
@@ -1821,7 +1822,7 @@
     },
     {
       "task": "multiply_list",
-      "reference_loss": 1.5890510082244873,
+      "reference_loss": 1.588876724243164,
       "greedy": {
         "code": "def multiply_list(numbers):\n    \"\"\"Return the product of all numbers in a list, or 1 for an empty list.\"\"\"\n    return list(numbers)\n",
         "passed": false
@@ -1871,7 +1872,7 @@
     },
     {
       "task": "range_sum",
-      "reference_loss": 1.428573727607727,
+      "reference_loss": 1.4284058809280396,
       "greedy": {
         "code": "def range_sum(a, b):\n    \"\"\"Return the sum of all integers from a to b inclusive, where a <= b.\"\"\"\n    return sum(a) * b\n",
         "passed": false
@@ -1921,7 +1922,7 @@
     },
     {
       "task": "swap_pair",
-      "reference_loss": 1.167359471321106,
+      "reference_loss": 1.1673834323883057,
       "greedy": {
         "code": "def swap_pair(pair):\n    \"\"\"Given a tuple (a, b), return the tuple (b, a).\"\"\"\n    if not isinstance(pair, list):\n        return tuple(pair)\n    if not isinstance(pair, list):\n        return tuple(pair)\n    if not isinstance(pair, list):\n        return tuple(pair)\n    if not isinstance(pair, list):\n        return tuple(pair)\n    if not isinstance(pair, list):\n        return tuple(pair)\n    if not isinstance(pair, list):\n        return tuple(pair)\n    if not isinstance(pair, list):\n        return tuple(pair)\n    if not isinstance(pair, list):\n        return tuple(pair)\n    if not isinstance(pair, list):\n        return tuple(pair)\n    if not isinstance(pair, list):\n        return tuple(pair)\n    if not isinstance(pair, list):\n",
         "passed": false
@@ -1971,7 +1972,7 @@
     },
     {
       "task": "clamp",
-      "reference_loss": 1.7605973482131958,
+      "reference_loss": 1.7606920003890991,
       "greedy": {
         "code": "def clamp(x, low, high):\n    \"\"\"Return x limited to the range from low to high inclusive.\"\"\"\n    return x + low\n",
         "passed": false
@@ -2019,5 +2020,6 @@
         }
       ]
     }
-  ]
+  ],
+  "commit": "efa2976"
 }
