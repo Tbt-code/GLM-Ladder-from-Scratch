@@ -45,6 +45,10 @@ Decisions are recorded with their reasons so the final report can explain why th
 | 2026-10-18 | Start from the SFT models; answer is one digit in the chat format; score by the most likely digit token | RL starts from the same models; one forward pass per review, exact and fast |
 | 2026-10-18 | Full fine-tuning vs LoRA (all attention and expert layers, alpha 16): LR grid of 3 each on Turkish validation macro-F1, then ranks 4 / 16 / 64, then English with the Turkish LRs; test sets opened once | Matched data and steps; the selection metric is fixed before the runs; English reuses the Turkish LRs so only the language changes |
 | 2026-10-18 | Packed fine-tuning windows hold several reviews, which attend to earlier reviews in the same window | Same packing as SFT; scoring sees one review alone. A train/test difference to keep in mind; per-document attention masks are not implemented |
+| 2026-10-18 | English training batch is 112 windows vs 32 in Turkish | English reviews are ~3.2× longer; equal reviews per step (~525) and equal steps (~142) keep the comparison about language, not step count |
+| 2026-10-18 | LR grids extended by one value (full 3e-4, LoRA 3e-3) before opening the test sets | All four best LRs were at the top edge of the first grid; with the extension the LoRA gap at `m-100m` shrank from 0.051 to 0.012 (val), so the first grid would have overstated full fine-tuning's advantage. Three choices are still at the new edge; not extended further |
+| 2026-10-18 | Phase 4 comparison complete; test sets opened once for 8 selected runs plus baselines | Results in README; receipts in `artifacts/finetune/` |
+| 2026-10-18 | Rule for any later fine-tuning that must keep earlier skills: select on task score **and** forgetting (SFT val loss, code reference loss), prefer the lower LR when scores are close, and mix in replay of earlier data | Selecting on F1 alone picked the LRs that erased coding ability (code reference loss 0.36 -> 7-9 nats) for gains of <0.01 F1 |
 | open | Batched, KV-cached generation before RL | RL needs far more generation than the code eval |
 
 ## Pretraining, measured (A100 40 GB, full training loop with gradient accumulation)
@@ -64,6 +68,17 @@ The full loop ran 1.2–1.4× faster than the Phase 0 benchmark below (8-way gra
 | `m-100m` | 406.6M | 3,102 | 1.22 | 92,296 |
 
 About 95 of 300 units were used through Phase 3 (Colab balance), including pretraining, SFT, the code evaluation, and failed or slow sessions (the L4 evaluation attempt).
+
+## Fine-tuning, measured (A100 40 GB, no `torch.compile`)
+
+| Run type | Training time per epoch | Tokens/s |
+|---|---:|---:|
+| `s-50m`, Turkish (4.6M tokens), full / LoRA | 78 s / 111 s | ~60k / ~42k |
+| `m-100m`, Turkish, full / LoRA | 108 s / 153 s | ~43k / ~30k |
+| `s-50m`, English (16.1M tokens), full / LoRA | 263 s / 388 s | ~62k / ~41k |
+| `m-100m`, English, full / LoRA | 369 s / 530 s | ~43k / ~30k |
+
+31 runs plus baselines and the test took about 2.5 hours of A100 time including scoring and checkpoint saves, roughly 25–30 units (estimate from session hours).
 
 ## Compute budget (Phase 0 estimate, A100 40 GB, torch.compile + TF32, commit 181c686)
 

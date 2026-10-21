@@ -4,7 +4,7 @@ A family of GLM-5.3-Flash-inspired mixture-of-experts language models at 25M, 50
 
 This project extends [vukrosic/glm-5.3-flash-from-scratch](https://github.com/vukrosic/glm-5.3-flash-from-scratch), which showed that executable-reward RL can teach a 25.7M model narrow coding behaviors. The central question here is what happens to that result as the model grows.
 
-> **Status: Phase 3 (supervised fine-tuning) complete for `s-50m` and `m-100m`.** Both models are pretrained to 20 tokens per parameter ([results](#pretraining-results)) and then fine-tuned on chat data ([results](#post-training-sft-results)). After SFT, `m-100m` writes a function that passes its unit tests for 65% of 40 coding tasks within 10 tries. `baseline-25m` reproduction and `l-200m` are deferred until fine-tuning and RL are done on the two trained rungs. Every number in this README comes from a receipt in [`artifacts/`](artifacts/) unless it is labeled as an estimate.
+> **Status: Phase 4 (fine-tuning) complete for `s-50m` and `m-100m`.** Both models are pretrained to 20 tokens per parameter ([results](#pretraining-results)), fine-tuned on chat data ([results](#post-training-sft-results)), and compared under full fine-tuning and LoRA on review rating in Turkish and English ([results](#fine-tuning-results-full-vs-lora)). After SFT, `m-100m` writes a function that passes its unit tests for 65% of 40 coding tasks within 10 tries; full fine-tuning beats LoRA on all four review-rating comparisons, by 0.004–0.036 macro-F1. `baseline-25m` reproduction and `l-200m` are deferred until fine-tuning and RL are done on the two trained rungs. Every number in this README comes from a receipt in [`artifacts/`](artifacts/) unless it is labeled as an estimate.
 
 ## Research question
 
@@ -264,6 +264,109 @@ Talk to a model on CPU: `python scripts/talk.py --run sft-m100m-001` (multi-turn
 - **Token boundaries matter for evaluation.** A completion prompt ending in `"\n"` broke indentation (see [samples](#samples)), so code prompts end on the docstring. The reference loss encodes prompt and solution together and checks that the prompt's tokens are a prefix of the result.
 - **Generation is the bottleneck.** Without a KV cache, each new token re-runs the full sequence, and the small MoE model is bound by kernel launches. One evaluation took ~10 minutes on an A100 and was too slow on an L4. RL needs much more generation than this, so batched, cached generation comes before RL.
 
+## Fine-tuning results: full vs LoRA
+
+Phase 4 asks how full fine-tuning compares with LoRA on one downstream task, at two sizes and in two languages. Both rungs start from their SFT checkpoints.
+
+### Task and data
+
+Rate a customer review from 1 to 5 stars, answering in the chat format with a single digit:
+
+```text
+<|user|>Rate the following review from 1 to 5 stars. Answer with the digit only.
+
+Review: ...<|end|><|assistant|>4<|end|>
+```
+
+| Language | Source | Train / val / test | Star distribution |
+|---|---|---:|---|
+| Turkish | [SentiTurca](https://huggingface.co/datasets/turkish-nlp-suite/SentiTurca) e-commerce (Trendyol, Hepsiburada; CC-BY-SA-4.0) | 73,912 / 14,997 / 14,997 | skewed: 59% are 4 or 5 stars |
+| English | [Yelp Review Full](https://huggingface.co/datasets/Yelp/yelp_review_full) (Yelp Dataset Agreement) | 73,912 / 14,997 / 14,997 | balanced, ~20% each |
+
+- **Same size in both languages.** The English sets are seeded samples with exactly as many reviews as the Turkish ones; English validation comes from the Yelp training split, disjoint from English train.
+- **Same length rule.** Reviews whose prompt exceeds 512 tokens are skipped: 8 Turkish and ~7% of English reviews, so the English set leans slightly towards shorter reviews.
+- **Equal reviews per step.** A Turkish review is ~60 tokens, an English one ~190, so a 1,024-token window holds ~16 or ~5 reviews. The batch is 32 windows in Turkish and 112 in English: both languages see ~525 reviews per step and ~142 steps per epoch.
+- **Only the digit and `<|end|>` are learned.** Several reviews are packed per window and can attend to earlier reviews in the window; scoring sees one review alone.
+- The domains differ (products vs. local businesses) and so do the label distributions, so **scores are compared within a language, not across languages.**
+
+Reproduce: `python scripts/prepare_finetune.py`. Counts and hashes are in the data manifest.
+
+### Scoring without generation
+
+Each review is scored with one forward pass: the prediction is the most likely of the tokens "1" … "5" after `<|assistant|>` ([`glm_ladder/classify.py`](glm_ladder/classify.py)). The metric used for every decision is **macro-F1** (each star counts equally), because accuracy rewards always answering "4" in Turkish. Mean absolute error in stars is reported too. `label_mass`, the probability the model puts on the five digits at all, shows whether it follows the format.
+
+### Baselines
+
+| Test set | Majority class: acc / F1 | Zero-shot SFT model: acc / F1 | Zero-shot `label_mass` |
+|---|---:|---:|---:|
+| Turkish | 0.303 / 0.093 | 0.128 / 0.045 | 0.06 (`s-50m`), 0.12 (`m-100m`) |
+| English | 0.209 / 0.069 | 0.196 / 0.067 | 0.02 |
+
+Both SFT models answer "1" to every review in both languages, below the majority class: at this size they do not follow a "digit only" instruction, and they want to answer in words.
+
+### Method and learning-rate sweep
+
+Full fine-tuning and LoRA (rank 16, alpha 16, on every attention and expert projection; the router and the tied embedding are frozen) were trained for one epoch with the same data, steps, warmup (5%), cosine decay, and no weight decay. The learning rate was chosen on **Turkish validation macro-F1** from four values per method, and the English runs reuse the Turkish choice, so only the language changes. The first grid had three values; all four best values were at its top edge, so each grid was extended by one value before the test sets were opened.
+
+| Turkish val macro-F1 (SFT Turkish val loss after fine-tuning) | | | | |
+|---|---:|---:|---:|---:|
+| **`s-50m` full**, LR | 1e-5: 0.444 (2.79) | 3e-5: 0.524 (3.07) | **1e-4: 0.575** (3.93) | 3e-4: 0.570 (7.26) |
+| **`s-50m` LoRA r16**, LR | 1e-4: 0.313 (2.76) | 3e-4: 0.444 (3.05) | 1e-3: 0.535 (4.01) | **3e-3: 0.556** (6.94) |
+| **`m-100m` full**, LR | 1e-5: 0.418 (2.42) | 3e-5: 0.558 (2.64) | 1e-4: 0.601 (3.43) | **3e-4: 0.609** (7.60) |
+| **`m-100m` LoRA r16**, LR | 1e-4: 0.255 (2.42) | 3e-4: 0.413 (2.64) | 1e-3: 0.550 (3.84) | **3e-3: 0.597** (6.71) |
+
+SFT Turkish validation loss before fine-tuning: 2.646 (`s-50m`), 2.348 (`m-100m`). Rank 4, 16, and 64 at the selected LoRA learning rate differ by less than 0.02 macro-F1 with no consistent direction (0.567 / 0.556 / 0.566 for `s-50m`, 0.587 / 0.597 / 0.576 for `m-100m`); rank is not what limits LoRA here.
+
+### Test results
+
+Selected runs, test sets opened once (14,997 reviews each, macro-F1):
+
+| Model | Method (LR) | Trained params | Turkish model on Turkish test | English model on English test |
+|---|---|---:|---:|---:|
+| `s-50m` | full (1e-4) | 53.2M | **0.572** | **0.586** |
+| `s-50m` | LoRA r16 (3e-3) | 3.4M (6%) | 0.568 | 0.550 |
+| `m-100m` | full (3e-4) | 96.0M | **0.607** | **0.617** |
+| `m-100m` | LoRA r16 (3e-3) | 5.4M (6%) | 0.593 | 0.610 |
+
+Accuracy of the same runs: 0.610 / 0.608 / 0.637 / 0.624 in Turkish and 0.588 / 0.551 / 0.616 / 0.610 in English; mean absolute error 0.44–0.56 stars. Validation and test agree within 0.004 for seven of the eight selected runs and within 0.012 for the eighth, so choosing among 31 runs did not overfit the validation sets.
+
+What the numbers show:
+
+- **Full fine-tuning wins all four comparisons, by 0.004 to 0.036 macro-F1** at each method's best learning rate. Only `s-50m` English (0.036) and `m-100m` Turkish (0.014) are clearly larger than the sampling noise of a 15k-review test set (roughly ±0.005 for a paired difference); differences between seeds were not measured.
+- **The learning rate mattered more than the method.** With the first, too-low grid, LoRA trailed by 0.025–0.05 on validation; after one more grid step the gap at `m-100m` fell to 0.006–0.014.
+- **At equal forgetting, full fine-tuning learns more.** In the sweep, full fine-tuning at LR *x* and LoRA at 10*x* forget almost exactly the same amount (SFT Turkish loss 2.79 vs 2.76, 3.07 vs 3.05, 2.42 vs 2.42, 2.64 vs 2.64), and full fine-tuning has the higher F1 in every such pair (e.g. `m-100m`: 0.558 vs 0.413 at 2.64). LoRA forgets less at a given learning rate, but only because it learns less.
+- **Scale helps both methods:** `m-100m` is 0.025–0.060 macro-F1 better than `s-50m`.
+- **Cross-lingual transfer is weak.** A model fine-tuned in one language learns the answer format in the other (`label_mass` rises from 0.02 to 1.00), but its macro-F1 there is only 0.13–0.26.
+
+### What fine-tuning costs: forgetting
+
+Fine-tuning on one narrow task damages what SFT taught, and the damage depends on the language and, above all, on the learning rate.
+
+| After fine-tuning (selected runs) | SFT val loss, Turkish | SFT val loss, English | Code reference loss |
+|---|---:|---:|---:|
+| `s-50m` SFT model (before) | 2.646 | 1.915 | 0.471 |
+| Turkish, full, 1e-4 | 3.930 (+49%) | 2.295 (+20%) | 1.305 |
+| English, full, 1e-4 | 3.191 (+21%) | 2.841 (+48%) | 1.620 |
+| Turkish, LoRA, 3e-3 | 6.938 | 5.712 | 5.213 |
+| English, LoRA, 3e-3 | 4.769 | 5.655 | 7.852 |
+| `m-100m` SFT model (before) | 2.348 | 1.660 | 0.362 |
+| Turkish, full, 3e-4 | 7.605 | 4.907 | 8.599 |
+| English, full, 3e-4 | 5.968 | 4.923 | 7.382 |
+| Turkish, LoRA, 3e-3 | 6.712 | 3.495 | 7.723 |
+| English, LoRA, 3e-3 | 10.077 | 3.918 | 6.667 |
+
+- **Forgetting is language-specific at moderate learning rates.** Training in Turkish raises the Turkish SFT loss by 49% but the English one by 20%; training in English does the opposite (+48% English, +21% Turkish). The model learns "after a user message in this language, answer with one digit".
+- **At the learning rates chosen for F1, the coding ability is gone.** A code reference loss of 5–9 nats per token is close to knowing nothing (ln 16,384 = 9.7). Only full fine-tuning at 1e-4 keeps it at 1.3–1.6 nats (2.8–3.4× the SFT model).
+- **The selection rule caused this.** It looked only at the task's F1: for `m-100m` full, 3e-4 beat 1e-4 by 0.008 F1 and cost almost all of the model's coding and chat ability. Any fine-tuning that has to keep earlier skills needs forgetting in its selection rule, a lower learning rate, and replay of earlier data.
+
+### Engineering notes from fine-tuning
+
+- **LoRA does not save time here.** Without `torch.compile`, LoRA steps were 1.4× slower than full fine-tuning: the backward pass still runs through every frozen matrix, and each of the 240–320 adapted layers adds two small matrix multiplications, many of them inside separately launched experts. LoRA saves optimizer memory, which these models do not need.
+- **LoRA checkpoints load as plain models.** Parameter names are unchanged (`...qkv.weight` plus `...lora_A`, `...lora_B`), so pretrained weights load before adapters are added, and `scripts/sample.py` folds the adapters into the weights on load. A test checks that merged and unmerged models give the same logits.
+- **Right-padding is safe for scoring.** Prompts of different lengths share a batch; a test checks against scoring each alone, because the model is causal and the MoE routes each token separately.
+
+Reproduce: [`notebooks/05_finetune.ipynb`](notebooks/05_finetune.ipynb) (about 2.5 hours on an A100 for all 31 runs and the test). Receipts for every run and the test summary: [`artifacts/finetune/`](artifacts/finetune/).
+
 ## Plan
 
 | Phase | Work | Exit criterion | Status |
@@ -272,7 +375,7 @@ Talk to a model on CPU: `python scripts/talk.py --run sft-m100m-001` (multi-turn
 | 1. Data | BPE tokenizer, mixed English + Python + Turkish corpus, sharded and hashed | Deterministic, resumable data stream | Done |
 | 2. Pretraining | S → M; baseline reproduction and L deferred | Loss curves, held-out loss, receipts | Done for S and M |
 | 3. Post-training | Supervised fine-tuning on chat data | Eval before vs after | Done for S and M: forgetting, executable code eval, chat samples |
-| 4. Fine-tuning | Full fine-tuning vs LoRA on review rating (1-5 stars) in Turkish and English | Matched-data comparison on held-out test sets | In progress |
+| 4. Fine-tuning | Full fine-tuning vs LoRA on review rating (1-5 stars) in Turkish and English | Matched-data comparison on held-out test sets | Done for S and M: LR sweep, ranks, test, forgetting |
 | 5. Reinforcement learning | Reproduce RLOO, then GRPO, DPO, reward and KL ablations at every rung | Locked confirmation-set results with paired statistics | |
 | 6. Report | Scaling analysis, negative results, limitations | `REPORT.md` | |
 
@@ -280,7 +383,7 @@ The evaluation protocol follows the original repository: decisions are made on a
 
 ## Compute and storage
 
-- **Compute:** Google Colab Pro (L4 and A100), 300 compute units in total. Pretraining both rungs took about 7 hours of training on an A100, roughly 45–50 units including setup, evaluation, and checkpoint uploads (estimate from session hours). After SFT and the GPU code evaluation, about 95 of the 300 units have been used (Colab balance).
+- **Compute:** Google Colab Pro (L4 and A100), 300 compute units in total. Pretraining both rungs took about 7 hours of training on an A100, roughly 45–50 units including setup, evaluation, and checkpoint uploads (estimate from session hours). After SFT and the GPU code evaluation, about 95 of the 300 units had been used (Colab balance); the fine-tuning study added roughly 25–30 (estimate from session hours).
 - **Resumable training:** Colab sessions can end at any time. Training state (weights, AdamW moments, RNG, step, data position) is pushed to the Hub every 15–25 minutes, and re-running the notebook resumes from the latest checkpoint with the same data order. The two most recent resume checkpoints and the final weights are kept.
 - **Code and receipts:** this GitHub repository.
 - **Checkpoints and tokenized data:** a Hugging Face Hub repository (too large for GitHub), saved as `safetensors` with SHA-256 hashes recorded in receipts here.
@@ -296,6 +399,7 @@ Notebooks are run from VS Code on a Colab GPU runtime through the Google Colab e
 | [`02_pretrain`](notebooks/02_pretrain.ipynb) | A100 | Pretrains one rung; set `RUN` and run all cells (resumable) |
 | [`03_sft`](notebooks/03_sft.ipynb) | A100 | Supervised fine-tuning of one pretrained rung (resumable) |
 | [`04_code_eval`](notebooks/04_code_eval.ipynb) | A100 | Code evaluation of every model and prompt mode; uploads receipts |
+| [`05_finetune`](notebooks/05_finetune.ipynb) | A100 | Full fine-tuning vs LoRA on review rating: baselines, LR sweep, ranks, English, test |
 
 In VS Code: open a notebook, *Select Kernel → Colab → New Colab Server*, pick the runtime, run all cells. The Hugging Face token is typed into a hidden prompt and never stored.
 
@@ -315,6 +419,10 @@ python scripts/plot_pretraining.py --runs s50m-001 m100m-001
 python scripts/talk.py --run sft-m100m-001
 python scripts/run_code_eval.py --run sft-m100m-001 --mode chat
 python scripts/fetch_evals.py
+
+# Build the review-rating data; fetch the fine-tuning receipts after notebook 05
+python scripts/prepare_finetune.py
+python scripts/fetch_evals.py --pattern "finetune/*.json" --to artifacts/finetune
 ```
 
 ## Repository map
@@ -333,11 +441,13 @@ python scripts/fetch_evals.py
 - [`glm_ladder/chat.py`](glm_ladder/chat.py): chat template and the assistant-only loss mask.
 - [`glm_ladder/sft_data.py`](glm_ladder/sft_data.py): packing whole conversations into windows; the SFT data source.
 - [`glm_ladder/code_eval.py`](glm_ladder/code_eval.py): code tasks, running unit tests, pass@k, batched sampling, reference loss.
+- [`glm_ladder/lora.py`](glm_ladder/lora.py): LoRA layers, applying adapters by layer type, merging them into the weights.
+- [`glm_ladder/classify.py`](glm_ladder/classify.py): review-rating prompts, scoring by label-token probability, accuracy / macro-F1 / MAE.
 - [`evals/code_tasks.jsonl`](evals/code_tasks.jsonl): the 40 coding tasks with reference solutions and tests.
-- [`tests/`](tests/): parity with the original model, kernel equivalence, causality, balance-loss gradient, loader determinism, bit-exact resume of the full training loop, chat masks and packing, the code-eval task set.
+- [`tests/`](tests/): parity with the original model, kernel equivalence, causality, balance-loss gradient, loader determinism, bit-exact resume of the full training loop, chat masks and packing, the code-eval task set, LoRA (formula, gradients, merge, resume), padding-invariant scoring.
 - [`tests/reference/original_model.py`](tests/reference/original_model.py): copy of the original model, used only by tests.
-- [`scripts/`](scripts/): tokenizer training, benchmark, sampling, receipts, plots, SFT data preparation, chat, code evaluation.
-- [`artifacts/`](artifacts/): receipts, code-eval results, samples, plots.
+- [`scripts/`](scripts/): tokenizer training, benchmark, sampling, receipts, plots, SFT and fine-tuning data preparation, chat, code evaluation.
+- [`artifacts/`](artifacts/): receipts, code-eval and fine-tuning results, samples, plots.
 - [`PLAN.md`](PLAN.md): decision log and compute budget.
 
 ## Sources
@@ -349,6 +459,9 @@ python scripts/fetch_evals.py
 - [SmolLM2 (Allal et al., 2025)](https://arxiv.org/abs/2502.02737), source of the `smol-smoltalk` SFT data
 - [InstrucTurca](https://huggingface.co/datasets/turkish-nlp-suite/InstrucTurca), Turkish SFT data
 - [Evaluating Large Language Models Trained on Code (Chen et al., 2021)](https://arxiv.org/abs/2107.03374), unbiased pass@k
+- [LoRA (Hu et al., 2021)](https://arxiv.org/abs/2106.09685)
+- [SentiTurca / TrGLUE (Altinok, 2025)](https://huggingface.co/datasets/turkish-nlp-suite/SentiTurca), Turkish review data
+- [Character-level Convolutional Networks for Text Classification (Zhang et al., 2015)](https://arxiv.org/abs/1509.01626), Yelp Review Full
 
 ## License
 
