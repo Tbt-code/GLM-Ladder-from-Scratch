@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "kind": "generation_speed",
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "commit": "8d171dc",
+  "new_tokens": 160,
+  "rows": [
+    {
+      "size": "s50m",
+      "n": 1,
+      "cached": 25,
+      "uncached": 20
+    },
+    {
+      "size": "s50m",
+      "n": 8,
+      "cached": 175,
+      "uncached": 105
+    },
+    {
+      "size": "s50m",
+      "n": 32,
+      "cached": 533,
+      "uncached": 343
+    },
+    {
+      "size": "s50m",
+      "n": 128,
+      "cached": 1134
+    },
+    {
+      "size": "m100m",
+      "n": 1,
+      "cached": 18,
+      "uncached": 15
+    },
+    {
+      "size": "m100m",
+      "n": 8,
+      "cached": 132,
+      "uncached": 80
+    },
+    {
+      "size": "m100m",
+      "n": 32,
+      "cached": 427,
+      "uncached": 275
+    },
+    {
+      "size": "m100m",
+      "n": 128,
+      "cached": 1016
+    }
+  ]
+}
