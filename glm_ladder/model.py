@@ -280,8 +280,39 @@ class Expert(nn.Module):
         gate,value = self.up(x).chunk(2,dim=-1)
         return self.down(F.silu(gate) * value)
 
+def dense_expert_mix(flat: torch.Tensor, experts: nn.ModuleList, top_indices: torch.Tensor,
+                     top_weights: torch.Tensor) -> torch.Tensor:
+    """Routed-expert output for a few tokens, computed without data-dependent shapes.
+
+    flat: [tokens, dim]; top_indices, top_weights: [tokens, k] from the router.
+    Every expert runs on every token, and each result is weighted by that expert's gate:
+    the router weight if the token picked the expert, 0 otherwise. The result is the same
+    as sending each token only to its k experts, but nothing depends on how many tokens an
+    expert got, so the GPU never has to report a count back to the CPU.
+    Returns [tokens, dim] (without the shared expert).
+    """
+    tokens = flat.shape[0]
+    experts_count = len(experts)
+    gates = torch.zeros(tokens, experts_count, dtype=top_weights.dtype, device=flat.device).scatter(1, top_indices, top_weights)
+    
+    output = torch.zeros_like(flat)
+    for e, expert in enumerate(experts):
+        expert_out = expert(flat)
+        output = output + expert_out * gates[:, e:e+1].to(expert_out.dtype)
+    return output
+
+
 class SparseMoE(nn.Module):
-    """Top-k routed experts plus one always-active shared expert."""
+    """Top-k routed experts plus one always-active shared expert.
+
+    Two ways to compute the same thing. Training and large batches send each token only to
+    its k experts (sparse). In eval mode with at most `dense_max_tokens` tokens (one decode
+    step of generation) every expert runs on every token instead (dense): more arithmetic,
+    but no torch.where / bincount, whose output sizes depend on the data and force the CPU
+    to wait for the GPU, ~9 times per layer per generated token.
+    """
+
+    dense_max_tokens = 256
 
     def __init__(self, config: ModelConfig):
         super().__init__()
@@ -301,11 +332,19 @@ class SparseMoE(nn.Module):
         top_values, top_indices = logits.topk(self.top_k, dim=-1)
         top_weights = torch.softmax(top_values, dim=-1)   # [tokens, k]
 
-        counts = torch.bincount(top_indices.reshape(-1),minlength=experts).float()
+        dense = not self.training and tokens <= self.dense_max_tokens
+        if dense:   # same counts as bincount, without a data-dependent output size
+            counts = F.one_hot(top_indices.reshape(-1), experts).sum(dim=0).float()
+        else:
+            counts = torch.bincount(top_indices.reshape(-1),minlength=experts).float()
         fraction = counts / (tokens * self.top_k)
         mean_probability = torch.softmax(logits,dim=-1).mean(dim=0)
         balance_loss = experts * (fraction * mean_probability).sum()
 
+        if dense:
+            output = self.shared(flat)
+            output = output + dense_expert_mix(flat, self.experts, top_indices, top_weights).to(output.dtype)
+            return output.view(original_shape), balance_loss, fraction.detach()
 
         output = self.shared(flat)
         # torch.compile kernels fail (ZeroDivisionError) on zero-sized data-dependent shapes,
