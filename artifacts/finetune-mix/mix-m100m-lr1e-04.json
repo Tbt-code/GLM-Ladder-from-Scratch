@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.0",
+  "kind": "finetune_mix_run",
+  "run_name": "mix-m100m-lr1e-04",
+  "commit": "ae7d70e",
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "size": "m100m",
+  "max_lr": 0.0001,
+  "init_from": "Tbt-AI/glm-ladder-runs/runs/sft-m100m-001/step-003102",
+  "weights": {
+    "tr": 0.1489228539429475,
+    "en": 0.5177547928058502,
+    "sft_english": 0.3000048570828818,
+    "sft_turkish": 0.03333396629151693
+  },
+  "steps": 238,
+  "tokens_seen": 31195136,
+  "train_seconds": 340.1,
+  "final_eval": {
+    "en": 0.4182681592305501,
+    "sft_english": 1.6919946373856851,
+    "sft_turkish": 2.4034872191471477,
+    "tr": 0.47479682632639436
+  },
+  "val": {
+    "tr": {
+      "n": 14997,
+      "accuracy": 0.6157231446289257,
+      "macro_f1": 0.5845044719811835,
+      "mae_stars": 0.5091018203640728,
+      "confusion": [
+        [
+          1410,
+          253,
+          65,
+          54,
+          121
+        ],
+        [
+          566,
+          628,
+          323,
+          104,
+          90
+        ],
+        [
+          147,
+          389,
+          1326,
+          564,
+          203
+        ],
+        [
+          87,
+          135,
+          566,
+          2417,
+          1319
+        ],
+        [
+          86,
+          39,
+          57,
+          595,
+          3453
+        ]
+      ],
+      "label_mass": 0.9989141225814819
+    },
+    "en": {
+      "n": 14997,
+      "accuracy": 0.6255251050210042,
+      "macro_f1": 0.6205241128075807,
+      "mae_stars": 0.4378208975128359,
+      "confusion": [
+        [
+          2260,
+          590,
+          26,
+          20,
+          31
+        ],
+        [
+          651,
+          1841,
+          367,
+          66,
+          35
+        ],
+        [
+          112,
+          823,
+          1317,
+          571,
+          112
+        ],
+        [
+          34,
+          119,
+          452,
+          1570,
+          878
+        ],
+        [
+          28,
+          50,
+          60,
+          591,
+          2393
+        ]
+      ],
+      "label_mass": 0.9991416931152344
+    }
+  },
+  "keep": {
+    "sft_english": 1.6919746893623036,
+    "sft_turkish": 2.4035208713265326,
+    "code": 0.3787953954190016
+  },
+  "forgetting": {
+    "sft_english": 0.019307959489737847,
+    "sft_turkish": 0.023532880815863244,
+    "code": 0.045646107262775404
+  },
+  "within_limits": true,
+  "config": {
+    "run_name": "mix-m100m-lr1e-04",
+    "total_tokens": 31086592,
+    "seq_len": 1024,
+    "batch_rows": 128,
+    "micro_batch": 32,
+    "max_lr": 0.0001,
+    "min_lr_ratio": 0.1,
+    "warmup_steps": 11,
+    "weight_decay": 0.0,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "balance_coef": 0.01,
+    "grad_clip": 1.0,
+    "seed": 1234,
+    "eval_every": 59,
+    "eval_windows": 128,
+    "log_every": 25,
+    "checkpoint_minutes": 1000000000.0,
+    "checkpoint_every_steps": null,
+    "compile": true,
+    "lora_rank": 0,
+    "lora_alpha": 16.0,
+    "lora_targets": "all",
+    "loss_per_window": true
+  }
+}
