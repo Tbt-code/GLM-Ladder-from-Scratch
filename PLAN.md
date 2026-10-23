@@ -49,6 +49,9 @@ Decisions are recorded with their reasons so the final report can explain why th
 | 2026-10-18 | LR grids extended by one value (full 3e-4, LoRA 3e-3) before opening the test sets | All four best LRs were at the top edge of the first grid; with the extension the LoRA gap at `m-100m` shrank from 0.051 to 0.012 (val), so the first grid would have overstated full fine-tuning's advantage. Three choices are still at the new edge; not extended further |
 | 2026-10-18 | Phase 4 comparison complete; test sets opened once for 8 selected runs plus baselines | Results in README; receipts in `artifacts/finetune/` |
 | 2026-10-18 | Rule for any later fine-tuning that must keep earlier skills: select on task score **and** forgetting (SFT val loss, code reference loss), prefer the lower LR when scores are close, and mix in replay of earlier data | Selecting on F1 alone picked the LRs that erased coding ability (code reference loss 0.36 -> 7-9 nats) for gains of <0.01 F1 |
+| 2026-10-21 | Joint fine-tuning per size before RL: Turkish + English reviews + SFT replay (1/3 of windows), full fine-tuning, LR 3e-5 or 1e-4 | One model must rate reviews in both languages and keep chat and code; notebook 05 showed full fine-tuning dominates LoRA at matched forgetting and that single-task fine-tuning erases earlier skills |
+| 2026-10-21 | Loss averaged per window for the mix (`loss_per_window`) | A chat window has ~600 learned tokens, a review window 10-30; with the token mean the replay would be ~95% of the loss |
+| 2026-10-21 | Selection for the joint model: best mean val macro-F1 among runs with SFT val loss <= +10% (each language) and code reference loss <= +25%; else the least-forgetting run | The rule from Phase 4, made concrete before the runs |
 | open | Batched, KV-cached generation before RL | RL needs far more generation than the code eval |
 
 ## Pretraining, measured (A100 40 GB, full training loop with gradient accumulation)

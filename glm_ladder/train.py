@@ -9,6 +9,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from .loader import IGNORE_INDEX
+
 
 def lr_at(step: int, *, max_lr: float, warmup_steps: int, total_steps: int, min_ratio: float = 0.1) -> float:
     """Linear warmup to max_lr, then cosine decay to min_ratio * max_lr at total_steps.
@@ -52,6 +54,37 @@ def param_groups(model: nn.Module, weight_decay: float) -> list[dict]:
     ]
 
 
+def lm_loss(logits: torch.Tensor, targets: torch.Tensor, *, per_window: bool = False) -> torch.Tensor:
+    """Next-token cross-entropy over the learned targets (targets != IGNORE_INDEX).
+
+    per_window=False: mean over every learned token in the batch. A window with 600 learned
+        tokens weighs 300x more than one with 2 (pretraining: all windows are full, so this is
+        the same as per_window=True).
+    per_window=True: first the mean over each window's own learned tokens, then the mean over
+        windows. Every window counts equally, whatever it learns: when chat windows (~600 learned
+        tokens) and review windows (~2 per review) are mixed, each source then contributes in
+        proportion to its share of windows. Windows without any learned token are left out;
+        if no window has one, the loss is 0 (still connected to the graph, so backward works).
+    """
+    flat_logits = logits.float().flatten(0, 1)
+    if not per_window:
+        return F.cross_entropy(flat_logits, targets.flatten())
+
+    B,T = targets.shape
+    losses = F.cross_entropy(flat_logits,targets.flatten(),reduction="none").view(B,T)
+
+    learned = targets != IGNORE_INDEX
+
+    counts = learned.sum(dim=1)
+
+    valid_mask = counts > 0
+    if not valid_mask.any():
+        return flat_logits.sum() * 0.0
+
+    window_losses = losses.sum(dim=1)[valid_mask] / counts[valid_mask].float()
+    return window_losses.mean()
+
+
 def train_step(
     model: nn.Module,
     optimizer: torch.optim.Optimizer,
@@ -61,9 +94,11 @@ def train_step(
     balance_coef: float = 0.01,
     grad_clip: float = 1.0,
     forward: nn.Module | None = None,
+    per_window: bool = False,
 ) -> dict[str, float]:
     """Accumulate gradients over `micro_batches`, clip, and take one optimizer step.
 
+    `per_window`: how the language-model loss averages, see `lm_loss`.
     `forward` may be a torch.compile'd wrapper of `model`; gradients still land in
     `model`'s parameters because the wrapper shares them.
     """
@@ -78,10 +113,10 @@ def train_step(
         y = torch.as_tensor(targets, device=device)
         with torch.autocast(device_type=device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"):
             output = forward(x)
-            lm_loss = F.cross_entropy(output.logits.float().flatten(0, 1), y.flatten())
-            loss = (lm_loss + balance_coef * output.balance_loss) / steps
+            language_loss = lm_loss(output.logits, y, per_window=per_window)
+            loss = (language_loss + balance_coef * output.balance_loss) / steps
         loss.backward()
-        lm_sum += lm_loss.detach() / steps
+        lm_sum += language_loss.detach() / steps
         balance_sum += output.balance_loss.detach() / steps
     grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
     if not torch.isfinite(grad_norm):

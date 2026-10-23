@@ -51,6 +51,7 @@ class PretrainConfig:
     lora_rank: int = 0                 # 0: train every parameter; > 0: freeze the model and train LoRA adapters
     lora_alpha: float = 16.0
     lora_targets: str = "all"          # "attention", "experts" or "all" (see glm_ladder/lora.py)
+    loss_per_window: bool = False      # average the loss per window first (see glm_ladder/train.py: lm_loss)
 
     @property
     def tokens_per_step(self) -> int:
@@ -67,7 +68,7 @@ class PretrainConfig:
 RESUME_FIELDS = (
     "run_name", "total_tokens", "seq_len", "batch_rows", "max_lr", "min_lr_ratio",
     "warmup_steps", "weight_decay", "beta1", "beta2", "balance_coef", "grad_clip", "seed",
-    "lora_rank", "lora_alpha", "lora_targets",
+    "lora_rank", "lora_alpha", "lora_targets", "loss_per_window",
 )
 # A checkpoint saved before a field existed is compared with that field's default.
 DEFAULTS = {field.name: field.default for field in fields(PretrainConfig)}
@@ -203,7 +204,7 @@ def run_pretraining(
         batches = [(inputs[i:i + micro], targets[i:i + micro]) for i in range(0, cfg.batch_rows, micro)]
         started = time.perf_counter()
         stats = train_step(model, optimizer, batches, device=device, balance_coef=cfg.balance_coef,
-                           grad_clip=cfg.grad_clip, forward=forward)
+                           grad_clip=cfg.grad_clip, forward=forward, per_window=cfg.loss_per_window)
         seconds = time.perf_counter() - started
         step += 1
         tokens_seen += inputs.size
