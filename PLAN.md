@@ -52,6 +52,8 @@ Decisions are recorded with their reasons so the final report can explain why th
 | 2026-10-21 | Joint fine-tuning per size before RL: Turkish + English reviews + SFT replay (1/3 of windows), full fine-tuning, LR 3e-5 or 1e-4 | One model must rate reviews in both languages and keep chat and code; notebook 05 showed full fine-tuning dominates LoRA at matched forgetting and that single-task fine-tuning erases earlier skills |
 | 2026-10-21 | Loss averaged per window for the mix (`loss_per_window`) | A chat window has ~600 learned tokens, a review window 10-30; with the token mean the replay would be ~95% of the loss |
 | 2026-10-21 | Selection for the joint model: best mean val macro-F1 among runs with SFT val loss <= +10% (each language) and code reference loss <= +25%; else the least-forgetting run | The rule from Phase 4, made concrete before the runs |
+| 2026-10-23 | RL starts from `mix-s50m-lr1e-04` and `mix-m100m-lr1e-04` | Both within the forgetting limits; test macro-F1 within 0.002-0.025 of the Phase 4 specialists, SFT loss +2.4% at most, code reference loss +5% |
+| 2026-10-23 | Accept the small Turkish format leak (digit answers to 1 of 20 ordinary Turkish requests) and re-measure after RL | Below the 10% level set before measuring; the fix (more Turkish replay, weighting by reviews) costs another round |
 | open | Batched, KV-cached generation before RL | RL needs far more generation than the code eval |
 
 ## Pretraining, measured (A100 40 GB, full training loop with gradient accumulation)

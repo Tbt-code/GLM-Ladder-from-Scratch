@@ -4,7 +4,7 @@ A family of GLM-5.3-Flash-inspired mixture-of-experts language models at 25M, 50
 
 This project extends [vukrosic/glm-5.3-flash-from-scratch](https://github.com/vukrosic/glm-5.3-flash-from-scratch), which showed that executable-reward RL can teach a 25.7M model narrow coding behaviors. The central question here is what happens to that result as the model grows.
 
-> **Status: Phase 4 (fine-tuning) complete for `s-50m` and `m-100m`.** Both models are pretrained to 20 tokens per parameter ([results](#pretraining-results)), fine-tuned on chat data ([results](#post-training-sft-results)), and compared under full fine-tuning and LoRA on review rating in Turkish and English ([results](#fine-tuning-results-full-vs-lora)). After SFT, `m-100m` writes a function that passes its unit tests for 65% of 40 coding tasks within 10 tries; full fine-tuning beats LoRA on all four review-rating comparisons, by 0.004–0.036 macro-F1. `baseline-25m` reproduction and `l-200m` are deferred until fine-tuning and RL are done on the two trained rungs. Every number in this README comes from a receipt in [`artifacts/`](artifacts/) unless it is labeled as an estimate.
+> **Status: Phase 4 (fine-tuning) complete for `s-50m` and `m-100m`.** Both models are pretrained to 20 tokens per parameter ([results](#pretraining-results)), fine-tuned on chat data ([results](#post-training-sft-results)), and compared under full fine-tuning and LoRA on review rating in Turkish and English ([results](#fine-tuning-results-full-vs-lora)). After SFT, `m-100m` writes a function that passes its unit tests for 65% of 40 coding tasks within 10 tries; full fine-tuning beats LoRA on all four review-rating comparisons, by 0.004–0.036 macro-F1. One [joint fine-tuning](#joint-fine-tuning-one-model-per-size) run per size then gave a model that rates reviews in both languages almost as well as the specialists while keeping chat and code; these two models are the starting point for RL. `baseline-25m` reproduction and `l-200m` are deferred until fine-tuning and RL are done on the two trained rungs. Every number in this README comes from a receipt in [`artifacts/`](artifacts/) unless it is labeled as an estimate.
 
 ## Research question
 
@@ -367,6 +367,66 @@ Fine-tuning on one narrow task damages what SFT taught, and the damage depends o
 
 Reproduce: [`notebooks/05_finetune.ipynb`](notebooks/05_finetune.ipynb) (about 2.5 hours on an A100 for all 31 runs and the test). Receipts for every run and the test summary: [`artifacts/finetune/`](artifacts/finetune/).
 
+## Joint fine-tuning: one model per size
+
+The Phase 4 specialists rate reviews in one language and have lost much of their chat and coding ability. RL needs a model that keeps them, so each size gets **one** more fine-tuning run that learns both languages at once and replays SFT data. These two models are the starting point for RL.
+
+### Recipe
+
+| Setting | Value |
+|---|---|
+| Start | the SFT checkpoints |
+| Data, by share of windows | Turkish reviews 14.9%, English reviews 51.8%, SFT replay 33.3% (English 30.0%, Turkish 3.3%) |
+| Length | one epoch of both review sets: 30,358 windows, 31.1M tokens, 238 steps of 128 windows |
+| Method | full fine-tuning (better than LoRA at every matched level of forgetting in Phase 4), no weight decay, warmup 5%, cosine decay, `torch.compile` |
+| Loss | **averaged per window** (`loss_per_window`) |
+| Learning rate | 3e-5 or 1e-4, chosen by the rule below |
+
+**Why the loss is averaged per window.** A chat window has ~600 learned tokens; a review window has 10–32 (one digit and `<|end|>` per review). With the usual mean over all learned tokens, the replay would make up ~95% of the loss and the reviews would barely be learned. Averaging inside each window first makes every window count equally, so each source contributes its share of windows.
+
+**Selection rule, fixed before the runs.** Among the runs whose SFT validation loss rises by at most 10% in each language and whose code reference loss rises by at most 25%, pick the highest mean validation macro-F1 over both languages.
+
+### Results
+
+| | LR | Val F1 TR / EN | SFT val loss EN / TR | Code reference loss |
+|---|---|---:|---:|---:|
+| `s-50m` | 3e-5 | 0.489 / 0.560 | +0.8% / +0.9% | +1.8% |
+| `s-50m` | **1e-4** (selected) | **0.555 / 0.583** | +1.8% / +2.4% | +4.2% |
+| `m-100m` | 3e-5 | 0.522 / 0.590 | +0.6% / +0.8% | +7.1% |
+| `m-100m` | **1e-4** (selected) | **0.585 / 0.621** | +1.9% / +2.4% | +4.6% |
+
+All four runs stayed well within the limits, so the rule picked the higher learning rate at both sizes. Test sets:
+
+| Test macro-F1 (accuracy) | Turkish | English | Code reference loss |
+|---|---:|---:|---:|
+| `s-50m` SFT model | 0.045 (0.128) | 0.067 (0.196) | 0.471 |
+| **`s-50m` joint** | **0.561** (0.599) | **0.584** (0.591) | **0.491** |
+| `s-50m` specialists (Phase 4, full) | 0.572 | 0.586 | 1.305 / 1.620 |
+| `m-100m` SFT model | 0.045 (0.128) | 0.067 (0.196) | 0.362 |
+| **`m-100m` joint** | **0.582** (0.617) | **0.611** (0.615) | **0.379** |
+| `m-100m` specialists (Phase 4, full) | 0.607 | 0.617 | 8.599 / 7.382 |
+
+- **One model now does what two specialists did, without paying for it in chat or code.** In English the joint models are within 0.006 macro-F1 of the specialists; the SFT validation losses rise by at most 2.4% instead of 20–224%, and the code reference loss by ~5% instead of 2.8–24×.
+- **Turkish is 0.011–0.025 behind the specialists, and the mix is the likely reason.** The window mean equalises windows, not reviews: a Turkish window holds ~16 reviews and an English one ~5, so each Turkish review weighs about 3.4× less than an English one. Weighting by reviews instead of windows is the obvious fix and was not tried.
+- The specialists' code losses above are from their own learning rates (1e-4 for `s-50m`, 3e-4 for `m-100m`), so the `m-100m` comparison is partly a learning-rate effect. The joint runs use 1e-4 at both sizes.
+
+### Format leakage into Turkish chat
+
+One greedy sample showed the problem that the validation losses could not: asked `Sağlıklı beslenme için üç öneri ver.` ("Give three tips for healthy eating."), the joint `m-100m` answered `5`. Almost every Turkish user message in the mix is a review to rate (Turkish SFT replay is only 3.3% of windows), so the model partly learned "Turkish request → digit". The SFT loss barely moves, because only the first token of the answer changes.
+
+Measured on 20 ordinary requests per language: the probability that the first answer token is a star digit.
+
+| | Turkish: mean | Turkish: requests above 0.5 | English: mean | English: requests above 0.5 |
+|---|---:|---:|---:|---:|
+| `s-50m` SFT → joint | 0.029 → 0.065 | 0 → 1 of 20 | 0.013 → 0.004 | 0 → 0 |
+| `m-100m` SFT → joint | 0.035 → 0.089 | 0 → 1 of 20 | 0.037 → 0.038 | 0 → 0 |
+
+The leak is real but small and only in Turkish, which fits the explanation: English has about nine times more replay. The models were accepted as the RL starting point; the measurement will be repeated after RL. More Turkish replay would be the fix.
+
+Other samples (greedy, [`artifacts/finetune-mix/summary.json`](artifacts/finetune-mix/summary.json)): both models still answer English chat requests in the SFT style, rate the two example reviews correctly (5 and 1), and `m-100m` still writes a correct `is_even`.
+
+Reproduce: [`notebooks/06_finetune_mix.ipynb`](notebooks/06_finetune_mix.ipynb) (about 45 minutes on an A100). Receipts: [`artifacts/finetune-mix/`](artifacts/finetune-mix/). Weights: `runs/mix-s50m-lr1e-04` and `runs/mix-m100m-lr1e-04` in the runs repo.
+
 ## Plan
 
 | Phase | Work | Exit criterion | Status |
@@ -375,7 +435,7 @@ Reproduce: [`notebooks/05_finetune.ipynb`](notebooks/05_finetune.ipynb) (about 2
 | 1. Data | BPE tokenizer, mixed English + Python + Turkish corpus, sharded and hashed | Deterministic, resumable data stream | Done |
 | 2. Pretraining | S → M; baseline reproduction and L deferred | Loss curves, held-out loss, receipts | Done for S and M |
 | 3. Post-training | Supervised fine-tuning on chat data | Eval before vs after | Done for S and M: forgetting, executable code eval, chat samples |
-| 4. Fine-tuning | Full fine-tuning vs LoRA on review rating (1-5 stars) in Turkish and English | Matched-data comparison on held-out test sets | Done for S and M: LR sweep, ranks, test, forgetting |
+| 4. Fine-tuning | Full fine-tuning vs LoRA on review rating (1-5 stars) in Turkish and English | Matched-data comparison on held-out test sets | Done for S and M: LR sweep, ranks, test, forgetting; joint model per size for RL |
 | 5. Reinforcement learning | Reproduce RLOO, then GRPO, DPO, reward and KL ablations at every rung | Locked confirmation-set results with paired statistics | |
 | 6. Report | Scaling analysis, negative results, limitations | `REPORT.md` | |
 
@@ -383,7 +443,7 @@ The evaluation protocol follows the original repository: decisions are made on a
 
 ## Compute and storage
 
-- **Compute:** Google Colab Pro (L4 and A100), 300 compute units in total. Pretraining both rungs took about 7 hours of training on an A100, roughly 45–50 units including setup, evaluation, and checkpoint uploads (estimate from session hours). After SFT and the GPU code evaluation, about 95 of the 300 units had been used (Colab balance); the fine-tuning study added roughly 25–30 (estimate from session hours).
+- **Compute:** Google Colab Pro (L4 and A100), 300 compute units in total. Pretraining both rungs took about 7 hours of training on an A100, roughly 45–50 units including setup, evaluation, and checkpoint uploads (estimate from session hours). After SFT and the GPU code evaluation, about 95 of the 300 units had been used (Colab balance); the fine-tuning study added roughly 25–30 and the joint fine-tuning about 6 (estimates from session hours).
 - **Resumable training:** Colab sessions can end at any time. Training state (weights, AdamW moments, RNG, step, data position) is pushed to the Hub every 15–25 minutes, and re-running the notebook resumes from the latest checkpoint with the same data order. The two most recent resume checkpoints and the final weights are kept.
 - **Code and receipts:** this GitHub repository.
 - **Checkpoints and tokenized data:** a Hugging Face Hub repository (too large for GitHub), saved as `safetensors` with SHA-256 hashes recorded in receipts here.
@@ -400,6 +460,7 @@ Notebooks are run from VS Code on a Colab GPU runtime through the Google Colab e
 | [`03_sft`](notebooks/03_sft.ipynb) | A100 | Supervised fine-tuning of one pretrained rung (resumable) |
 | [`04_code_eval`](notebooks/04_code_eval.ipynb) | A100 | Code evaluation of every model and prompt mode; uploads receipts |
 | [`05_finetune`](notebooks/05_finetune.ipynb) | A100 | Full fine-tuning vs LoRA on review rating: baselines, LR sweep, ranks, English, test |
+| [`06_finetune_mix`](notebooks/06_finetune_mix.ipynb) | A100 | Joint fine-tuning (both languages + SFT replay): the RL starting models |
 
 In VS Code: open a notebook, *Select Kernel → Colab → New Colab Server*, pick the runtime, run all cells. The Hugging Face token is typed into a hidden prompt and never stored.
 
@@ -423,6 +484,7 @@ python scripts/fetch_evals.py
 # Build the review-rating data; fetch the fine-tuning receipts after notebook 05
 python scripts/prepare_finetune.py
 python scripts/fetch_evals.py --pattern "finetune/*.json" --to artifacts/finetune
+python scripts/fetch_evals.py --pattern "finetune-mix/*.json" --to artifacts/finetune-mix
 ```
 
 ## Repository map
