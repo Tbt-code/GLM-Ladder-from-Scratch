@@ -114,7 +114,12 @@ def sample_many(
     model: nn.Module, prompt_ids: list[int], *, n: int, max_new_tokens: int, temperature: float,
     top_k: int | None, seed: int, stop: Callable[[list[int]], bool],
 ) -> list[list[int]]:
-    """n continuations of one prompt, generated as one batch; each stops when stop(its new ids) is True."""
+    """n continuations of one prompt, generated as one batch; each stops when stop(its new ids) is True.
+
+    Models with a generation cache (GLMLadderModel.new_cache) process the prompt once and then
+    one token per step, as long as prompt + new tokens fit in the context; otherwise every step
+    re-runs the whole (sliding) window. Both paths draw the same random numbers.
+    """
     was_training = model.training
     model.eval()
     device = next(model.parameters()).device
@@ -123,8 +128,13 @@ def sample_many(
     context = torch.tensor([prompt_ids] * n, dtype=torch.long)
     outputs: list[list[int]] = [[] for _ in range(n)]
     done = [False] * n
+    cache = model.new_cache() if hasattr(model, "new_cache") and len(prompt_ids) + max_new_tokens <= window else None
+    step_input = context
     for _ in range(max_new_tokens):
-        logits = model(context[:, -window:].to(device)).logits[:, -1].float().cpu()
+        if cache is not None:
+            logits = model(step_input.to(device), cache=cache).logits[:, -1].float().cpu()
+        else:
+            logits = model(context[:, -window:].to(device)).logits[:, -1].float().cpu()
         if temperature == 0:
             tokens = logits.argmax(dim=-1)
         else:
@@ -140,6 +150,7 @@ def sample_many(
         if all(done):
             break
         context = torch.cat([context, tokens[:, None]], dim=1)
+        step_input = tokens[:, None]
     model.train(was_training)
     return outputs
 

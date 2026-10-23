@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass, field
 from typing import NamedTuple
 
 import torch
@@ -17,6 +18,34 @@ class ModelOutput(NamedTuple):
     expert_usage: torch.Tensor  # [layers, experts], fraction of routed slots (detached)
 
 
+# ----------------------------------------------------------------- generation cache
+#
+# Without a cache, every new token re-runs the model over the whole sequence. With it, the
+# prompt is processed once ("prefill") and each new token is a forward pass of length 1
+# ("decode") that reads what earlier tokens left behind:
+#   linear attention: a running sum per head, state = sum_j k_j v_j^T and normalizer = sum_j k_j
+#                     (fixed size, however long the sequence is)
+#   sparse attention: the keys and values of every earlier position (grows by one per token)
+# Everything else in the model (norms, MoE, residual streams) works on each token on its own.
+
+@dataclass
+class LinearCache:
+    state: torch.Tensor | None = None        # [B, H, d, e] float32
+    normalizer: torch.Tensor | None = None   # [B, H, d] float32
+
+
+@dataclass
+class SparseCache:
+    keys: torch.Tensor | None = None         # [B, H, T, d]
+    values: torch.Tensor | None = None       # [B, H, T, d]
+
+
+@dataclass
+class ModelCache:
+    layers: list = field(default_factory=list)   # one LinearCache or SparseCache per layer
+    length: int = 0                              # positions already processed
+
+
 class RMSNorm(nn.Module):
     def __init__(self, dim: int, eps: float = 1e-6):
         super().__init__()
@@ -28,13 +57,17 @@ class RMSNorm(nn.Module):
         return (x.float() * inv_rms * self.weight.float()).to(x.dtype)
 
 
-def apply_rope(q: torch.Tensor, k: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-    """Apply rotary position embeddings to [batch, time, heads, head_dim]."""
+def apply_rope(q: torch.Tensor, k: torch.Tensor, start: int = 0) -> tuple[torch.Tensor, torch.Tensor]:
+    """Apply rotary position embeddings to [batch, time, heads, head_dim].
+
+    `start` is the position of the first token: 0 for a whole sequence, the number of
+    cached positions when decoding with a cache.
+    """
     length, width = q.shape[1], q.shape[-1]
     if width % 2:
         raise ValueError("head dimension must be even for RoPE")
 
-    positions = torch.arange(length,device = q.device,dtype = torch.float32)
+    positions = torch.arange(start, start + length, device=q.device, dtype=torch.float32)
     frequencies = 1 / (10000 ** (torch.arange(0,width,2,device=q.device).float() / width))
     angles = positions[:,None] * frequencies[None,:]
     cos = angles.cos()[None, :, None, :].to(q.dtype)
@@ -88,6 +121,34 @@ def chunked_causal_linear_attention(
     output = numerator / denominator.clamp_min(1e-6).unsqueeze(-1)
     return output.reshape(batch,chunks * chunk_size,heads,value_width)[:,:length]
 
+def linear_attention_step(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, cache: LinearCache) -> torch.Tensor:
+    """One new position with the recurrent form of linear attention.
+
+    q, k: [B, 1, H, d] (already positive, ELU + 1), v: [B, 1, H, e], all float32.
+    cache.state [B, H, d, e] and cache.normalizer [B, H, d] hold the sums over every earlier
+    position. Update them with this position first (attention includes the token itself),
+    then return the output [B, 1, H, e]:
+
+        state      <- state + k^T v              (outer product per head)
+        normalizer <- normalizer + k
+        output      = (q . state) / (q . normalizer)
+
+    This must give exactly what chunked_causal_linear_attention gives for the last position
+    of the whole sequence (the test checks it).
+    """
+
+    q, k, v = q[:, 0], k[:, 0], v[:, 0]
+    cache.state = cache.state + torch.einsum("bhd,bhe->bhde", k, v)
+    cache.normalizer = cache.normalizer + k
+
+    numerator = torch.einsum("bhd,bhde->bhe", q, cache.state)
+    denominator = (q * cache.normalizer).sum(-1)
+    output = numerator / denominator.clamp_min(1e-6)[..., None]
+    
+    return output.unsqueeze(1)
+
+
+
 class LinearAttention(nn.Module):
     """Causal positive-feature (ELU + 1) linear attention."""
 
@@ -99,18 +160,30 @@ class LinearAttention(nn.Module):
         self.qkv = nn.Linear(config.dim, config.dim * 3, bias=False)
         self.out = nn.Linear(config.dim, config.dim, bias=False)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, cache: LinearCache | None = None, start: int = 0) -> torch.Tensor:
         batch, length, dim = x.shape
         q, k, v = self.qkv(x).chunk(3, dim=-1)
         q = q.view(batch,length,self.heads,self.head_dim)
         k = k.view(batch,length,self.heads,self.head_dim)
         v = v.view(batch,length,self.heads,self.head_dim)
-        q,k = apply_rope(q,k) #apply_rope to q and k
+        q,k = apply_rope(q,k,start) #apply_rope to q and k
 
         with torch.autocast(device_type=x.device.type, enabled=False):
             q = F.elu(q.float()) + 1.0
             k = F.elu(k.float()) + 1.0
-            output = chunked_causal_linear_attention(q,k,v.float(),self.chunk_size)
+            v = v.float()
+            if cache is None or cache.state is None:
+                # Whole sequence, or the prompt when generating ("prefill").
+                if cache is not None and start != 0:
+                    raise ValueError("a linear-attention cache must be filled from position 0")
+                output = chunked_causal_linear_attention(q, k, v, self.chunk_size)
+                if cache is not None:
+                    cache.state = torch.einsum("bthd,bthe->bhde", k, v)
+                    cache.normalizer = k.sum(dim=1)
+            else:
+                if length != 1:
+                    raise ValueError("decode one position at a time once the cache is filled")
+                output = linear_attention_step(q, k, v, cache)
         return self.out(output.to(x.dtype).reshape(batch, length, dim))
 
 
@@ -123,6 +196,35 @@ def sparse_causal_mask(length: int, window: int, stride: int, device: torch.devi
     anchor = (cols % stride) == 0
 
     return causal & (local | anchor)
+
+def cached_attention(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, cache: SparseCache,
+                     mask_rows: torch.Tensor) -> torch.Tensor:
+    """Attention for new positions that may also look at every cached position.
+
+    q, k, v: [B, H, T, d] for the T new positions (RoPE already applied).
+    cache.keys / cache.values: [B, H, P, d] for the P earlier positions, or None when empty.
+    mask_rows: [T, P + T] booleans, the rows of the sparse causal mask for the new positions.
+    Append the new keys and values to the cache, then attend. Returns [B, H, T, d].
+    """
+    if cache.keys is None or cache.values is None:
+        cache.keys = k
+        cache.values = v
+    else:
+        cache.keys = torch.cat([cache.keys,k],dim=2)
+        cache.values = torch.cat([cache.values,v],dim=2)
+    return F.scaled_dot_product_attention(q,cache.keys,cache.values,attn_mask=mask_rows)
+
+
+def sparse_mask_rows(start: int, length: int, window: int, stride: int, device: torch.device) -> torch.Tensor:
+    """Rows start .. start + length - 1 of sparse_causal_mask(start + length), built directly.
+
+    Caching a full mask for every length a decode passes through would hold ~0.5 GB of
+    booleans per layer at 1024 tokens; one row per step is tiny.
+    """
+    rows = torch.arange(start, start + length, device=device)[:, None]
+    cols = torch.arange(start + length, device=device)[None, :]
+    return (cols <= rows) & (((rows - cols) < window) | ((cols % stride) == 0))
+
 
 class SparseAttention(nn.Module):
     """Causal attention restricted to a local window plus strided anchors."""
@@ -144,7 +246,7 @@ class SparseAttention(nn.Module):
             self._mask_cache[key] = sparse_causal_mask(length, self.window, self.stride, device)
         return self._mask_cache[key]
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, cache: SparseCache | None = None, start: int = 0) -> torch.Tensor:
         batch, length, dim = x.shape
         q, k, v = self.qkv(x).chunk(3, dim=-1)
        
@@ -152,12 +254,16 @@ class SparseAttention(nn.Module):
         k = k.view(batch, length, self.heads, self.head_dim)
         v = v.view(batch,length,self.heads,self.head_dim)
 
-        q,k = apply_rope(q,k)
+        q,k = apply_rope(q,k,start)
 
         q = q.transpose(1,2)
         k = k.transpose(1,2)
         v = v.transpose(1,2)
-        output = F.scaled_dot_product_attention(q, k, v, attn_mask=self.mask(length, x.device))
+        if cache is None:
+            output = F.scaled_dot_product_attention(q, k, v, attn_mask=self.mask(length, x.device))
+        else:
+            mask_rows = sparse_mask_rows(start, length, self.window, self.stride, x.device)
+            output = cached_attention(q, k, v, cache, mask_rows)
     
         return self.out(output.transpose(1,2).reshape(batch,length,dim))
 
@@ -226,8 +332,10 @@ class HybridBlock(nn.Module):
         self.attention = SparseAttention(config) if sparse else LinearAttention(config)
         self.moe = SparseMoE(config)
 
-    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        x = x + self.attention(self.attention_norm(x)) #pre-norm residual attention, then pre-norm residual MoE.
+    def forward(self, x: torch.Tensor, cache=None, start: int = 0) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        normed = self.attention_norm(x)
+        attended = self.attention(normed) if cache is None else self.attention(normed, cache, start)
+        x = x + attended #pre-norm residual attention, then pre-norm residual MoE.
         ffn,balance_loss,usage = self.moe(self.ffn_norm(x))
         return x + ffn,balance_loss,usage
 
@@ -240,9 +348,9 @@ class HyperConnection(nn.Module):
         self.input_logits = nn.Parameter(torch.linspace(0.1, -0.1, config.streams))
         self.output_logits = nn.Parameter(torch.linspace(-0.1, 0.1, config.streams))
 
-    def forward(self, streams: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def forward(self, streams: torch.Tensor, cache=None, start: int = 0) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         mixed = torch.einsum("s,btsd->btd", torch.softmax(self.input_logits, dim=0).to(streams.dtype), streams)
-        transformed, balance_loss, usage = self.block(mixed)
+        transformed, balance_loss, usage = self.block(mixed) if cache is None else self.block(mixed, cache, start)
         routed = torch.softmax(self.output_logits,dim=0).to(streams.dtype)
         streams = streams + transformed.unsqueeze(2) * routed[None, None, :, None]
         return streams,balance_loss,usage
@@ -278,19 +386,31 @@ class GLMLadderModel(nn.Module):
             for expert in [*layer.block.moe.experts, layer.block.moe.shared]:
                 nn.init.normal_(expert.down.weight, mean=0.0, std=std)
 
-    def forward_embeddings(self, embedded: torch.Tensor) -> ModelOutput:
-        """Run the language model from precomputed token-like embeddings."""
+    def new_cache(self) -> ModelCache:
+        """An empty generation cache; pass it to forward() for the prompt, then one token at a time."""
+        return ModelCache(layers=[SparseCache() if self.config.is_sparse_layer(index) else LinearCache()
+                                  for index in range(self.config.layers)])
+
+    def forward_embeddings(self, embedded: torch.Tensor, cache: ModelCache | None = None) -> ModelOutput:
+        """Run the language model from precomputed token-like embeddings.
+
+        With `cache`, the inputs are the next positions after cache.length (all of the prompt
+        first, then one token per call), and the cache is updated in place.
+        """
         if embedded.ndim != 3 or embedded.shape[-1] != self.config.dim:
             raise ValueError("embedded inputs must have shape [batch, time, dim]")
-        if embedded.shape[1] > self.config.max_sequence_length:
+        start = 0 if cache is None else cache.length
+        if start + embedded.shape[1] > self.config.max_sequence_length:
             raise ValueError("input exceeds max_sequence_length")
 
         # One embedding copied into every stream: [B, T, D] -> [B, T, S, D]
         streams = embedded.unsqueeze(2).expand(-1, -1, self.config.streams, -1).contiguous()
 
         balance_losses, usages = [], []
-        for layer in self.layers:
-            if self.gradient_checkpointing and self.training:
+        for index, layer in enumerate(self.layers):
+            if cache is not None:
+                streams, balance_loss, usage = layer(streams, cache.layers[index], start)
+            elif self.gradient_checkpointing and self.training:
                 streams, balance_loss, usage = checkpoint(layer, streams, use_reentrant=False)
             else:
                 streams,balance_loss,usage = layer(streams)
@@ -300,8 +420,11 @@ class GLMLadderModel(nn.Module):
         return ModelOutput(self.output(hidden), torch.stack(balance_losses).mean(), torch.stack(usages))
 
 
-    def forward(self, input_ids: torch.Tensor) -> ModelOutput:
-        return self.forward_embeddings(self.embedding(input_ids))
+    def forward(self, input_ids: torch.Tensor, cache: ModelCache | None = None) -> ModelOutput:
+        output = self.forward_embeddings(self.embedding(input_ids), cache)
+        if cache is not None:
+            cache.length += input_ids.shape[1]
+        return output
 
     def parameter_counts(self) -> dict[str, int]:
         total = sum(parameter.numel() for parameter in self.parameters())
