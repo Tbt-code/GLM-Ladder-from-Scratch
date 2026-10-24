@@ -112,13 +112,14 @@ def pass_at_k(n: int, c: int, k: int) -> float:
 @torch.no_grad()
 def sample_many(
     model: nn.Module, prompt_ids: list[int], *, n: int, max_new_tokens: int, temperature: float,
-    top_k: int | None, seed: int, stop: Callable[[list[int]], bool],
+    top_k: int | None, seed: int, stop: Callable[[list[int]], bool], decoder=None,
 ) -> list[list[int]]:
     """n continuations of one prompt, generated as one batch; each stops when stop(its new ids) is True.
 
     Models with a generation cache (GLMLadderModel.new_cache) process the prompt once and then
     one token per step, as long as prompt + new tokens fit in the context; otherwise every step
-    re-runs the whole (sliding) window. Both paths draw the same random numbers.
+    re-runs the whole (sliding) window. With `decoder` (a GraphDecoder recorded for batch n),
+    each new token is one CUDA-graph replay. All paths draw the same random numbers.
     """
     was_training = model.training
     model.eval()
@@ -128,10 +129,14 @@ def sample_many(
     context = torch.tensor([prompt_ids] * n, dtype=torch.long)
     outputs: list[list[int]] = [[] for _ in range(n)]
     done = [False] * n
+    if decoder is not None and (decoder.batch != n or len(prompt_ids) + max_new_tokens > decoder.max_length):
+        raise ValueError("decoder does not fit this batch or length")
     cache = model.new_cache() if hasattr(model, "new_cache") and len(prompt_ids) + max_new_tokens <= window else None
     step_input = context
-    for _ in range(max_new_tokens):
-        if cache is not None:
+    for step in range(max_new_tokens):
+        if decoder is not None:
+            logits = (decoder.prefill(context) if step == 0 else decoder.step(step_input[:, 0].to(device))).float().cpu()
+        elif cache is not None:
             logits = model(step_input.to(device), cache=cache).logits[:, -1].float().cpu()
         else:
             logits = model(context[:, -window:].to(device)).logits[:, -1].float().cpu()

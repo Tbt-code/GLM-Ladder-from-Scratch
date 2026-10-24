@@ -46,6 +46,23 @@ class ModelCache:
     length: int = 0                              # positions already processed
 
 
+# A CUDA graph replays exactly the kernels it recorded, on exactly the same memory. So a cache
+# used inside one must never change shape or move: keys and values live in buffers of the
+# full context length, every update writes into existing tensors (in place), and the current
+# position is a tensor on the GPU instead of a Python int.
+
+@dataclass
+class StaticSparseCache:
+    keys: torch.Tensor                           # [B, H, max_length, d], filled up to `position`
+    values: torch.Tensor
+
+
+@dataclass
+class StaticCache:
+    layers: list                                 # LinearCache (preallocated) or StaticSparseCache per layer
+    position: torch.Tensor                       # long [1]: index of the next token
+
+
 class RMSNorm(nn.Module):
     def __init__(self, dim: int, eps: float = 1e-6):
         super().__init__()
@@ -57,7 +74,7 @@ class RMSNorm(nn.Module):
         return (x.float() * inv_rms * self.weight.float()).to(x.dtype)
 
 
-def apply_rope(q: torch.Tensor, k: torch.Tensor, start: int = 0) -> tuple[torch.Tensor, torch.Tensor]:
+def apply_rope(q: torch.Tensor, k: torch.Tensor, start: int | torch.Tensor = 0) -> tuple[torch.Tensor, torch.Tensor]:
     """Apply rotary position embeddings to [batch, time, heads, head_dim].
 
     `start` is the position of the first token: 0 for a whole sequence, the number of
@@ -67,7 +84,8 @@ def apply_rope(q: torch.Tensor, k: torch.Tensor, start: int = 0) -> tuple[torch.
     if width % 2:
         raise ValueError("head dimension must be even for RoPE")
 
-    positions = torch.arange(start, start + length, device=q.device, dtype=torch.float32)
+    # `start` is an int, or a long tensor of shape [1] when decoding from a CUDA graph.
+    positions = torch.arange(length, device=q.device, dtype=torch.float32) + start
     frequencies = 1 / (10000 ** (torch.arange(0,width,2,device=q.device).float() / width))
     angles = positions[:,None] * frequencies[None,:]
     cos = angles.cos()[None, :, None, :].to(q.dtype)
@@ -135,11 +153,16 @@ def linear_attention_step(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, cac
 
     This must give exactly what chunked_causal_linear_attention gives for the last position
     of the whole sequence (the test checks it).
+
+    The update must be IN PLACE (cache.state.add_(...), not cache.state = cache.state + ...):
+    a CUDA graph records the memory address of cache.state, and replays read and write that
+    address. A new tensor would live elsewhere, so the next replay would read stale data.
     """
 
     q, k, v = q[:, 0], k[:, 0], v[:, 0]
-    cache.state = cache.state + torch.einsum("bhd,bhe->bhde", k, v)
-    cache.normalizer = cache.normalizer + k
+   
+    cache.state.add_(torch.einsum("bhd,bhe->bhde", k, v))
+    cache.normalizer.add_(k)
 
     numerator = torch.einsum("bhd,bhde->bhe", q, cache.state)
     denominator = (q * cache.normalizer).sum(-1)
@@ -215,6 +238,26 @@ def cached_attention(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, cache: S
     return F.scaled_dot_product_attention(q,cache.keys,cache.values,attn_mask=mask_rows)
 
 
+def static_cached_attention(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, cache: StaticSparseCache,
+                            position: torch.Tensor, window: int, stride: int) -> torch.Tensor:
+    """One new position with a preallocated key/value buffer (CUDA-graph friendly).
+
+    q, k, v: [B, H, 1, d] for the token at `position` (long tensor [1]).
+    cache.keys / cache.values: [B, H, L, d], where L is the full context length.
+    Write k and v into slot `position`, then attend over all L slots with a mask that keeps
+    only this token's sparse causal row: slots after `position` hold old or unwritten data
+    and must be masked out. Returns [B, H, 1, d]. No shape may depend on the position value.
+    """
+ 
+    cache.keys.index_copy_(2, position, k)
+    cache.values.index_copy_(2, position, v)
+    L = cache.keys.shape[2]
+    cols = torch.arange(L, device=q.device)
+    allowed = (cols <= position) & (((position - cols) < window) | ((cols % stride) == 0))
+    
+    return F.scaled_dot_product_attention(q, cache.keys, cache.values, attn_mask=allowed.view(1, L))
+
+
 def sparse_mask_rows(start: int, length: int, window: int, stride: int, device: torch.device) -> torch.Tensor:
     """Rows start .. start + length - 1 of sparse_causal_mask(start + length), built directly.
 
@@ -261,6 +304,10 @@ class SparseAttention(nn.Module):
         v = v.transpose(1,2)
         if cache is None:
             output = F.scaled_dot_product_attention(q, k, v, attn_mask=self.mask(length, x.device))
+        elif isinstance(cache, StaticSparseCache):
+            if length != 1:
+                raise ValueError("a static cache decodes one position at a time")
+            output = static_cached_attention(q, k, v, cache, start, self.window, self.stride)
         else:
             mask_rows = sparse_mask_rows(start, length, self.window, self.stride, x.device)
             output = cached_attention(q, k, v, cache, mask_rows)
@@ -333,8 +380,8 @@ class SparseMoE(nn.Module):
         top_weights = torch.softmax(top_values, dim=-1)   # [tokens, k]
 
         dense = not self.training and tokens <= self.dense_max_tokens
-        if dense:   # same counts as bincount, without a data-dependent output size
-            counts = F.one_hot(top_indices.reshape(-1), experts).sum(dim=0).float()
+        if dense:   # same counts as bincount, without a data-dependent output size or a check that syncs
+            counts = (top_indices.reshape(-1, 1) == torch.arange(experts, device=flat.device)).sum(dim=0).float()
         else:
             counts = torch.bincount(top_indices.reshape(-1),minlength=experts).float()
         fraction = counts / (tokens * self.top_k)
@@ -430,6 +477,39 @@ class GLMLadderModel(nn.Module):
         return ModelCache(layers=[SparseCache() if self.config.is_sparse_layer(index) else LinearCache()
                                   for index in range(self.config.layers)])
 
+    def new_static_cache(self, batch: int, max_length: int | None = None, device: torch.device | None = None,
+                         dtype: torch.dtype = torch.float32) -> StaticCache:
+        """Preallocated buffers for decoding `batch` sequences of up to `max_length` positions."""
+        config = self.config
+        max_length = max_length or config.max_sequence_length
+        device = device or self.embedding.weight.device
+        heads, width = config.heads, config.head_dim
+        layers = []
+        for index in range(config.layers):
+            if config.is_sparse_layer(index):
+                layers.append(StaticSparseCache(
+                    keys=torch.zeros(batch, heads, max_length, width, device=device, dtype=dtype),
+                    values=torch.zeros(batch, heads, max_length, width, device=device, dtype=dtype)))
+            else:
+                layers.append(LinearCache(
+                    state=torch.zeros(batch, heads, width, width, device=device, dtype=torch.float32),
+                    normalizer=torch.zeros(batch, heads, width, device=device, dtype=torch.float32)))
+        return StaticCache(layers=layers, position=torch.zeros(1, dtype=torch.long, device=device))
+
+    @staticmethod
+    def fill_static_cache(static: StaticCache, cache: ModelCache) -> None:
+        """Copy a prompt's ordinary cache into static buffers, in place (the CUDA graph keeps its addresses)."""
+        for target, source in zip(static.layers, cache.layers):
+            if isinstance(target, StaticSparseCache):
+                if source.keys.shape[2] > target.keys.shape[2]:
+                    raise ValueError("prompt longer than the static cache")
+                target.keys[:, :, :source.keys.shape[2]].copy_(source.keys)
+                target.values[:, :, :source.values.shape[2]].copy_(source.values)
+            else:
+                target.state.copy_(source.state)
+                target.normalizer.copy_(source.normalizer)
+        static.position.fill_(cache.length)
+
     def forward_embeddings(self, embedded: torch.Tensor, cache: ModelCache | None = None) -> ModelOutput:
         """Run the language model from precomputed token-like embeddings.
 
@@ -438,9 +518,12 @@ class GLMLadderModel(nn.Module):
         """
         if embedded.ndim != 3 or embedded.shape[-1] != self.config.dim:
             raise ValueError("embedded inputs must have shape [batch, time, dim]")
-        start = 0 if cache is None else cache.length
-        if start + embedded.shape[1] > self.config.max_sequence_length:
-            raise ValueError("input exceeds max_sequence_length")
+        if isinstance(cache, StaticCache):
+            start = cache.position          # a tensor; the caller keeps the position inside the buffers
+        else:
+            start = 0 if cache is None else cache.length
+            if start + embedded.shape[1] > self.config.max_sequence_length:
+                raise ValueError("input exceeds max_sequence_length")
 
         # One embedding copied into every stream: [B, T, D] -> [B, T, S, D]
         streams = embedded.unsqueeze(2).expand(-1, -1, self.config.streams, -1).contiguous()
@@ -461,7 +544,9 @@ class GLMLadderModel(nn.Module):
 
     def forward(self, input_ids: torch.Tensor, cache: ModelCache | None = None) -> ModelOutput:
         output = self.forward_embeddings(self.embedding(input_ids), cache)
-        if cache is not None:
+        if isinstance(cache, StaticCache):
+            cache.position.add_(input_ids.shape[1])        # in place: part of the recorded graph
+        elif cache is not None:
             cache.length += input_ids.shape[1]
         return output
 

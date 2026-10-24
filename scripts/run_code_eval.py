@@ -29,15 +29,29 @@ from glm_ladder.chat import END_TOKEN, prompt_ids, special_id  # noqa: E402
 from glm_ladder.code_eval import (  # noqa: E402
     answer_loss, extract_from_chat, extract_from_completion, load_tasks, run_tests, sample_many, summarize,
 )
+from glm_ladder.graph_decode import GraphDecoder  # noqa: E402
 from glm_ladder.tokenizer import EOS_ID, load_tokenizer  # noqa: E402
 from sample import load_run  # noqa: E402  (scripts/sample.py)
 
 
 def evaluate(model, tokenizer, tasks, *, mode: str, n: int = 10, temperature: float = 0.8, top_k: int = 50,
              max_tokens: int = 160, seed: int = 0, loss_only: bool = False, verbose: bool = False,
-             log=print) -> tuple[list[dict], dict]:
-    """Per-task results and the summary (reference loss, greedy pass@1, sampled pass@k)."""
+             log=print, graphs: bool | None = None) -> tuple[list[dict], dict]:
+    """Per-task results and the summary (reference loss, greedy pass@1, sampled pass@k).
+
+    graphs: decode from CUDA graphs (default: when the model is on a GPU).
+    """
     end_id = special_id(tokenizer, END_TOKEN)
+    if graphs is None:
+        graphs = next(model.parameters()).is_cuda
+    decoders = {}
+
+    def decoder(batch):
+        if not graphs:
+            return None
+        if batch not in decoders:
+            decoders[batch] = GraphDecoder(model, batch)
+        return decoders[batch]
 
     if mode == "completion":
         def stop(ids):  # a new line that starts without indentation ends the function
@@ -75,8 +89,8 @@ def evaluate(model, tokenizer, tasks, *, mode: str, n: int = 10, temperature: fl
             log(f"[{index + 1:2d}/{len(tasks)}] {task.name:22s} reference loss {reference_loss:.3f}")
             continue
         common = dict(max_new_tokens=max_tokens, top_k=top_k, seed=seed + index, stop=stop)
-        greedy = sample_many(model, ids, n=1, temperature=0.0, **common)[0]
-        sampled = sample_many(model, ids, n=n, temperature=temperature, **common)
+        greedy = sample_many(model, ids, n=1, temperature=0.0, decoder=decoder(1), **common)[0]
+        sampled = sample_many(model, ids, n=n, temperature=temperature, decoder=decoder(n), **common)
         entry = {"task": task.name, "reference_loss": reference_loss, "greedy": None, "samples": []}
         for out, target in [(greedy, "greedy"), *[(s, "samples") for s in sampled]]:
             code = to_code(task, out)
