@@ -1,0 +1,19 @@
+{
+  "seed": 2026,
+  "ood_families": [
+    "distance_to_k",
+    "round_down_to_multiple",
+    "keep_less_than_k",
+    "sum_greater_than_k",
+    "ends_with",
+    "last_k_chars",
+    "count_spaces",
+    "last_word",
+    "adjacent_differences"
+  ],
+  "counts": {
+    "train": 301,
+    "test_id": 82,
+    "test_ood": 107
+  }
+}

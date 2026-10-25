@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import re
 import subprocess
 import sys
@@ -31,6 +32,22 @@ UNSAFE_PATTERNS = (
     "import os", "from os", "import sys", "from sys", "import subprocess", "from subprocess",
     "import shutil", "from shutil", "import socket", "from socket", "import pathlib", "from pathlib",
     "__import__", "open(", "eval(", "exec(", "compile(", "input(", "globals(", "breakpoint(",
+    # RL runs thousands of generated programs: also no raising of resource limits, no foreign
+    # function calls, no network, no new processes or threads, no dynamic imports.
+    "import resource", "from resource", "import ctypes", "from ctypes", "import importlib", "from importlib",
+    "import multiprocessing", "from multiprocessing", "import threading", "from threading",
+    "import signal", "from signal", "import urllib", "from urllib", "import http", "from http",
+    "import requests", "import asyncio", "from asyncio", "import pickle", "from pickle",
+)
+
+# On Linux (Colab) every test program first limits itself: 1 GB of memory, a few CPU seconds,
+# no files larger than 1 MB. The limits are set inside the child, before the model's code runs.
+LIMITS_PRELUDE = (
+    "import resource as _r\n"
+    "_r.setrlimit(_r.RLIMIT_AS, (1 << 30, 1 << 30))\n"
+    "_r.setrlimit(_r.RLIMIT_CPU, ({cpu}, {cpu}))\n"
+    "_r.setrlimit(_r.RLIMIT_FSIZE, (1 << 20, 1 << 20))\n"
+    "del _r\n"
 )
 
 
@@ -69,13 +86,33 @@ def run_tests(code: str, tests: Sequence[str], timeout: float = 5.0) -> bool:
     if not is_safe(code):
         return False
     program = code + "\n\n" + "\n".join(tests) + "\n"
+    environment = None
+    if os.name == "posix":
+        program = LIMITS_PRELUDE.format(cpu=int(math.ceil(timeout)) + 1) + program
+        environment = {"PATH": "/usr/bin:/bin"}        # nothing from the parent's environment
     with tempfile.TemporaryDirectory() as workdir:
         try:
             result = subprocess.run([sys.executable, "-I", "-c", program], cwd=workdir, capture_output=True,
-                                    stdin=subprocess.DEVNULL, timeout=timeout)
+                                    stdin=subprocess.DEVNULL, timeout=timeout, env=environment)
         except subprocess.TimeoutExpired:
             return False
     return result.returncode == 0
+
+
+def run_tests_many(jobs: Sequence[tuple[str | None, Sequence[str]]], *, timeout: float = 5.0,
+                   workers: int | None = None) -> list[bool]:
+    """run_tests for many (code, tests) pairs at once, in order; code None counts as a failure.
+
+    Each program is its own subprocess; threads only wait for them, so they run on all CPU cores.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
+    def one(job):
+        code, tests = job
+        return code is not None and run_tests(code, tests, timeout=timeout)
+
+    with ThreadPoolExecutor(max_workers=workers or os.cpu_count() or 4) as pool:
+        return list(pool.map(one, jobs))
 
 
 def extract_from_completion(prompt: str, continuation: str) -> str:
