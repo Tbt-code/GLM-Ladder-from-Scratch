@@ -262,7 +262,7 @@ Talk to a model on CPU: `python scripts/talk.py --run sft-m100m-001` (multi-turn
 - **A generator consumed twice.** The masked evaluation first passed a generator to a function that iterates its input twice; the second pass saw nothing, so masking was silently skipped. A test now checks that the evaluation averages over exactly the learned targets.
 - **Script names must not shadow modules.** `scripts/chat.py` next to `glm_ladder/chat.py` let the editor's import refactoring overwrite the library module. Scripts now have unique names (`talk.py`, `run_code_eval.py`).
 - **Token boundaries matter for evaluation.** A completion prompt ending in `"\n"` broke indentation (see [samples](#samples)), so code prompts end on the docstring. The reference loss encodes prompt and solution together and checks that the prompt's tokens are a prefix of the result.
-- **Generation is the bottleneck.** Without a KV cache, each new token re-runs the full sequence, and the small MoE model is bound by kernel launches. One evaluation took ~10 minutes on an A100 and was too slow on an L4. RL needs much more generation than this, so batched, cached generation comes before RL.
+- **Generation is the bottleneck.** Without a KV cache, each new token re-runs the full sequence, and the small MoE model is bound by kernel launches. One evaluation took ~10 minutes on an A100 and was too slow on an L4. RL needs much more generation than this, so batched, cached generation comes before RL (done: see [Fast generation](#fast-generation)).
 
 ## Fine-tuning results: full vs LoRA
 
@@ -427,6 +427,39 @@ Other samples (greedy, [`artifacts/finetune-mix/summary.json`](artifacts/finetun
 
 Reproduce: [`notebooks/06_finetune_mix.ipynb`](notebooks/06_finetune_mix.ipynb) (about 45 minutes on an A100). Receipts: [`artifacts/finetune-mix/`](artifacts/finetune-mix/). Weights: `runs/mix-s50m-lr1e-04` and `runs/mix-m100m-lr1e-04` in the runs repo.
 
+## Fast generation
+
+RL learns from the model's own samples, so it needs far more generation than any evaluation so far. The code evaluation already took 10–17 minutes per model on an A100. Four changes, each found by measuring the previous one, made generation 13–19× faster at every batch size measured. Every row is measured on an A100 40 GB: a coding prompt of ~60 tokens, 160 new tokens per sequence, no early stop.
+
+| `s-50m`, tokens/s | n = 1 | n = 8 | n = 32 | n = 128 | n = 256 |
+|---|---:|---:|---:|---:|---:|
+| No cache (every earlier evaluation) | 14 | 106 | 353 | — | — |
+| 1. Generation cache | 16 | 118 | 394 | 961 | — |
+| 2. + dense MoE in decoding | 25 | 175 | 533 | 1,134 | — |
+| 3. + CUDA graph (run log; this table was overwritten by row 4, not kept as a receipt) | 192 | 814 | 1,360 | 1,740 | 1,746 |
+| 4. + sampling on the GPU | **235** | **1,487** | **5,467** | **18,719** | **32,431** |
+| `m-100m`, all four | 173 | 1,152 | 4,108 | 13,477 | 21,196 |
+
+1. **Cache** ([`glm_ladder/model.py`](glm_ladder/model.py)). The prompt is processed once, then one position per step. Linear-attention layers keep a fixed-size running sum per head (`state = Σ kᵀv`, `normalizer = Σ k`, the recurrent form of the chunked kernel); sparse-attention layers keep every earlier key and value. A test checks that prefill plus token-by-token decoding gives the full-forward logits at every position. **Gain: 1.1×**, because the arithmetic was never the bottleneck.
+2. **Dense MoE for small batches.** Sending each token to its two experts uses `torch.where` and `bincount`, whose output sizes depend on the data, so the CPU must wait for the GPU about 9 times per layer per token. In eval mode with at most 256 tokens, every expert now runs on every token, weighted by its gate (0 when not selected): same result, no waiting. **Gain: 1.2–1.6×**; ~40 ms per step remained at n = 1.
+3. **CUDA graph** ([`glm_ladder/graph_decode.py`](glm_ladder/graph_decode.py)). The remaining 40 ms were the CPU launching ~1,600 small operations per step. One decode step is recorded once and replayed with a single call. This needs fixed shapes and fixed memory: a preallocated cache over the full context, the position as a GPU tensor, and **in-place** cache updates, because the graph replays the recorded addresses and a new tensor would never be read. **Gain: 7.7× at n = 1** (5 ms per step), but only 1.2–1.5× at n ≥ 128.
+4. **Sampling on the GPU.** At large batches the step time grew linearly with n: every step copied `[n, 16,384]` logits to the CPU and sampled there. Now only the n chosen ids are copied. **Gain: up to 19×**, which uncovered the graph's real benefit at large batches (5–6× over the cached step with GPU sampling).
+
+The code evaluation of one model now takes ~100 s instead of 825–1,002 s. Greedy pass rates were unchanged by the graph (up to one task whose two best tokens are nearly tied), but random numbers now come from the GPU, so sampled results differ from earlier runs by chance.
+
+### Coding baseline for RL
+
+The two RL starting models, evaluated with the final decoding (40 tasks, chat prompts, 1 greedy + 10 sampled answers each):
+
+| | Greedy pass@1 | Sampled pass@1 | pass@5 | pass@10 | Reference loss |
+|---|---:|---:|---:|---:|---:|
+| `mix-s50m-lr1e-04` | 0.375 | 0.130 | 0.393 | 0.525 | 0.491 |
+| `mix-m100m-lr1e-04` | 0.450 | 0.253 | 0.544 | 0.700 | 0.379 |
+
+**How noisy is this?** The same `m-100m` model scored pass@10 = 0.550 with CPU sampling and 0.700 with GPU sampling: only the random numbers changed. With 10 samples per task, a task whose solution appears 1 time in 10 passes or fails by chance, and each task moves pass@10 by 0.025. An RL gain of this size could not be told apart from luck, so the RL evaluation will draw many more samples per task and use more tasks.
+
+Receipts: [`artifacts/evals/generation-speed*.json`](artifacts/evals/), [`code-mix-*-chat.json`](artifacts/evals/). Reproduce: [`notebooks/07_generation.ipynb`](notebooks/07_generation.ipynb).
+
 ## Plan
 
 | Phase | Work | Exit criterion | Status |
@@ -443,7 +476,7 @@ The evaluation protocol follows the original repository: decisions are made on a
 
 ## Compute and storage
 
-- **Compute:** Google Colab Pro (L4 and A100), 300 compute units in total. Pretraining both rungs took about 7 hours of training on an A100, roughly 45–50 units including setup, evaluation, and checkpoint uploads (estimate from session hours). After SFT and the GPU code evaluation, about 95 of the 300 units had been used (Colab balance); the fine-tuning study added roughly 25–30 and the joint fine-tuning about 6 (estimates from session hours).
+- **Compute:** Google Colab Pro (L4 and A100), 300 compute units in total. Pretraining both rungs took about 7 hours of training on an A100, roughly 45–50 units including setup, evaluation, and checkpoint uploads (estimate from session hours). After SFT and the GPU code evaluation, about 95 of the 300 units had been used (Colab balance); the fine-tuning study added roughly 25–30, the joint fine-tuning about 6, and the generation work about 6 (estimates from session hours).
 - **Resumable training:** Colab sessions can end at any time. Training state (weights, AdamW moments, RNG, step, data position) is pushed to the Hub every 15–25 minutes, and re-running the notebook resumes from the latest checkpoint with the same data order. The two most recent resume checkpoints and the final weights are kept.
 - **Code and receipts:** this GitHub repository.
 - **Checkpoints and tokenized data:** a Hugging Face Hub repository (too large for GitHub), saved as `safetensors` with SHA-256 hashes recorded in receipts here.
@@ -461,6 +494,7 @@ Notebooks are run from VS Code on a Colab GPU runtime through the Google Colab e
 | [`04_code_eval`](notebooks/04_code_eval.ipynb) | A100 | Code evaluation of every model and prompt mode; uploads receipts |
 | [`05_finetune`](notebooks/05_finetune.ipynb) | A100 | Full fine-tuning vs LoRA on review rating: baselines, LR sweep, ranks, English, test |
 | [`06_finetune_mix`](notebooks/06_finetune_mix.ipynb) | A100 | Joint fine-tuning (both languages + SFT replay): the RL starting models |
+| [`07_generation`](notebooks/07_generation.ipynb) | A100 | Generation speed (uncached, cached, CUDA graph) and the coding baseline of the RL starting models |
 
 In VS Code: open a notebook, *Select Kernel → Colab → New Colab Server*, pick the runtime, run all cells. The Hugging Face token is typed into a hidden prompt and never stored.
 
@@ -504,9 +538,10 @@ python scripts/fetch_evals.py --pattern "finetune-mix/*.json" --to artifacts/fin
 - [`glm_ladder/sft_data.py`](glm_ladder/sft_data.py): packing whole conversations into windows; the SFT data source.
 - [`glm_ladder/code_eval.py`](glm_ladder/code_eval.py): code tasks, running unit tests, pass@k, batched sampling, reference loss.
 - [`glm_ladder/lora.py`](glm_ladder/lora.py): LoRA layers, applying adapters by layer type, merging them into the weights.
+- [`glm_ladder/graph_decode.py`](glm_ladder/graph_decode.py): decoding from a CUDA graph with a static cache.
 - [`glm_ladder/classify.py`](glm_ladder/classify.py): review-rating prompts, scoring by label-token probability, accuracy / macro-F1 / MAE.
 - [`evals/code_tasks.jsonl`](evals/code_tasks.jsonl): the 40 coding tasks with reference solutions and tests.
-- [`tests/`](tests/): parity with the original model, kernel equivalence, causality, balance-loss gradient, loader determinism, bit-exact resume of the full training loop, chat masks and packing, the code-eval task set, LoRA (formula, gradients, merge, resume), padding-invariant scoring.
+- [`tests/`](tests/): parity with the original model, kernel equivalence, causality, balance-loss gradient, loader determinism, bit-exact resume of the full training loop, chat masks and packing, the code-eval task set, LoRA (formula, gradients, merge, resume), padding-invariant scoring, per-window loss, cached and static-cache decoding against the full forward, dense vs sparse MoE, CUDA-graph replay (GPU only).
 - [`tests/reference/original_model.py`](tests/reference/original_model.py): copy of the original model, used only by tests.
 - [`scripts/`](scripts/): tokenizer training, benchmark, sampling, receipts, plots, SFT and fine-tuning data preparation, chat, code evaluation.
 - [`artifacts/`](artifacts/): receipts, code-eval and fine-tuning results, samples, plots.

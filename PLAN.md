@@ -54,7 +54,12 @@ Decisions are recorded with their reasons so the final report can explain why th
 | 2026-10-21 | Selection for the joint model: best mean val macro-F1 among runs with SFT val loss <= +10% (each language) and code reference loss <= +25%; else the least-forgetting run | The rule from Phase 4, made concrete before the runs |
 | 2026-10-23 | RL starts from `mix-s50m-lr1e-04` and `mix-m100m-lr1e-04` | Both within the forgetting limits; test macro-F1 within 0.002-0.025 of the Phase 4 specialists, SFT loss +2.4% at most, code reference loss +5% |
 | 2026-10-23 | Accept the small Turkish format leak (digit answers to 1 of 20 ordinary Turkish requests) and re-measure after RL | Below the 10% level set before measuring; the fix (more Turkish replay, weighting by reviews) costs another round |
-| open | Batched, KV-cached generation before RL | RL needs far more generation than the code eval |
+| 2026-10-23 | Generation cache (recurrent linear attention, growing K/V for sparse layers) | RL generates far more than the code eval; measured gain only 1.1x, which pointed to overhead rather than arithmetic |
+| 2026-10-23 | Dense MoE in eval mode for <= 256 tokens | `torch.where`/`bincount` force a CPU-GPU sync ~9 times per layer per token; dense gives the same result without syncs (1.2-1.6x) |
+| 2026-10-24 | CUDA-graph decoding with a static cache and in-place updates | ~1,600 eager operations per step cost ~40 ms of CPU launch time; 7.7x at n = 1 |
+| 2026-10-25 | Sample on the GPU, copy only token ids | CPU sampling of [n, 16,384] logits capped throughput at ~1,750 tok/s; now 32k tok/s (`s-50m`) and 21k (`m-100m`) at n = 256 |
+| 2026-10-25 | RL evaluation needs many more samples per task (and more tasks) | Same model, different random numbers: pass@10 0.550 vs 0.700 with 10 samples on 40 tasks |
+| open | RL design: training tasks, algorithm, reward, evaluation, budget | To be agreed before writing code |
 
 ## Pretraining, measured (A100 40 GB, full training loop with gradient accumulation)
 
