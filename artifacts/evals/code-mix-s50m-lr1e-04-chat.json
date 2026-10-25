@@ -13,81 +13,81 @@
   "seed": 0,
   "loss_only": false,
   "summary": {
-    "reference_loss": 0.49110891819000246,
+    "reference_loss": 0.49102129340171813,
     "greedy_pass@1": 0.375,
-    "sampled_pass@1": 0.1275,
-    "sampled_pass@5": 0.35287698412698415,
-    "sampled_pass@10": 0.5
+    "sampled_pass@1": 0.13,
+    "sampled_pass@5": 0.39305555555555555,
+    "sampled_pass@10": 0.525
   },
   "results": [
     {
       "task": "is_even",
-      "reference_loss": 0.3392844498157501,
+      "reference_loss": 0.33927062153816223,
       "greedy": {
         "code": "def is_even(n):\n    if n < 0:\n        return False\n    return (n & (n - 1)) == 0\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def is_even(n):\n    \"\"\"Check if n is even.\"\"\"\n    return num % 2 == 0\n",
+          "code": "def is_even(n):\n    if n <= 0:\n        return False\n    return n % n == 0 and (n % 2 == 0 and (n // 2 != 0 or n % 2 == 0))\n",
           "passed": false
         },
         {
-          "code": "def is_even(n):\n    if not isinstance(n, int):\n        raise ValueError(\"Input must be a number\")\n    if n <= 1:\n        return False\n    if n % 2 == 0:\n        return True\n    if n % 2 == 0:\n        return True\n    if n % 2 == 0:\n        return True\n    if n % 2 == 0:\n        return True\n    if n // 2 == 0:\n        return False\n    if n % 2 == 0:\n        return False\n    return (n % 2 == 0)",
+          "code": "def is_even(n):\n    return sum(n) <= n\n\n# Example usage:\nprint(is_even(\"Yes\"))  # Output: True\nprint(is_even(\"Yes\"))  # Output: True\n",
           "passed": false
         },
         {
-          "code": "def is_even(n):\n    return 1 <= 0\n",
+          "code": "def is_even(n):\n    return all(k > 0 for k in range(1, 1001, 1001).days)\n",
           "passed": false
         },
         {
-          "code": "def is_even(n):\n    return not isinstance(n, int) and n < 0\n",
+          "code": "def is_even(n):\n    def is_even(n):\n        if n < 2:\n            return False\n        return (n & (n - 1)) == 0\n    return (n & (n - 1)) == 0\n",
           "passed": false
         },
         {
-          "code": "def is_even(n):\n    if n < 2:\n        return False\n    for i in range(2, int(n ** 0.5) + 1):\n        if i % 2 == 0:\n            return False\n    return True\n",
+          "code": "def is_even(n):\n    if n < 0:\n        return False\n    for i in range(2, int(n ** 0.5) + 2):\n        if i % 2 == 0:\n            return False\n    return True\n",
           "passed": false
         },
         {
-          "code": "def is_even(n):\n    return all(isinstance(x, (int, float)) for x in range(n))\n",
+          "code": "def is_even(n):\n    if n < 2:\n        return False\n    return sum(1 for _ in range(n))\n",
           "passed": false
         },
         {
-          "code": "def is_even(n):\n    return not isinstance(n, int) and not isinstance(n, int)\n",
+          "code": "def is_even(n):\n    return all(n % 2 == 0 or n % 2 == 0) else False\n",
           "passed": false
         },
         {
-          "code": "def is_even(n):\n    if not isinstance(n, int):\n        return False\n    for i in range(1, n):\n        if i % 2 == 0:\n            return False\n    return True\n",
+          "code": "def is_even(n):\n    if n < 2:\n        return False\n    for i in range(2, int(n ** 0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n",
           "passed": false
         },
         {
-          "code": "def is_even(n):\n    if n <= 0:\n        return False\n    return [1] * (n + 1)\n",
+          "code": "def is_even(n):\n    if n <= 0:\n        return False\n    return not (n & 1)\n",
           "passed": false
         },
         {
-          "code": "def is_even(n):\n    if n < 0:\n        return False\n    return True\n",
+          "code": "def is_even(n):\n    if n <= 0:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return True\n    return False\n",
           "passed": false
         }
       ]
     },
     {
       "task": "add",
-      "reference_loss": 0.2554754614830017,
+      "reference_loss": 0.2555674910545349,
       "greedy": {
         "code": "def add(a, b):\n    return a + b\n",
         "passed": true
       },
       "samples": [
         {
-          "code": "def add(a, b):\n    return a + b\n\ndef add(a, b):\n    result = a + b\n    return result\n",
-          "passed": true
-        },
-        {
-          "code": "def add(a, b):\n    return a + b\n\ndef add(a, b):\n    return a + b\n\ndef add(a, b):\n    if isinstance(a, int):\n        return a + b\n    else:\n        return add(a, b)\n\ndef add(a, b):\n    return a + b\n\ndef add(a, b):\n    return a + b + b\n\nprint(add(1, 2))  # Output: 2\nprint(add(1, 3))  # Output: 3\nprint(add(3, 5))  # Output: 2\nprint(add(3, 6)) ",
+          "code": "def add(a, b):\n    b = a + b\n    return a\n",
           "passed": false
         },
         {
-          "code": "import re\n\ndef add(a, b):\n    return re.sub(r'^\\d*([ \\d])', '', a.lower())\n\ndef add(a, b):\n    return ''.join(reversed(a))\n",
+          "code": "def add(a, b):\n    return a + b\n\ndef add(a, b):\n    return a + b\n",
+          "passed": true
+        },
+        {
+          "code": "def add(a, b):\n    return a + b\n\ndef add(a, b):\n    return a + b\n\na = [1, 2, 3]\nb = [3, 4, 5]\nprint(add(add(a, b)))  # Output: [3, 5, 1]\n",
           "passed": false
         },
         {
@@ -95,23 +95,23 @@
           "passed": true
         },
         {
-          "code": "def add(a, b):\n    return a if b else b\n",
+          "code": "def add(a, b):\n    \"\"\"\n    Add a and b together.\"\"\"\n    a, b = b, a % b\n    return a\n\ndef add(a, b):\n    \"\"\"\n    Add a and b together together, with a and b.\n    \"\"\"\n    a, b = a, b\n    return a - b\n\ndef multiply(a, b):\n    \"\"\"\n    Add a and b together together together, with a and b.\"\"\"\n    b = a / b\n    return a\n",
           "passed": false
         },
         {
-          "code": "def add(a, b):\n    c = a + b\n    result = a + b\n    return c, result\n",
+          "code": "def add(a, b):\n    return a + b\n",
+          "passed": true
+        },
+        {
+          "code": "def add(a, b):\n    b, b = a, b\n\n    if b != 0:\n        return \"(-1)\")\n\n    return b\n",
           "passed": false
         },
         {
-          "code": "def add(a, b):\n    return a + b\n\ndef add(a, b):\n    return a + b\n\ndef add(a, b):\n    return a + b\n\ndef add(a, b):\n    return a + b\n\ndef add_a(a, b):\n    return a + b\n\ndef add_a(a, b):\n    return a + b\n",
+          "code": "def add(a, b):\n    return a + b\n",
           "passed": true
         },
         {
-          "code": "def add(a, b):\n    return a + b\n\ndef add(a, b):\n    return a + b\n",
-          "passed": true
-        },
-        {
-          "code": "def add(a, b):\n    total = 0\n    while b:\n        if a %= b:\n            return a\n        else:\n            return d * b\n    return sum(a)\n\ndef add(a, b):\n    return a + b\n\ndef add(a, b):\n    return a\n\ndef add(a, b):\n    return a + b\n\ndef add(a, b):\n    return a + b\n\ndef add(a, b):\n    return a + b\n\ndef add(a, b):\n    return a + b\n\ndef add(a, b):\n    if a == 1 or b !=",
+          "code": null,
           "passed": false
         },
         {
@@ -122,14 +122,34 @@
     },
     {
       "task": "square",
-      "reference_loss": 0.605114221572876,
+      "reference_loss": 0.6050032377243042,
       "greedy": {
         "code": "def square(x):\n    return x ** 2\n\ndef square(x):\n    return x ** 2\n\ndef square_square(x):\n    return x ** 2\n\ndef square_square(x):\n    return x ** 2\n\ndef square_square(x):\n    return x **",
         "passed": false
       },
       "samples": [
         {
-          "code": "import math\n\ndef squared_square(x):\n    if not isinstance(x, float):\n        raise ValueError(\"x must be a float.\")\n    try:\n        return math.log(x) - math.log(x)\n    except ValueError:\n        return math.log(x)\n\ndef square(x):\n    return x**2 + 1\n\ndef square(x):\n    return x**2 + 1**2 + 2**2\n\nx = input(\"Enter a number: \")\nprint(square(x))\n",
+          "code": "import math\n\ndef square(x):\n    return math.pi * x * x**2 + 1\n\nnumbers = np.arange(1, 8)\nsquared_numbers = [math.sqrt(x) ** 2 / x**2 + 1]\nprint(squared_numbers)  # prints: [1, 2, 3, 4, 5]\nprint(squared_numbers)  # prints: [1, 3, 4, 5]\n",
+          "passed": false
+        },
+        {
+          "code": "import math\n\ndef square(x):\n    return math.sqrt(x)\n\nprint(square(2))  # Output: 3\nprint(square(2))  # Output: 2\nprint(square(2))  # Output: 2\n",
+          "passed": false
+        },
+        {
+          "code": "def square(x):\n    return x**2\n\ndef square_count(x):\n    return x**2\n\ndef square_count(x):\n    return x**2\n\nprint(square(2))  # Output: 4\nprint(square(2)) # Output: 1\ntry:\n    print(square(2))  # Output: 2\nexcept ValueError as e:\n    print(e)  # Output: None or TypeError  # or TypeError: Input is not a list\n",
+          "passed": true
+        },
+        {
+          "code": "import math\n\ndef square(x):\n    return math.\u03c0(x)\n",
+          "passed": false
+        },
+        {
+          "code": "def square(x):\n    return x**2\n",
+          "passed": true
+        },
+        {
+          "code": "def square(x):\n    return x - squared\n",
           "passed": false
         },
         {
@@ -137,7 +157,7 @@
           "passed": false
         },
         {
-          "code": "def squared_squares(x):\n    return x * x\n\ndef square(x):\n    if x == 0:\n        raise ValueError(\"The input must be non-negative\")\n    return x ** 2\n\n# Example usage:\nprint(square(5))  # Output: 7.0\nprint(square(2))  # Output: 6\nprint(square(1))  # Output: -1\n",
+          "code": null,
           "passed": false
         },
         {
@@ -145,49 +165,41 @@
           "passed": false
         },
         {
-          "code": "import math\n\nx = 2\n\ndef square(x):\n    return math.sqrt(x)\n\nx = 2\nprint(f\"Pie(x = 2: {x * (1 + x) * (1 + x) * (1 + x))}\")\n",
-          "passed": false
-        },
-        {
-          "code": null,
-          "passed": false
-        },
-        {
-          "code": "def square(x):\n    return x * x\n\n# Use the function `square` to calculate the square of each value\nsquare = (x - 1) * x\nprint(f\"You are {x} years old.\".format(square))\n",
-          "passed": false
-        },
-        {
-          "code": "def square(x):\n    if not isinstance(x, str):\n        raise TypeError(\"x must be a string\")\n    square = [x]\n    for i in range(len(x)):\n        if i % 2 == 0:\n            return i",
-          "passed": false
-        },
-        {
-          "code": null,
-          "passed": false
-        },
-        {
-          "code": "import math\n\ndef square(x):\n    return abs(x)\n",
+          "code": "import math\n\ndef square(x):\n    return math.mat(x, 2)\n\ndef square(x):\n    return math.mat(x)\n\n# Example usage:\nprint(square(5))  # Output: 10\nprint(square(5))  # Output: 10\nprint(square(5))  # Output: 10\n",
           "passed": false
         }
       ]
     },
     {
       "task": "max_of_two",
-      "reference_loss": 0.4464576840400696,
+      "reference_loss": 0.4464038908481598,
       "greedy": {
         "code": "def max_of_two(a, b):\n    return a + b\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def max_of_two(a, b):\n    return a * b\n",
+          "code": "def max_of_two(a, b):\n    if a > b:\n        return 0\n    elif a > b:\n        return max(a, b)\n    else:\n        return max(a, b)\n",
           "passed": false
         },
         {
-          "code": null,
+          "code": "def max_of_two(a, b):\n    return a + b\n",
           "passed": false
         },
         {
-          "code": "def max_of_two(a, b):\n    max_a = max_of_two(a, b)\n    return max_a, max_a, max_b\n",
+          "code": "def max_of_two(a, b):\n    return a + b\n",
+          "passed": false
+        },
+        {
+          "code": "def max_of_two(a, b):\n    return b if a > b else b if a > b else b if b > b else b if b > b else b if a > b else b if a > b else b if a > b else b if b > b else b if a > b else b if b > b else b if a > b else b if b > b else b if b >",
+          "passed": false
+        },
+        {
+          "code": "def max_of_two(a, b):\n    \"\"\"\n    Returns the larger of a and b.\n\n    Args:\n        a: A A - A.\n        b: A - A.\n        b: A.\n        b: A.\n    \"\"\"\n    return a * b\n",
+          "passed": false
+        },
+        {
+          "code": "def max_of_two(a, b):\n    return a / b\n\ndef max_of_two(a, b, c):\n    return a / b\n",
           "passed": false
         },
         {
@@ -195,61 +207,37 @@
           "passed": true
         },
         {
-          "code": null,
-          "passed": false
-        },
-        {
-          "code": "def max_of_two(a, b):\n    if a == 0 or b == 0:\n        return None\n    return max(a + b, axis=1)\n",
-          "passed": false
-        },
-        {
-          "code": "def max_of_two(a, b):\n    if a is None:\n        return a\n    if a.n <= 0:\n        return b\n    return a[0] * b[0]\n",
-          "passed": false
-        },
-        {
-          "code": "def max_of_two(a, b):\n    return a if a <= b else b if a <= b else b if a == b else b if a > b else b if b > b else b if b > b else c if a > b else b if b > b else b if b > b else b if b > b else b if b > b else a if b > b else b if b > b else b if b > b else b if b > b else b if g > b else b if b > b else b if b > b else c` else b if b > b else b if b",
-          "passed": false
-        },
-        {
-          "code": null,
-          "passed": false
-        },
-        {
           "code": "def max_of_two(a, b):\n    return a + b\n",
+          "passed": false
+        },
+        {
+          "code": "def max_of_two(a, b):\n    return a * b\n",
+          "passed": false
+        },
+        {
+          "code": "def max_of_two(a, b):\n    return abs(a - b)\n",
           "passed": false
         }
       ]
     },
     {
       "task": "sum_list",
-      "reference_loss": 0.18672901391983032,
+      "reference_loss": 0.18683858215808868,
       "greedy": {
         "code": "def sum_list(numbers):\n    return sum(numbers)\n",
         "passed": true
       },
       "samples": [
         {
-          "code": "def sum_list(num1, num2):\n    return sum(num1) / len(num1)\n",
+          "code": "def sum_list(numbers):\n    \"\"\"\n    Calculates the sum of an iterable.\n\n    Args:\n        numbers (list): A list of numbers.\n\n    Returns:\n        float: The sum of the numbers.\n    \"\"\"\n    return sum(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def sum_list(numbers):\n    return sum(num for num in numbers if num==0)\n",
           "passed": false
         },
         {
-          "code": "def sum_list(numbers):\n    result = 0\n    for num in numbers:\n        if num > 0:\n            result += num\n        else:\n            result += num\n    return result\n",
-          "passed": true
-        },
-        {
-          "code": "def sum_list(numbers):\n    return sum(numbers)\n",
-          "passed": true
-        },
-        {
-          "code": "def sum_list(numbers):\n    return sum(numbers)\n",
-          "passed": true
-        },
-        {
-          "code": "def sum_list(numbers):\n    return sum(numbers)\n",
-          "passed": true
-        },
-        {
-          "code": "def sum_list(numbers, num_sets):\n    return sum(numbers)\n",
+          "code": "def sum_list(numbers):\n    total = sum(numbers)\n    return sum(numbers) / len(numbers)\n",
           "passed": false
         },
         {
@@ -257,33 +245,41 @@
           "passed": true
         },
         {
-          "code": "def sum_list(numbers):\n    return [num for num in numbers if num > 1]\n\ndef sum_list(numbers):\n    return sum(numbers)\n\nnumbers = [1, 2, 3, 4, 5]\nprint(sum_list(numbers))  # Output: [2, 4, 6]\n",
+          "code": "def sum_list(numbers):\n    return sum(numbers)\n",
           "passed": true
         },
         {
-          "code": "def sum_list(numbers):\n    \"\"\"\n    Returns the sum of a list of numbers.\n    \"\"\"\n    return sum_list(numbers)\n\ndef sum_list(numbers):\n    \"\"\"\n    Returns the sum of a list of numbers.\n    \"\"\"\n    return sum(numbers)] * len(numbers)\n",
+          "code": "def sum_list(numbers):\n    return sum(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def sum_list(numbers):\n    return sum(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def sum_list(numbers):\n    return sum(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": null,
           "passed": false
         },
         {
-          "code": "def sum_list(numbers):\n    return sum(numbers)\n\n# Example usage:\nnumbers = [1, 2, 3, 4, 5]\nresult = sum_list(numbers)\nprint(result)  # Output: 3 and 5.0\n",
-          "passed": true
+          "code": "import itertools\n\ndef sum_list(numbers):\n    return list(itertools.permutations(numbers))\n\ndef main():\n    numbers = input(\"Enter a list of numbers separated by a space: \")\n    numbers = [int(num) for num in numbers]\n    print(sum_list(numbers))\n\nif __name__ == \"__main__\":\n    main()\n",
+          "passed": false
         }
       ]
     },
     {
       "task": "average",
-      "reference_loss": 0.19847317039966583,
+      "reference_loss": 0.19837124645709991,
       "greedy": {
         "code": "def average(numbers):\n    return sum(numbers) / len(numbers)\n",
         "passed": true
       },
       "samples": [
         {
-          "code": "def average(numbers):\n    if not numbers:\n        return None\n    return sum(numbers) / len(numbers) / len(numbers)\n",
-          "passed": false
-        },
-        {
-          "code": "def average(numbers):\n    return sum(numbers) / len(numbers)\n",
+          "code": "def average(numbers):\n    if not isinstance(numbers, list) or not numbers:\n        return None\n    return sum(numbers) / len(numbers)\n",
           "passed": true
         },
         {
@@ -291,28 +287,32 @@
           "passed": true
         },
         {
-          "code": "def average(numbers):\n    try:\n        return sum(numbers) / len(numbers)\n    except ValueError:\n        raise ValueError(\"Input list cannot be empty.\")\n",
-          "passed": true
+          "code": "import statistics\n\ndef average(numbers):\n    numbers_list = []\n    for numbers in numbers:\n        number = numbers.mean()\n        if number not in numbers_list and number > 0:\n            numbers_list.append(number)\n    return statistics.mean(numbers_list)\n",
+          "passed": false
         },
         {
-          "code": "def average(numbers):\n    num_numbers = []\n    for num in numbers:\n        num_numbers.append(num)\n    return dp(num_numbers)\n",
-          "passed": false
+          "code": "def average(numbers):\n    if len(numbers) != len(numbers):\n        raise ValueError(\"Length and length must be of the same length.\")\n\n    return sum(numbers) / len(numbers)\n",
+          "passed": true
         },
         {
           "code": "def average(numbers):\n    return sum(numbers) / len(numbers)\n",
           "passed": true
         },
         {
-          "code": "def average(numbers):\n    \"\"\"\n    Generates a list of numbers from the input list.\n\n    Args:\n        numbers (list): A list of numbers.\n\n    Returns:\n        list: A list of numbers.\n    \"\"\"\n    total = 0\n    for num in numbers:\n        total += num\n    return total\n",
+          "code": null,
           "passed": false
         },
         {
-          "code": "def average(numbers):\n    total = sum(numbers)\n    return total * total\n\ndef generate_average(numbers):\n    \"\"\"\n    Calculates the average of a given list of numbers.\n\n    Args:\n        numbers (list): A list of numbers.\n\n    Returns:\n        float: The average of the given list of numbers.\n    \"\"\"\n    total = sum(numbers)\n    return sum(total)\n\ndef main():\n    total = generate_average(5)\n    print(f\"Categorical value: {total}\")\n\nif __name__ == \"__main__\":\n    main()\n",
+          "code": "def average(numbers):\n    return sum(percent([-2 for _ in range(numbers)) if numbers and num > 0]))\n",
           "passed": false
         },
         {
-          "code": "import statistics\n\ndef average(numbers):\n    return statistics.mean(numbers)\n\ndef calculate_average(numbers):\n    return statistics.median(numbers)\n",
-          "passed": true
+          "code": "def average(numbers):\n    if not numbers:\n        return None\n    return sum(numbers) / (2 * numbers) if numbers else 0\n",
+          "passed": false
+        },
+        {
+          "code": "def average(numbers):\n    \"\"\"\n    Calculate the average of a non-empty list of numbers.\n\n    Args:\n        numbers (list): A list of numbers.\n\n    Returns:\n        float: The average of the input list and zero.\n\n    Raises:\n        TypeError: If the input list contains non-empty lists.\n    \"\"\"\n    if not isinstance(numbers, list):\n        raise TypeError(\"Input list must be a list of numbers\")\n\n    total = 0\n    for num in numbers:\n        total += num / num\n\n    return total\n",
+          "passed": false
         },
         {
           "code": "def average(numbers):\n    return sum(numbers) / len(numbers)\n",
@@ -322,38 +322,42 @@
     },
     {
       "task": "reverse_string",
-      "reference_loss": 0.2766115367412567,
+      "reference_loss": 0.276518851518631,
       "greedy": {
         "code": "def reverse_string(s):\n    return s.replace(r'\\\\', r'\\\\')\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def reverse_string(s):\n    if len(s) < 2:\n        return s\n    else:\n        return s[:4]\n",
+          "code": "def reverse_string(s):\n    return s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def reverse_string(s):\n    reversed_s = set()\n    reversed_s = []\n\n    reversed_s = []\n\n    for re in reversed_s:\n        reversed_s.add(re.sub(re, ' '))\n        reversed_s.append(re.sub(re, ' '))\n\n    reversed_s = reversed_s\n",
           "passed": false
         },
         {
-          "code": null,
+          "code": "def reverse_string(s):\n    reversed_s = [s.replace(c, ' ', c) for c in s.split(',')]\n    return reversed_s\n",
           "passed": false
+        },
+        {
+          "code": "from re import re\n\ndef reverse_string(s):\n    return re.sub(r'(([0-9])\\, (0-9))', text)\n\n# Example usage:\nprint(reverse_string('(([0-9]))'))\n",
+          "passed": false
+        },
+        {
+          "code": "def reverse_string(s):\n    return s.reverse()\n",
+          "passed": false
+        },
+        {
+          "code": "def reverse_string(s):\n    return ''.join(reversed(s))\n",
+          "passed": true
         },
         {
           "code": "def reverse_string(s):\n    return s.title()\n",
           "passed": false
         },
         {
-          "code": "def reverse_string(s):\n    return ' '.join(reversed(s))\n",
-          "passed": false
-        },
-        {
-          "code": "def reverse_string(s):\n    reversed_s = ''.join(reversed(s[0], s[1:]))\n    reversed_s = ''.join(reversed(reversed(reversed(s))) for re",
-          "passed": false
-        },
-        {
-          "code": "def reverse_string(s):\n    return str(s)\n",
-          "passed": false
-        },
-        {
-          "code": "def reverse_string(s):\n    return ' '.join(reversed(s))\n",
+          "code": "def reverse_string(s):\n    result = ''\n    reversed_string = \"\"\n    for char in s:\n        if char in result:\n            reversed_string += char\n            reversed_string += word[1:-1]\n        else:\n            reversed_string += char\n        reversed_string += char\n    return reversed_string\n",
           "passed": false
         },
         {
@@ -361,87 +365,79 @@
           "passed": true
         },
         {
-          "code": "def reverse_string(s):\n    \"\"\"\n    reverses a string `s` from the beginning of a string `s`.\n    \"\"\"\n    return ' '.join(reversed(r))\n",
-          "passed": false
-        },
-        {
-          "code": "import re\n\ndef reverse_string(s):\n    assert s.startswith(\"*\") or s.startswith(\"*\")\n    words = s.split(\",\")\n    return words[0] if len(words) < 2 else words\n",
+          "code": "def reverse_string(s):\n    s = s.lower()\n    return s[::-1]\n\n# Example usage:\nprint(reverse_string(s))  # Output: '1'\nprint(reverse_string(s))  # Output: '2'\n",
           "passed": false
         }
       ]
     },
     {
       "task": "count_vowels",
-      "reference_loss": 0.42361974716186523,
+      "reference_loss": 0.4237302243709564,
       "greedy": {
         "code": "def count_vowels(s):\n    vowels = 'aeiouAEIOU'\n    return sum(1 for char in s if char in vowels)\n",
         "passed": true
       },
       "samples": [
         {
-          "code": "def count_vowels(s):\n    vowels = 'aeiou'\n    return sum(1 for i, num in enumerate(s))\n",
+          "code": "def count_vowels(s):\n    vowels = s[0]\n    while s[1] > s[1:-1]:\n        vowels += s[1:-1]\n    return consonant(s)\n",
           "passed": false
         },
         {
-          "code": "def count_vowels(s):\n    vowels = s.lower()\n    if not vowels:\n        return 0\n    vowels = 'aeiouAEIOU'\n\n    return sum(vowel for vowel in s.lower() if vowels[1])\n",
+          "code": "def count_vowels(s):\n    vowels = 'aeiou'\n    while True:\n        vowels += 'aeiou'\n        vowels += 'aeiou'\n    return sha_vowels(len(s))\n",
           "passed": false
         },
         {
-          "code": "def count_vowels(s):\n    vowels = 'aeiouAEIOU'\n    return sum(1 for char in s if char in vowels)\n",
+          "code": "def count_vowels(s):\n    vowels = 'aeiouAEIOU'\n    return count_vowels(s)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_vowels(s):\n    if not s.isalnum():\n        return 0\n    if not s.isalpha():\n        return 0\n    for c in s.lower():\n        if c.isalnum():\n            return c\n    return count_vowels(c)\n\n# Example usage\ns = [1, 2, 3, 4, 5, 1]\nprint(count_vowels(s))  # Output: 3\n",
+          "passed": false
+        },
+        {
+          "code": null,
+          "passed": false
+        },
+        {
+          "code": "def count_vowels(s):\n    vowels = 'aeiou'\n    return sum(1 for char in s.lower() if char in vowels)\n",
           "passed": true
         },
         {
-          "code": "def count_vowels(s):\n    # Print the number of vowels, where 'a' is the vowel and 'i' is the vowel\n    return ''.join(c for c in s if c.isalnum()).lower()\n\ndef count_vowels(s):\n    vowels = 'aeiouAEIOU'\n    return ''.join(c for c in s if c.isalnum()).lower()\n",
+          "code": "def count_vowels(s):\n    vowels = 'aeiou'\n    return sum(1 for _ in s.lower() if _ in s.lower())\n",
           "passed": false
         },
         {
-          "code": "def count_vowels(s):\n    vowels = \"aeiouAEIOU\"\n    while len(vowels) < 3 or len(vowels) > 3:\n        return None\n    vowels = s.lower()\n    return sum(1 for char, int(ord(ord(ord(ord(ord(ord(ord(ord(ord(ord(ord) -ord(ord(ord(ord(ord(ord(ordord(ord(ord(ord(ord(ord(ord(ord(ord(ord(ord(ordord(ord(ord(ord(ord(ord(ordord(ord(ord(ord(ord(ord(ord(ord(ord(ord(ord",
+          "code": "def count_vowels(s):\n    count = 0\n    while s:\n        count += 1\n        if count == -1:\n            count += 2\n        count += 1\n    return count\n",
           "passed": false
         },
         {
-          "code": "def count_vowels(s):\n    return sum(1 for _ in range(len(s)))\n",
+          "code": "def count_vowels(s):\n    if not s:\n        return 0\n    elif not isinstance(s, str):\n        return 0\n    elif not isinstance(s, str):\n        return 0\n    elif not isinstance(s, str):\n        return 0\n    else:\n        return 0\n",
           "passed": false
         },
         {
-          "code": "def count_vowels(s):\n    n = len(s)\n    for i in range(n):\n        if s[i] == s[i]:\n            if s[i] == vowels:\n                return 1, -1\n    return 0, -1\n",
-          "passed": false
-        },
-        {
-          "code": "def count_vowels(s):\n    vowels = ''.join(c for c in s if c.isalpha()).lower()\n    return 1, -1, 4\n",
-          "passed": false
-        },
-        {
-          "code": "def count_vowels(s):\n  vowels = 'aeiouAEIOU'\n  vowels = 'aeiouAEIOU'\n  return sum(1 for char in s if",
-          "passed": false
-        },
-        {
-          "code": "def count_vowels(s):\n    vowels = 'aeiou'\n    return sum(1 for i in s if i >= 0)\n",
+          "code": "def count_vowels(s):\n    vowels = 'aeiouAEIOUABA'\n    return (1, -5, -1) + 2 * 2 + 1, 2 * 2 + 1\n",
           "passed": false
         }
       ]
     },
     {
       "task": "factorial",
-      "reference_loss": 0.30900344252586365,
+      "reference_loss": 0.3090079426765442,
       "greedy": {
         "code": "def factorial(n):\n    if n < 0:\n        raise ValueError(\"Factorial is not defined for negative numbers\")\n    elif n == 0:\n        return 1\n    else:\n        return n * factorial(n - 1)\n",
         "passed": true
       },
       "samples": [
         {
-          "code": null,
+          "code": "def factorial(n):\n    if n == 1:\n        factorial(n)\n    else:\n        factorial(n)\n    return factorial(n-1)\n",
           "passed": false
         },
         {
-          "code": "def factorial(n):\n    if n == 0 or n == 1:\n        return 1\n    elif n == 1:\n        return 1\n    else:\n        return n * factorial(n-1)\n",
-          "passed": true
-        },
-        {
-          "code": "def factorial(n):\n    if n == 0 or n == 1:\n        return 1\n    elif n == 0:\n        return 1\n    elif n == 1:\n        return 1 / n\n    else:\n        return n ** 2\n",
+          "code": "def factorial(n):\n    if n < 0:\n        raise ValueError(\"Input must be a non-negative integer\")\n\n    # Extract the factors from n to get the factorial\n    factorial = 1\n\n    for i in range(1, n):\n        factorial *= i\n\n    return factorial\n\n# Example usage:\nprint(factorial(5))  # Output: 3\nprint(factorial(5))  # Output: 2\n",
           "passed": false
         },
         {
-          "code": "import math\n\ndef factorial(n):\n    if not isinstance(n, int) or n < 0:\n        raise ValueError(\"n must be an integer\")\n    return math.factorial(n)\n",
+          "code": "def factorial(n):\n    if n == 1:\n        return 1\n\n    if n < 1:\n        raise ValueError(\"Factorial is not defined for negative numbers\")\n\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\ndef factorial(n):\n    if n == 1:\n        return 1\n    else:\n        result = 1\n\n    for i in range(1, n + 1):\n        result *= i\n    return result\n",
           "passed": true
         },
         {
@@ -449,245 +445,269 @@
           "passed": true
         },
         {
-          "code": "def factorial(n):\n    if not isinstance(n, int):\n        raise TypeError(\"Input must be an integer\")\n    if n < 0:\n        return 1\n    elif n > 0:\n        return 1\n    elif n > 0:\n        return n * factorial(n // 2)\n    else:\n        raise TypeError(\"Input",
-          "passed": false
-        },
-        {
-          "code": "def factorial(n):\n    if n == 0:\n        return 1\n\n    factorial = 1\n    for i in range(2, n):\n        x = i * i\n        n_factorial = 1\n        result = 1\n        for i in range(factorial, n_factorial):\n            result *= 1\n\n    return result\n",
-          "passed": false
-        },
-        {
-          "code": "def factorial(n):\n    if n <= 0:\n        return 1\n    else:\n        return n * factorial(n - 1)\n",
+          "code": "def factorial(n):\n    if n == 0:\n        return 1\n    elif n == 1:\n        return 1\n    else:\n        return n * factorial(n-1)\n",
           "passed": true
         },
         {
-          "code": "def factorial(n):\n    if n < 1:\n        raise ValueError(\"Factorial has a non-negative integer\")\n    factorial = 1\n    for i in range(2, int(n**0.5) + 1):\n        factorial *= 1\n    return factorial\n",
+          "code": null,
           "passed": false
         },
         {
-          "code": "import math\ndef factorial(n):\n    if n < 0:\n        return 0\n\n    def factorial(n):\n        non_factorial(n)\n        n += 1\n\n    return factorial(n, 0)\n",
+          "code": null,
+          "passed": false
+        },
+        {
+          "code": "def factorial(n):\n    if n == 0:\n        return 1\n    elif n == 1:\n        return 1\n    else:\n        return n * factorial(n - 1)\n",
+          "passed": true
+        },
+        {
+          "code": "def factorial(n):\n    if n <= 0:\n        raise ValueError(\"Factorial is not defined for negative numbers.\")\n    if n > 0:\n        raise ValueError(\"Factorial is not defined for positive numbers.\")\n    factorial_function = 1\n    while factorial_function * factorial(n):\n        factorial_function += factorial_function * factorial(n - 1)\n\n    return factorial_function\n\n# Example usage:\nprint(factorial(5))  # Output: 120\nprint(factorial(0))  # Output: 120\n",
+          "passed": false
+        },
+        {
+          "code": "def factorial(n):\n    def factorial(n):\n        if n < 0:\n            return 0\n        elif n == 1:\n            return 1\n        elif n == 2:\n            return 1\n        else:\n            return 1\n\n    return factorial(n)\n",
           "passed": false
         }
       ]
     },
     {
       "task": "fibonacci",
-      "reference_loss": 0.46197637915611267,
+      "reference_loss": 0.46195340156555176,
       "greedy": {
         "code": "def fibonacci(n):\n    if n < 0:\n        return 0\n    elif n == 1:\n        return 1\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)\n",
         "passed": true
       },
       "samples": [
         {
-          "code": "def fibonacci(n):\n    if n == 0:\n        return 0\n    elif n == 0:\n        return 1\n    elif n == 1:\n        return 1\n    else:\n        return fibonacci(n - 1) + fibonacci(1)\n",
+          "code": "def fibonacci(n):\n    \"\"\"\n    Fibonacci number to the power of 0.\n\n    Args:\n        n (int): The number to be Fibonacci numbers.\n\n    Returns:\n        int: The n-th Fibonacci number.\n    \"\"\"\n    if n < 0:\n        return 0\n    else:\n        return n * (n + 1) // 2\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    if n <= 0:\n        return 0\n    if n == 1:\n        return 0\n    else:\n        return 0 * (n + 1) // 2\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    if n <= 1:\n        return 1\n    else:\n        return fibonacci(n - 1)\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    fib_set = set()\n    for i in range(1, n+1):\n        fib_set.add(i)\n    return fib_set\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    if n <= 0:\n        return 1\n    else:\n        fib_n, fib_n = fibonacci(n-1, n)\n        if fib_n == 0:\n            return 1\n    else:\n        return fib_n * fib_n\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    if n == 1:\n        return 1\n    else:\n        return fibonacci(n-1)\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    if n == 0:\n        return 0\n    return fibonacci(n - 1)\n\ndef fibonacci(n):\n    if n == 1:\n        return 1\n    return fibonacci(n - 1)\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    if n <= 0:\n        return 0\n    fibonacci(n-1)\n    return fibonacci(n-2)\n\n# Test the function\nprint(fibonacci(0))  # Output: 1\nprint(fibonacci(0))  # Output: 1\n",
+          "passed": false
+        },
+        {
+          "code": "def fibonacci(n):\n    fib, fib = 0, 0\n    while n > len(fib):\n        fib += fib\n    return fib\n",
           "passed": false
         },
         {
           "code": null,
-          "passed": false
-        },
-        {
-          "code": "def fibonacci(n):\n    if n != 0:\n        return 1\n\n    if n % 2 == 0:\n        return 1\n    else:\n        return n * 1/n\n",
-          "passed": false
-        },
-        {
-          "code": "def fibonacci(n):\n    if n < 0:\n        return 0\n    fib_val = 0\n    while n > 0:\n        fib_val += n\n        n >>= 1\n    return fib_val\n",
-          "passed": false
-        },
-        {
-          "code": "import math\n\ndef fibonacci(n):\n    if n == 1:\n        return 1\n    else:\n        return 1\n\n# Example usage\nprint(fibonacci(1))\n",
-          "passed": false
-        },
-        {
-          "code": "def fibonacci(n):\n    return n * (fibonacci(n))\n",
-          "passed": false
-        },
-        {
-          "code": null,
-          "passed": false
-        },
-        {
-          "code": "def fibonacci(n):\n    if isinstance(n, int):\n        return 1\n    elif isinstance(n, int):\n        return n * (n-1) + fibonacci(n-2)\n    else:\n        fib_count = 0\n        while len(fib_count) < n:\n            fib_count += fib_count.count(n)\n        return fib_count\n",
-          "passed": false
-        },
-        {
-          "code": "def fibonacci(n):\n    if n <= 0:\n        return 0\n    if n == 1:\n        return 1\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)\n",
-          "passed": true
-        },
-        {
-          "code": "def fibonacci(n):\n    if n <= 0:\n        return 0\n    max_fibonacci = n\n    while i < n - 1:\n        n //= 2\n        n //= 2\n    return n\n\n# Test the function\nn = 6\nprint(fibonacci(n))  # Output: 1\n\nn = 6\nprint(fibonacci(n))  # Output: 1\n",
           "passed": false
         }
       ]
     },
     {
       "task": "is_palindrome",
-      "reference_loss": 0.2206188142299652,
+      "reference_loss": 0.21760672330856323,
       "greedy": {
         "code": "def is_palindrome(s):\n    s = ''.join(c for c in s if c.isalnum()).lower()\n    return s == s[::-1]\n",
         "passed": true
       },
       "samples": [
         {
+          "code": "def is_palindrome(s):\n    \"\"\"\n    Checks if a string is a palindrome.\n\n    Args:\n        s (str): The string to be checked.\n\n    Returns:\n        bool: True if the string s read, False otherwise.\n    \"\"\"\n    m = len(s)\n    left, right = 0, len(s) - 1\n\n    while left < right:\n        if s[left] + s[right] != s[left]:\n            return False\n\n        left += 1\n        right -= 1\n\n    return True\n",
+          "passed": false
+        },
+        {
+          "code": "def is_palindrome(s):\n    string =",
+          "passed": false
+        },
+        {
+          "code": "def is_palindrome(s):\n    s = ''.join(c for c in s if c.isalnum()).lower()\n\n    if not s:\n        return False\n    return s == s[::-1]\n",
+          "passed": false
+        },
+        {
+          "code": "def is_palindrome(s):\n    s = ''.join(c for c in s if c.isalnum()).lower()\n    s = s[::-1]\n    return s == s[::-1]\n",
+          "passed": true
+        },
+        {
+          "code": "def is_palindrome(s: str) -> bool:\n    return type(s) == bool\n",
+          "passed": false
+        },
+        {
+          "code": "def is_palindrome(s):\n    return all(c in s if c.isalnum() for c in s)\n",
+          "passed": false
+        },
+        {
           "code": "def is_palindrome(s):\n    s = ''.join(c for c in s if c.isalnum()).lower()\n    return s == s[::-1]\n",
           "passed": true
         },
         {
-          "code": "def is_palindrome(s):\n    \"\"\"\n    Checks if the string is a palindrome.\n\n    Args:\n        s (str): The string to check.\n\n    Returns:\n        bool: True if the string is a palindrome, False otherwise.\n    \"\"\"\n    return s == s[::-1]\n",
-          "passed": true
-        },
-        {
-          "code": null,
+          "code": "def is_palindrome(s):\n    sep = ''.join(c for c in s if c.isalnum()).lower()\n    return (sep == s[::-1]) == s[::-1]\n",
           "passed": false
         },
         {
-          "code": "def is_palindrome(s):\n    s = ''.join(c for c in s if c.isalnum()).lower()\n    lowercase_s = s.upper()\n    return lowercase_s != uppercase_s[:lowercase_s.index(lowercase_s)]\n",
+          "code": "def is_palindrome(s):\n    if not s:\n        return False\n\n    left, right = 0, 0\n\n    while s[left], s[right]:\n        left >>= s[right]\n        if right && right:\n            right <<= s[left]\n        right >>= s[right]\n\n    return True\n",
           "passed": false
         },
         {
-          "code": "def is_palindrome(s):\n    s = ''.join(c for c in s if c.isalnum()).lower()\n    return s == s[::-1]\n",
-          "passed": true
-        },
-        {
-          "code": "def is_palindrome(s):\n    # Check if s reads the same characters\n    s = s.strip().lower()  # Remove the end-level character from the string\n    return s != s[::-1]  # Remove the end of the string\n    return s == s[::-1]  # Remove the end of the string\n",
+          "code": "def is_palindrome(s):\n    return s[::-1]\n",
           "passed": false
-        },
-        {
-          "code": "def is_palindrome(s):\n    s = s.rsplit(\".\")\n    return s == s[::-1]\n",
-          "passed": false
-        },
-        {
-          "code": "def is_palindrome(s):\n    return s.isalnum()\n",
-          "passed": false
-        },
-        {
-          "code": "def is_palindrome(s):\n    s = ''.join(c for c in s if c.isalnum())\n    return s == s[::-1]\n\n# Example usage:\nprint(is_palindrome('hello'))  # True\nprint(is_palindrome('hello'))  # False\nprint(is_palindrome('hello'))  # False\nprint(is_palindrome('world'))  # True\nprint(is_palindrome('hello'))  # False\nprint(is_pal",
-          "passed": false
-        },
-        {
-          "code": "def is_palindrome(s):\n    return s == s[::-1]\n",
-          "passed": true
         }
       ]
     },
     {
       "task": "first_element",
-      "reference_loss": 0.49170440435409546,
+      "reference_loss": 0.49184051156044006,
       "greedy": {
         "code": "def first_element(items):\n    return [item for item in items if item.isdigit()]\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def first_element(items):\n    return [item for item in items for item in items]\n",
+          "code": "def first_element(items):\n    if not isinstance(items, list):\n        return []\n    return items\n",
           "passed": false
         },
         {
-          "code": "def first_element(items):\n    for item in items:\n        if item is None:\n            item.index(item)\n        elif item == item:\n            return item\n        else:\n            return item\n\n    return first_element(items)\n",
-          "passed": true
-        },
-        {
-          "code": "def first_element(items):\n    return [item for item in items if item.is_empty()]\n",
+          "code": "def first_element(items):\n    return items.split('\\n')\n",
           "passed": false
         },
         {
-          "code": null,
+          "code": "def first_element(items):\n    return [item for item in items if item]\n",
           "passed": false
         },
         {
-          "code": "def first_element(items):\n    first_element = items.pop(\"first\")\n    return (first_element, first_element)\n",
+          "code": "def first_element(items):\n    seen = set()\n    for item in items:\n        if item in seen:\n            return item\n        seen.add(item)\n    return -1\n",
           "passed": false
         },
         {
-          "code": "def first_element(items):\n    return [item for item in items if item not in items]\n",
+          "code": "def first_element(items):\n    items.reverse()\n    return",
           "passed": false
         },
         {
-          "code": null,
+          "code": "def first_element(items):\n    if not isinstance(items, list):\n        raise TypeError(\"The first element must be a list.\")\n\n    for item in items:\n        if isinstance(item, list):\n            return [item]\n    return None\n",
           "passed": false
         },
         {
-          "code": "def first_element(items):\n    if not isinstance(items, list):\n        raise TypeError(\"Item must be a single list\")\n\n    return items\n",
+          "code": "def first_element(items):\n    return iter(items)\n",
           "passed": false
         },
         {
-          "code": "def first_element(items):\n    return [item for item in items if item in items]\n",
+          "code": "def first_element(items):\n    return (items == subset)\n",
           "passed": false
         },
         {
-          "code": "def first_element(items):\n    if isinstance(items, list):\n        return items\n    elif isinstance(items, list):\n        return [item for item in items if item in items]\n    elif isinstance(items, list):\n        return [item for item in items if item in items]\n    else:\n        return None\n",
+          "code": "def first_element(items):\n    if isinstance(items, list):\n        items = [items]\n    elif isinstance(items, list):\n        return []\n    else:\n        return items\n",
+          "passed": false
+        },
+        {
+          "code": "def first_element(items):\n    return items.strip()\n",
           "passed": false
         }
       ]
     },
     {
       "task": "last_element",
-      "reference_loss": 0.5536704063415527,
+      "reference_loss": 0.5535863637924194,
       "greedy": {
         "code": "def last_element(items):\n    if not items:\n        return []\n\n    last_element = items[0]\n    for item in items:\n        if item == last_element:\n            last_element = item\n        else:\n            last_element = item\n\n    return last_element\n",
         "passed": true
       },
       "samples": [
         {
-          "code": "def last_element(items):\n    return [item for item in items if item.isspace()]\n",
+          "code": "def last_element(items):\n    for item in items:\n        if item[0] == item:\n            return item\n    return None\n",
           "passed": false
         },
         {
-          "code": null,
+          "code": "def last_element(items):\n    if not items:\n        return None\n    return len(items)\n",
           "passed": false
         },
         {
-          "code": "def last_element(items):\n    if len(items) < 2:\n        return []\n    last_element = items[0]\n    remaining_elements = []\n    \n    for item in items:\n        if item not in last_element:\n            last_element = item\n            last_element = item\n        last_element = next(item)\n    \n    return last_element\n",
+          "code": "def last_element(items):\n    if not items:\n        return []\n    last_element = []\n    first_element.append(item)\n    last_element.append(last_element)\n    return items\n",
           "passed": false
         },
         {
-          "code": "def last_element(items):\n    return last_element(items)\n",
+          "code": "def last_element(items):\n    if len(items) == 0:\n        return [item.replace(end = ' ').lower() for item in items]\n    else:\n        return [item.replace('&', '').replace(' ', '') for item in items]\n",
           "passed": false
         },
         {
-          "code": "def last_element(items):\n    if not isinstance(items, list):\n        return []\n    return [item for _ in items if isinstance(item, tuple) else item for item in items]\n",
+          "code": "def last_element(items):\n    if not isinstance(items, list):\n        raise TypeError(\"Each element must be a list.\")\n    if isinstance(items, int) or len(items) < 2:\n        raise TypeError(\"The input is not a positive integers.\")\n    return items[0]\n",
           "passed": false
         },
         {
-          "code": "def last_element(items, last):\n    current = item\n    if current is None:\n        current = current\n    else:\n        current = current\n    return last + 1\n\n# Example usage:\nnumbers = [1, 2, 3, 3",
+          "code": "def last_element(items):\n    return [item for item in items if item not in item[\"value\"]]\n",
           "passed": false
         },
         {
-          "code": "def last_element(items):\n    last_element = items[0]\n    for item in items:\n        if isinstance(item, list):\n            last_element = \"\"\n        if item and item[0]:\n            last_element += item\n        else:\n            last_element = item\n\n    return last_element\n",
+          "code": "def last_element(items):\n    if len(items) == 0:\n        return ''\n\n    if not isinstance(items[0], list):\n        return ''\n\n    item = item[0]\n    for item in items:\n        if item[0] == item[1]:\n            return item[1::2]\n        else:\n            return item\n    return '' if item[0] == item[1] else ''\n",
           "passed": false
         },
         {
-          "code": "def last_element(items):\n    if len(items) < 2:\n        return None\n\n    if isinstance(items, list):\n        return [item for item in items if item[0] == item[1]]\n\n    return None\n",
+          "code": "def last_element(items):\n    return [item for item in items if (item, item) == '']\n",
           "passed": false
         },
         {
-          "code": null,
+          "code": "def last_element(items):\n    return [item for item in items if item not in item]\n",
           "passed": false
         },
         {
-          "code": "def last_element(items):\n    return [item for item in items if item]\n",
+          "code": "def last_element(items):\n    return next(items)\n",
           "passed": false
         }
       ]
     },
     {
       "task": "count_positive",
-      "reference_loss": 0.4165303707122803,
+      "reference_loss": 0.4165528416633606,
       "greedy": {
         "code": "def count_positive(numbers):\n    return sum(numbers) / len(numbers)\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def count_positive(numbers):\n    return sum(x for i, x in enumerate(numbers), reverse=True) if i % 2 == 0 else 0\n",
+          "code": "def count_positive(numbers):\n    return len(numbers)\n",
           "passed": false
         },
         {
-          "code": "def count_positive(numbers):\n    return len(numbers) // 2\n",
+          "code": "def count_positive(numbers):\n    if not numbers:\n        return False\n    for number in numbers:\n        if number > number:\n            count = count_positive(number)\n            count = count_positive(number)\n            count += count\n    return count\n\nnumbers = [11, 11, 11, 13, 13, 13, 13, 13, 13, 13, 15, 15]\nprint(count_positive(numbers))\n",
           "passed": false
         },
         {
-          "code": null,
+          "code": "def count_positive(numbers):\n    return sum(num ** 2 for num in numbers if num % 2 != 0)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_positive(numbers):\n    total = 0\n    for num in numbers:\n        if num > 0:\n            total += num\n    return total\n\n# Test the function\nnumbers = [1, 2, 3, 4, 5, 7, 8, 9, 10]\nprint(count_positive(numbers))  # Output: 4\n",
+          "passed": false
+        },
+        {
+          "code": "def count_positive(numbers):\n    count = 0\n\n    for num inbers:\n        if num % 2 == 0:\n            count += 1\n        else:\n            count += 1\n    return count\n",
+          "passed": false
+        },
+        {
+          "code": "import re\n\ndef count_positive(numbers):\n    return sum(1 for num in numbers if num % 2 == 0)\n",
+          "passed": true
+        },
+        {
+          "code": "def count_positive(numbers):\n    \"\"\"\n    Returns the count of numbers in the list given the specified conditions.\n\n    Args:\n        numbers (list): A list of numbers.\n\n    Returns:\n        float: The count of numbers in the list.\n    \"\"\"\n    return sum(numbers) / len(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_positive(numbers):\n    if not numbers:\n        return 0\n\n    # Create an empty list to store the count of numbers\n    count_positive = 0\n\n    for number in numbers:\n        count_positive += count_positive / number\n\n    return count_positive\n",
           "passed": false
         },
         {
@@ -695,45 +715,21 @@
           "passed": false
         },
         {
-          "code": "def count_positive(numbers):\n    return len(numbers)\n",
-          "passed": false
-        },
-        {
-          "code": "def count_positive(numbers):\n    \"\"\"Return the number of positive numbers in the list.\"\"\"\n    count = 0\n    while count > 0:\n        count += 1\n        count = count // 2\n        count += 1\n    return count\n",
-          "passed": false
-        },
-        {
-          "code": null,
-          "passed": false
-        },
-        {
-          "code": "def count_positive(numbers):\n    count = 0\n    for i, number in enumerate(numbers):\n        if i + number == 0:\n            count += 1\n    return count\n",
-          "passed": false
-        },
-        {
-          "code": "def count_positive(numbers):\n    return len(numbers)\n",
-          "passed": false
-        },
-        {
-          "code": "def count_positive(numbers):\n    return sum(1 for i in numbers if i < len(numbers))\n",
+          "code": "def count_positive(numbers):\n    \"\"\"\n    Returns the count of numbers in the list of numbers.\n\n    Args:\n        numbers (list): The numbers to count.\n\n    Returns:\n        int: The count of numbers in the list.\n    \"\"\"\n    count = 0\n    for num in numbers:\n        count += num ** 2\n    return count, count\n\n# Example usage:\nnumbers = [1, 2, 3, 3, 3, 3, 3, 3]\nprint(count_positive(numbers))  # Output: 3.0\nprint(count_positive(numbers))  # Output: 2.0\nprint(count_positive(numbers))  # Output: 3.",
           "passed": false
         }
       ]
     },
     {
       "task": "celsius_to_fahrenheit",
-      "reference_loss": 0.8281427621841431,
+      "reference_loss": 0.8282252550125122,
       "greedy": {
         "code": "def celsius_to_fahrenheit(celsius):\n    return (celsius * 5) + 32\n\ndef celsius_to_fahrenheit(celsius):\n    return (celsius * 5) + 32\n\ndef celsius_to_fahrenheit(celsius):\n    return (celsius * 5) + 32\n\ndef celsius_to_fahrenheit(celsius):\n    return (celsius * 5) + 32\n\ndef celsius_to_fahrenheit(celsius):\n    return (celsius * 5",
         "passed": false
       },
       "samples": [
         {
-          "code": "def celsius_to_fahrenheit(celsius):\n    return (celsius * 3 / 32) + 32\n\ncelsius = 100\n\ndef celsius_to_fahrenheit(celsius):\n    return (celsius * 6 / 3 / 9) + 32\n\ncelsius = 5\n\ndef celsius_to_fahrenheit(celsius):\n    return (celsius * 3 / 9) + 32\n\ndef celsius_to_fahrenheit(celsius):\n    return (celsius * 3 / 9) * 3 / 6\n\n",
-          "passed": false
-        },
-        {
-          "code": "def celsius_to_fahrenheit(c):\n    return (c * (c - 32) + (c - 32) * (c - 32))\n",
+          "code": "def celsius_to_fahrenheit(c):\n    return (c - 1) * (c - 1)\n",
           "passed": false
         },
         {
@@ -741,11 +737,11 @@
           "passed": false
         },
         {
-          "code": "def celsius_to_fahrenheit(c):\n    return (c * 2 + c * 2 + 1) + 4\n",
+          "code": null,
           "passed": false
         },
         {
-          "code": "def celsius_to_fahrenheit(c):\n    \"\"\"\n    Convert a temperature to degrees Celsius.\n    \n    Args:\n        c (float): the temperature to read.\n\n        c (float): the temperature to read.\n     If c is 1: as long as Celsius is 0.\n    \n    Returns:\n        float: the temperature to read.\n    \"\"\"\n    celsius = [celsius_to_fahrenheit(c)]\n    return celsius\n\n# Example usage:\ncelsius_to_fahrenheit = celsius_to_fahrenheit(celsius_to_",
+          "code": "def celsius_to_fahrenheit(celsius):\n    \"\"\"\n    Applies a temperature of celsius to degrees Fahrenheit.\n    \"\"\"\n    return celsius_to_fahrenheit(celsius, \"C\")\n",
           "passed": false
         },
         {
@@ -753,237 +749,237 @@
           "passed": false
         },
         {
-          "code": "def celsius_to_fahrenheit(celsius):\n    return (celsius * 3600 * 5/9) + 32\n\ndef fahrenheit_to_fahrenheit(celsius):\n    return (celsius * 3600, 0 / 3600) + 32\n\ncelsius = celsius_to_fahrenheit(celsius)\nprint(f\"{fahrenheit_to_fahrenheit(celsius))}\u00b0F\")\n\ncelsius = cels",
+          "code": "import math\n\ndef celsius_to_fahrenheit(celsius_to_fahrenheit):\n    degrees = math.floor(celsius_to_fahrenheit)\n    return degrees\n",
           "passed": false
         },
         {
-          "code": "def celsius_to_fahrenheit(celsius):\n    if celsius < 0:\n        return 0\n    return (celsius * (celsius * (celsius * 9/9) + 36)) + 32\n",
+          "code": "import celsius\nimport celsius\n\ndef celsius_to_fahrenheit(celsius):\n    \"\"\"\n    Converts a temperature of celsius to degrees Fahrenheit.\n    \"\"\"\n    celsius_to_fahrenheit_celsius(celsius_to_fahrenheit)\n    return celsius_to_fahrenheit(celsius_to_fahrenheit(celsius_to_fahrenheit))\n",
           "passed": false
         },
         {
-          "code": null,
+          "code": "def celsius_to_fahrenheit(c):\n    return celsius_to_fahrenheit(c)\n",
           "passed": false
         },
         {
-          "code": "def celsius_to_fahrenheit(c):\n    return (c * (c - 32)) / (c - 32)\n",
+          "code": "def celsius_to_fahrenheit(c):\n    \"\"\"\n    Converts Celsius to degrees Celsius.\n\n    Args:\n        c (str): The desired temperature in Celsius.\n\n    Returns:\n        float: The percentage expressed in Celsius.\n    \"\"\"\n    return celsius_to_fahrenheit(c) % 36\n    return celsius_to_fahrenheit(celsius_to_fahrenheit(c))\n",
+          "passed": false
+        },
+        {
+          "code": "def celsius_to_fahrenheit(c):\n    return (celsius * 9/2) * 9/5\n\n# Example usage:\nprint(celsius_to_fahrenheit(10))  # Output: -4\n",
           "passed": false
         }
       ]
     },
     {
       "task": "is_prime",
-      "reference_loss": 0.24985651671886444,
+      "reference_loss": 0.2498578429222107,
       "greedy": {
         "code": "def is_prime(n):\n    if n < 2:\n        return False\n    for i in range(2, int(n ** 0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n",
         "passed": true
       },
       "samples": [
         {
-          "code": "def is_prime(n):\n    if n <= 0:\n        return False\n    for i in range(2, int(math.sqrt(n)) + 1):\n        if i % 2 == 0:\n            return False\n    return True\n",
-          "passed": false
-        },
-        {
-          "code": "def is_prime(n):\n    \"\"\"\n    Checks if a number is a prime number.\n    \"\"\"\n    if n < 1:\n        return False\n    for i in range(2, int(n ** 0.5) + 1):\n        if not isinstance(n, int) and n < 1:\n            return False\n    return True\n",
-          "passed": false
-        },
-        {
-          "code": "def is_prime(n):\n    if not isinstance(n, int):\n        return False\n    if n < 1:\n        return False\n    for i in range(2, int(n ** 0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n",
-          "passed": false
-        },
-        {
-          "code": "def is_prime(n):\n    if n <= 0:\n        return False\n    for i in range(2, int(n ** 0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n",
-          "passed": false
-        },
-        {
-          "code": "def is_prime(n):\n    if n < 2:\n        return False\n    for i in range(2, int(n ** 0.5) + 1):\n        if n % i == 0:\n            return False\n    return False\n",
-          "passed": false
-        },
-        {
-          "code": "def is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n",
+          "code": "def is_prime(n):\n    \"\"\"\n    Checks if the integer is a prime number.\"\"\"\n    if n < 2:\n        return False\n    if n < 2:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n",
           "passed": true
         },
         {
-          "code": "def is_prime(n):\n    if n <= 2:\n        return False, False\n    for i in range(2, int(math.sqrt(n)) + 1):\n        if n % i == 0:\n            return False, False\n    return True\n",
+          "code": "def is_prime(n):\n    if n == 1:\n        return False\n    for i in range(2, int(n ** 0.5) + 1):\n        if n % i == 0:\n            return False\n    return not True\n",
           "passed": false
         },
         {
-          "code": "def is_prime(n):\n    \"\"\"\n    Checks if the integer n is a prime number.\n\n    Args:\n        n (int): The number to check.\n\n    Returns:\n        bool: True if the number is a prime number, False otherwise.\n    \"\"\"\n    if n < 1:\n        return False\n    return (n & (n - 1)) == 0\n",
+          "code": "def is_prime(n):\n    \"\"\"\n    Checks if a given integer is prime.\n\n    Args:\n        n (int): The integer to check\n\n    Returns:\n        bool: True if the number is prime, False otherwise.\n    \"\"\"\n    if not isinstance(n, int):\n        raise TypeError(\"n must be a non-negative integer\")\n\n    # Initialize an empty list to",
           "passed": false
         },
         {
-          "code": "def is_prime(n):\n    \"\"\"\n    Checks if the integer n is a prime number.\n\n    Args:\n        n (int): The number to check.\n\n    Returns:\n        bool: True if the integer is prime, False otherwise.\n    \"\"\"\n    if n < 1:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n",
+          "code": "def is_prime(n):\n    if n <= 2:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n",
           "passed": false
         },
         {
-          "code": "def is_prime(n):\n    if n == 0:\n        return False\n    for i in range(2, int(n ** 0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n",
+          "code": "def is_prime(n):\n    def is_prime(n):\n        if n <= 1:\n            return False\n        for i in range(2, int(n**0.5) + 1):\n            if num % i == 0:\n                return False\n        return True\n    if n % 2 == 0:\n        return False\n    return [True] * (n - 1) == 1\n",
           "passed": false
+        },
+        {
+          "code": "def is_prime(n):\n    if n <= 2:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return True\n    return False\n",
+          "passed": false
+        },
+        {
+          "code": "def is_prime(n):\n    if not isinstance(n, int):\n        raise TypeError(\"The integer n is not a prime number\")\n    if n < 0:\n        return False\n    for i in range(2, int(math.sqrt(n)) + 1):\n        if n % i == 0:\n            return False\n    return True\n",
+          "passed": false
+        },
+        {
+          "code": "def is_prime(n):\n    if n < 1:\n        return False\n\n    for i in range(2, int(n ** 0.5) + 1):\n        if n % i == 0:\n            return False\n\n    return True\n",
+          "passed": false
+        },
+        {
+          "code": "def is_prime(n):\n    if n < 2:\n        return False\n    for i in range(2, int(n ** 0.5) + 1):\n        if is_pr",
+          "passed": false
+        },
+        {
+          "code": "def is_prime(n):\n    \"\"\"\n        Returns True if n is a prime number, False otherwise.\n\n    Parameters:\n        n (int): The expected number.\n\n    Returns:\n        bool: False if n is an integer, False otherwise.\n    \"\"\"\n    if n < 2:\n        return False\n    for i in range(2, int(n ** 0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n",
+          "passed": true
         }
       ]
     },
     {
       "task": "find_max",
-      "reference_loss": 0.3039167523384094,
+      "reference_loss": 0.3038768470287323,
       "greedy": {
         "code": "def find_max(numbers):\n    return max(numbers)\n",
         "passed": true
       },
       "samples": [
         {
-          "code": "def find_max(numbers):\n    if not numbers:\n        return 0\n    \n    max_num = numbers[0]\n    while len(numbers) < 0:\n        try:\n            numbers.append(numbers[0])\n        except ValueError:\n            return 0\n    \n    max_num = max(numbers)\n    max_num = max(numbers)\n    \n    return max_num\n",
+          "code": "def find_max(numbers):\n    return max(numbers), max(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def find_max(numbers):\n    return max(numbers)\n",
           "passed": true
         },
         {
-          "code": "def find_max(numbers):\n    return min(numbers)\n\ndef main():\n    numbers = [2, 4, 6, 7, 8, 12, 15]\n    found = find_max(numbers)\n    if found is not None:\n        print(f\"The largest number in the list is: {found}\")\n        return\n\n    if found:\n        find_max(numbers)\n    else:\n        print(f\"The largest number in the list is: {found}\")\n",
+          "code": "def find_max(numbers):\n    max_num = len(numbers)\n    max_num = numbers[0]\n    if len(numbers) == 0:\n        return None\n    return max(numbers[-1] - numbers[-2], max_num)\n",
           "passed": false
         },
         {
-          "code": "def find_max(numbers):\n    max_num = float('-inf')\n    for num in numbers:\n        if num > max_num:\n            max_num = num\n        elif num < max_num:\n            max_num = num\n\n    return max_num\n",
-          "passed": false
-        },
-        {
-          "code": "def find_max(numbers):\n    if not numbers:\n        return None\n    return max(numbers)\n",
+          "code": "def find_max(numbers):\n    max_num = max(numbers)\n    if len(numbers) > max_num:\n        return max_num\n    else:\n        return max_num\n",
           "passed": true
         },
         {
-          "code": "def find_max(numbers):\n    max_num = float('-inf')\n    for num in numbers:\n        if num > max_num:\n            max_num = num\n    return max_num\n\nnumbers = [1, 2, 3, 4, 5]\nprint(find_max(numbers))\n",
+          "code": "def find_max(numbers):\n    if not numbers:\n        return None\n    return max([num for num in numbers if num % 2 == 0])\n",
+          "passed": false
+        },
+        {
+          "code": "def find_max(numbers):\n    max_num = 0\n    for number in numbers:\n        if number in max_num:\n            max_num = number\n    return max_num\n",
+          "passed": false
+        },
+        {
+          "code": "def find_max(numbers):\n    if not numbers:\n        return None\n    max_val = 0\n\n    for num in numbers:\n        if num > max_val:\n            max_val = num\n        elif num < max_val:\n            max_val = num\n        elif num < min_val:\n            max_val = num\n        else:\n            max_val = num\n\n    return max_val\n",
+          "passed": false
+        },
+        {
+          "code": "def find_max(numbers):\n    if not numbers:\n        return -1\n    return max(numbers)\n",
           "passed": true
         },
         {
-          "code": "def find_max(numbers):\n    \"\"\"\n    Returns the largest number in a non-empty list.\n\n    Args:\n        numbers (list): The list to find the minimum number.\n    Returns:\n        int: The largest number in the list.\n    \"\"\"\n    return numbers\n",
+          "code": "def find_max(numbers):\n    \"\"\"\n    Returns the largest number in the given list.\n\n    Args:\n        numbers (list): An empty list.\n\n    Returns:\n        int: The largest number in the list.\n    \"\"\"\n    max_num = float('inf')\n    for num in numbers:\n        if num < max_num:\n            max_num = num\n    return max_num\n",
           "passed": false
         },
         {
-          "code": "def find_max(numbers):\n    \"\"\"\n    Get the first list of numbers from the given list.\n\n    Args:\n        numbers (list): A list of numbers.\n        numbers (list): A list of numbers.\n\n    Returns:\n        int: The largest number in the list.\n    \"\"\"\n    return numbers\n",
-          "passed": false
-        },
-        {
-          "code": "def find_max(numbers):\n    if not numbers:\n        return None\n\n    for number in numbers:\n        if number == 0:\n            return number\n\n    return max(min(num, key=int))\n\ndef find_largest_index(numbers):\n    if not numbers:\n        return None\n\n    max_val = None\n    max_val = None\n\n    for number in numbers:\n        if number > max_val:\n            max_val =",
-          "passed": false
-        },
-        {
-          "code": "def find_max(numbers):\n    max_num = float('-inf')\n    for num in numbers:\n        if (num > max_num):\n            max_num = num\n            max_num = num\n    return max_num\n",
-          "passed": true
-        },
-        {
-          "code": "def find_max(numbers):\n    return max_nums(numbers)\n",
+          "code": "def find_max(nums):\n    try:\n        nums.sort()\n        return nums[0].count(num)\n    except ValueError:\n        return 0\n",
           "passed": false
         }
       ]
     },
     {
       "task": "find_min",
-      "reference_loss": 0.4180923104286194,
+      "reference_loss": 0.4180591404438019,
       "greedy": {
         "code": "def find_min(numbers):\n    if not numbers:\n        return None\n    return (numbers[0] - numbers[0]) / 2\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def find_min(numbers):\n    if not numbers:\n        return None\n    return max(numbers)\n\nnumbers = [1, 2, 3]\nprint(find_min(numbers))  # Output: 6\n",
+          "code": "def find_min(nums):\n    \"\"\"\n    Returns the smallest number in a non-empty list.\n\n    Args:\n        nums (list): A non-empty list.\n\n    Returns:\n        int: The smallest number in the list.\n\n    Raises:\n        ValueError: If the input is empty.\n    \"\"\"\n    if not numbers:\n        raise ValueError(\"Input list must contain only numbers\")\n    num_min_num = min(nums)\n    is_empty_list = list(num_min_num)\n    if is_empty_list:\n        return num_min_num\n\n    return num_min_num\n",
           "passed": false
         },
         {
-          "code": "def find_min(numbers):\n    \"\"\"Find the smallest number in a non-empty list based on the given numbers.\n\n    Args:\n        numbers (list): A list of non-empty lists.\n\n    Returns:\n        int: The smallest number in the non-empty list.\n\n    Raises:\n        ValueError: If the input list is empty.\n    \"\"\"\n    if len(numbers) == 0:\n        raise ValueError(\"List must contain at least two non-empty list elements.\")\n    if len",
+          "code": "import math\n\ndef find_min(numbers):\n    if not numbers:\n        return None\n    num_value = math.ceil(numbers[0])\n    return [num_value for num in math.ceil(numbers[1:])]\n",
           "passed": false
         },
         {
-          "code": "def find_min(numbers):\n    int_length = float('-inf')\n    while len(numbers) > 1:\n        int_length = float('-inf')\n        int_length = float('-inf')\n        sub_min = float('-inf')\n        if int_length == 0:\n            return float('-inf')\n        numbers.sort()\n        smallest = float('-inf')\n        while smallest > smallest:\n            sub_min = min(numbers)\n            num = numbers[smallest]\n            if num > smaller_num:\n                return int",
+          "code": "def find_min(numbers):\n    smallest = numbers.pop(0)\n    smallest = numbers.pop(0)\n    if smallest is None:\n        return None\n    else:\n        smallest = numbers.pop(0)\n        return smallest\n",
           "passed": false
         },
         {
-          "code": "def find_min(numbers):\n    try:\n        mid = float(numbers[0])\n        if len(numbers) != 3:\n            return (numbers[mid] + numbers[mid]) / 2\n        else:\n            return float(numbers[mid])\n    except ValueError:\n        return None\n",
+          "code": "def find_min(numbers):\n    if len(numbers) == 0:\n        return None\n\n    factors = [num for num in numbers if num > 0]\n    if len(numbers) % 2 == 0:\n        factors.append(numbers[-1])\n    return factors\n",
           "passed": false
         },
         {
-          "code": "def find_min(numbers):\n    max_num = numbers[0]\n    for num in numbers:\n        if num > max_num:\n            max_num = num\n        elif num > max_num:\n            return num\n    return None\n\ndef find_min(numbers):\n    if len(numbers) <= 1:\n        return None  # or any other type\n    return max(numbers)\n",
+          "code": "def find_min(numbers):\n    assert isinstance(numbers, list), \"are\"\n    for item in numbers:\n        assert isinstance(item, list), \"are\"\n    return item\n\ndef find_min(numbers):\n    \"\"\"\n    Finds the minimum number in a non-empty list of integers.\n\n    Args:\n        numbers (list): A list of integers.\n\n    Returns:\n        int: The smallest number in the iterable.\n\n    Raises:\n        ValueError: If the input is empty.\n        ValueError: If the input is not a list or the input is empty.\n    \"\"\"\n    if not numbers:\n        raise ValueError(\"Array must",
           "passed": false
         },
         {
-          "code": "def find_min(numbers):\n    if not numbers:\n        return None\n    return [num for num in numbers if num not in numbers]\n",
+          "code": "def find_min(numbers):\n    if len(numbers) < 2:\n        raise ValueError(\"Input list must contain at least 3 elements\")\n    else:\n        num = numbers[0]\n        while num != 0:\n            num = numbers[num]\n            if num != 0:\n                return num\n        num = numbers[num]\n        num = numbers.issubset(num)\n    return num\n",
           "passed": false
         },
         {
-          "code": "def find_min(numbers):\n    if not numbers:\n        return 0\n\n    max_size = float('-inf')\n    for num in numbers:\n        if num > max_size:\n            max_size = num\n    return min_size\n",
+          "code": "def find_min(numbers):\n    if not numbers:\n        return None\n    return min(numbers)\n",
+          "passed": true
+        },
+        {
+          "code": "def find_min(numbers):\n    if not numbers:\n        return []\n\n    for number in numbers:\n        if number in numbers:\n            return numbers[number]\n        else:\n            raise ValueError(\"Cannot find minimum number\")\n\nnumbers = [1, 2, 3, 4, 5]\n\nassert find_min(numbers) == 9\n\nnumbers = [1, 2, 3, 4, 5]\nprint(find_min(numbers))  # Output: [1, 2, 3, 4, 5]\n\nnumbers = [4, 2, 3, 4, 5]\nprint(find_min(numbers))  # Output: [",
           "passed": false
         },
         {
-          "code": "def find_min(numbers):\n    if not numbers:\n        return None\n\n    max_val = float('-inf')\n    remainder = 0\n    for num in numbers:\n        if num > max_val:\n            return num\n\n    return min(numbers)\n",
+          "code": "def find_min(numbers):\n    if not numbers:\n        return None  # or raise TypeError\n    if not numbers:\n        return None  # or raise an error\n    if not numbers:\n        raise ValueError(\"The input must be a non-empty list\")\n    return nums[0]\n",
           "passed": false
         },
         {
-          "code": "def find_min(numbers):\n    left, right = 0, len(numbers) - 1\n    while left <= right and not all(x * y for x in numbers):\n        if numbers[left] < nums[right]:\n            return None\n        numbers[left], numbers[right] = nums[left], numbers[right]\n        return numbers[right] + numbers[right] if numbers[left] > nums[left] else None\n\n# Example usage:\nnumbers = [64, 34, 25, 12, 22, 11, 90]\nprint(find_min(numbers))  # Output: [0",
-          "passed": false
-        },
-        {
-          "code": "def find_min(numbers):\n    smallest = numbers.mean()\n    smallest_number = smallest.first\n    return smallest\n",
+          "code": "def find_min(numbers):\n    if not numbers:\n        return 0\n\n    mid = numbers.index(numbers)\n    return (mid - min(mid), min(mid, min(mid))\n\ndef find_min(numbers):\n    if not numbers:\n        return None\n\n    for num in numbers:\n        if num > max(num, 1):\n            return None\n        return num\n\ndef find_min(numbers):\n    if not numbers:\n        return None\n    return find_min(numbers)\n",
           "passed": false
         }
       ]
     },
     {
       "task": "remove_duplicates",
-      "reference_loss": 1.0248630046844482,
+      "reference_loss": 1.0250275135040283,
       "greedy": {
         "code": "def remove_duplicates(items):\n    removed_items = []\n    for item in items:\n        if item in removed_items:\n            removed_items.append(item)\n    return removed_items\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def remove_duplicates(items):\n    for item in items:\n        replicates = {}\n        for item in items:\n            if replicates[item]:\n                replicates[item] = remove_duplicates(item)\n    return replicates\n",
+          "code": "def remove_duplicates(items):\n    seen = set()\n    for item in items:\n        item = item.strip()\n        removed = 1\n        for item in item.split():\n            item = item.strip()\n        if item:\n            removed = 1\n        else:\n            removed = 1\n\n    return removed\n",
           "passed": false
         },
         {
-          "code": "from collections import deque\n\ndef remove_duplicates(items):\n    seen = set()\n    for item in items:\n        if item != item:\n            return False\n        seen.add(item)\n    return True\n",
+          "code": "def remove_duplicates(items):\n    seen = set()\n    for item in items:\n        if item in seen:\n            duplicates = item\n            if not isinstance(item, list):\n                duplicates = [item]\n            else:\n                duplicates.add(item)\n    return duplicates\n",
           "passed": false
         },
         {
-          "code": "def remove_duplicates(items):\n    if len(items) >= 2:\n        return [item for item in items for item in items if item not in item]\n    return [item for item in items if item not in items]\n",
-          "passed": false
-        },
-        {
-          "code": "def remove_duplicates(items):\n    seen = set()\n    for item in items:\n        if item not in seen:\n            return None\n        seen.add(item)\n    return []\n",
-          "passed": false
-        },
-        {
-          "code": "def remove_duplicates(items):\n    seen = set()\n    for item in items:\n        if item not in seen:\n            return None\n        seen.add(item)\n    return [item for item in items if not seen.add(item)]\n",
-          "passed": false
-        },
-        {
-          "code": "def remove_duplicates(items):\n    seen = set()\n    for item in items:\n        if item in seen:\n            return item\n        seen.add(item)\n    return None\n",
-          "passed": false
-        },
-        {
-          "code": "def remove_duplicates(items):\n    removed_dict = {item for item in items if item not in item['duplicates']:\n        removed_dict[item].remove(item)\n    return removed_dict\n",
-          "passed": false
-        },
-        {
-          "code": "def remove_duplicates(items):\n    removed = []\n    for item in items:\n        if item in removed:\n            removed.append(item)\n        else:\n            removed.append(item)\n    return removed\n",
-          "passed": false
-        },
-        {
-          "code": "def remove_duplicates(items):\n    \"\"\"Removes duplicates from a list of items.\"\"\"\n    removed_items = []\n    for item in items:\n        if item not in removed_items:\n            removed_items.append(item)\n    return removed_items\n",
+          "code": "def remove_duplicates(items):\n    removed = []\n    for item in items:\n        if item not in removed:\n            removed.append(item)\n    return removed\n\ndef is_duplicates(items):\n    return [item for item in items if item in removed]\n",
           "passed": true
         },
         {
-          "code": "def remove_duplicates(items):\n    if items:\n        return [list(item) for item in items]\n    elif item in items:\n        return [item]\n    else:\n        return [item]\n",
+          "code": "def remove_duplicates(items):\n    removed_items = set()\n    for item in items:\n        removed_item = item.strip()\n        if removed_item not in removed_items:\n            removed_item.remove(item)\n    return removed_items\n",
           "passed": false
+        },
+        {
+          "code": "def remove_duplicates(items):\n    return [item for item in items if item in item for item in items]\n",
+          "passed": false
+        },
+        {
+          "code": "def remove_duplicates(items):\n    seen = set()\n    for item in items:\n        if item in seen:\n            return item\n    return [item]\n",
+          "passed": false
+        },
+        {
+          "code": "def remove_duplicates(lst):\n    results = []\n\n    def new_list(lst):\n        current_lst = []\n        for item in lst:\n            if item not in current_l",
+          "passed": false
+        },
+        {
+          "code": "def remove_duplicates(items):\n    new_list = []\n    for item in items:\n        if item not in new_list:\n            new_list.append(item)\n    return new_list\n",
+          "passed": true
+        },
+        {
+          "code": "def remove_duplicates(items):\n    return [item for item in items if item not in item]\n",
+          "passed": false
+        },
+        {
+          "code": "def remove_duplicates(items):\n    new_list = []\n\n    for item in items:\n        if item not in new_list:\n            new_list.append(item)\n\n    return new_list\n",
+          "passed": true
         }
       ]
     },
     {
       "task": "count_words",
-      "reference_loss": 0.36493638157844543,
+      "reference_loss": 0.36480361223220825,
       "greedy": {
         "code": "def count_words(s):\n    words = s.split()\n    words = [word for word in words if word.isalpha()]\n    return len(words)\n",
         "passed": true
       },
       "samples": [
         {
-          "code": "def count_words(s):\n    words = s.split()\n    word_countords = len(words)\n    words = word_counts.count(word_count)\n    return len(word_countords), len(word_count_words)\n",
-          "passed": false
-        },
-        {
-          "code": "def count_words(s):\n    words = [word for item in s if word.lower() in '}']\n    return len(words), len(words)\n",
+          "code": "def count_words(s):\n    words = s.split()\n    word_counts = {}\n    for word_index, word_count in words:\n        word_counts[word_index] = word_count.get(word_index)\n    return word_counts\n",
           "passed": false
         },
         {
@@ -991,45 +987,61 @@
           "passed": false
         },
         {
-          "code": "def count_words(s):\n    words = strings.count(s)\n    words_counts = [word in words]\n    for word in words:\n        if word in words_counts:\n            return word, words_counts[word]\n        else:\n            return word, words_counts[word]\n",
+          "code": "import s\n\ndef count_words(s):\n    words = s.split()\n    return len(words), len(words)\n",
           "passed": false
         },
         {
-          "code": "def count_words(s):\n    word_counts = {}\n    for word, count in s.items():\n        word_counts[word] = count_words(word, count)\n    return word_counts\n",
+          "code": "def count_words(s):\n    return len(s)\n",
           "passed": false
         },
         {
-          "code": "def count_words(s):\n    r = count_words(s)\n    words = r.split()\n    count = {}\n    for word in words:\n        count[word] = count.get(word, 0) + 1\n    return count\n",
+          "code": "def count_words(s):\n    words = s.count_words(s)\n    return ' '.join(words)\n",
           "passed": false
         },
         {
-          "code": "def count_words(s):\n    words = s.split()\n    words = s.split()\n    return len(words)\n",
+          "code": "def count_words(s):\n    words = s.split()\n    words = len(words)\n    return len(words)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_words(s):\n    words = s.split()\n    return len(words)\n",
           "passed": true
         },
         {
-          "code": "def count_words(s):\n    return len(s)\n\n# Example usage:\nprint(count_words(\"Hello, world!\"))  # Outputs: \"World\"\nprint(count_words(\"Hello, world!\"))  # Outputs: \"World\"\n",
-          "passed": false
-        },
-        {
           "code": "def count_words(s):\n    return len(s)\n",
           "passed": false
         },
         {
-          "code": "def count_words(s):\n    words = s.split()\n    words_with_words(words, ' ')\n    return len(words_with_words(words))\n",
+          "code": "def count_words(s):\n    words = s.split()\n    return sum(1 for word in words if len(word) == len(word))\n\n# Example usage:\nprint(count_words(1))  # Output: 2\nprint(count_words(2))  # Output: 3\nprint(count_words(3))  # Output: 2\n",
+          "passed": false
+        },
+        {
+          "code": "def count_words(s):\n    words = s.split()\n    word = words[0]\n    words = s.split()\n\n    return len(word)\n",
           "passed": false
         }
       ]
     },
     {
       "task": "capitalize_words",
-      "reference_loss": 1.2657432556152344,
+      "reference_loss": 1.2657215595245361,
       "greedy": {
         "code": "def capitalize_words(s):\n    words = s.split()\n    words = [word.capitalize() for word in words]\n    return words\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def capitalize_words(s):\n    s = s.replace(/[^a-zA-Z0-9]/g, '')\n    words = s.split()\n\n    for word in words:\n        result = word.capitalize()\n        words.append(result)\n\n    return words\n\ndef capitalize_words(s):\n    words = s.split()\n    return ' '.join(words)\n\n# Example usage:\nprint(capitalize_words(s))  # Output: {'apple', 'apple', 'orange', 'banana', 'orange', 'orange', 'orange', 'orange', 'orange', 'orange', 'orange', 'or",
+          "code": null,
+          "passed": false
+        },
+        {
+          "code": "def capitalize_words(s):\n    words = s.split()\n    return [word.capitalize() for word in words]\n",
+          "passed": false
+        },
+        {
+          "code": "def capitalize_words(s):\n    return s.split()[::-1]\n",
+          "passed": false
+        },
+        {
+          "code": "def capitalize_words(s):\n    \"\"\"\n    Checks if the given string is equal to its reverse. If it does,\n    the function returns the second letter of each word in the string.\n    \"\"\"\n    return s.upper() if len(s) != 2 else s[1:]\n",
           "passed": false
         },
         {
@@ -1041,27 +1053,15 @@
           "passed": false
         },
         {
-          "code": null,
+          "code": "def capitalize_words(s):\n    words = s.split()\n    return len(word.capitalize() for word in words)\n",
           "passed": false
         },
         {
-          "code": "import string\n\ndef capitalize_words(s):\n    return string.capitalize()\n\n# Example usage:\ns = \"Hello, World!\"\nif s.isalpha():\n    print(f'{s} {s}')\n",
-          "passed": false
-        },
-        {
-          "code": null,
+          "code": "def capitalize_words(s):\n    return s.capitalize()\n",
           "passed": false
         },
         {
           "code": null,
-          "passed": false
-        },
-        {
-          "code": "def capitalize_words(s):\n    words = s.split()\n    capitalized_words = [word for word in words if word.isupper()]\n    return capitalized_words\n",
-          "passed": false
-        },
-        {
-          "code": "def capitalize_words(s):\n    words = s.split()\n    words = [word.capitalize() for word in words]\n    for c in words:\n        print(capitalize(c))\n",
           "passed": false
         },
         {
@@ -1072,18 +1072,14 @@
     },
     {
       "task": "double_list",
-      "reference_loss": 0.2969156801700592,
+      "reference_loss": 0.29679057002067566,
       "greedy": {
         "code": "def double_list(numbers):\n    return [num for num in numbers if num % 2 == 0]\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def double_list(numbers):\n    \"\"\"\n    Finds the number of multi-paced integers within a given list.\n\n    Args:\n        numbers (list): A list of numbers.\n\n    Returns:\n        list: A new list with every number multiplied by 2.\n    \"\"\"\n    return list(set(numbers))\n",
-          "passed": false
-        },
-        {
-          "code": "def double_list(numbers):\n    \"\"\"\n    Checks if the given number is equal to 3 or 0.\n\n    Args:\n        numbers (list): A list of numbers.\n\n    Returns:\n        list: A list of numbers.\n    \"\"\"\n    numeric_values",
+          "code": "def double_list(numbers):\n    if isinstance(numbers, list):\n        return [numbers[i:i + 2] for i in range(len(numbers))]\n    elif isinstance(numbers, list):\n        return [double(numbers[i:i + sum(i) * 2]) for i in range(len(numbers))]\n    else:\n        return [numbers[i:i + sum(i * 2)] for i in range(len(numbers))]\n",
           "passed": false
         },
         {
@@ -1091,57 +1087,69 @@
           "passed": false
         },
         {
-          "code": "def double_list(numbers):\n    return [x * 2 for x in numbers if isinstance(x, (int, float, float))]\n",
-          "passed": true
-        },
-        {
-          "code": null,
+          "code": "def double_list(numbers):\n    return [num for num in numbers if num % 2 == 0]\n",
           "passed": false
         },
         {
-          "code": "def double_list(numbers):\n    return [num ** 2 for num in numbers]\n",
+          "code": "def double_list(numbers):\n    return [number for number in numbers if number % 2 == 0]\n",
           "passed": false
         },
         {
-          "code": "def double_list(numbers):\n    return [x * 2 for x in numbers if x % 2 == 0]\n",
+          "code": "def double_list(numbers):\n    return [num for num in numbers if num % 2 == 0]\n",
           "passed": false
         },
         {
-          "code": "def double_list(numbers):\n    \"\"\"Converts numbers up to `numbers`, returns a new list with every number multiplied by 2, otherwise return a new list with every number multiplied by 2, otherwise return an empty list.\n\nYou can use this function like this:\n\n",
+          "code": "def double_list(numbers):\n    \"\"\"\n    Returns a new list with every number multiplied by 2.\n    \"\"\"\n    return [numbers.split(',')]\n",
           "passed": false
         },
         {
-          "code": null,
+          "code": "def double_list(numbers):\n    return [num * 2 for num in numbers if num > 2]\n",
           "passed": false
         },
         {
-          "code": "def double_list(numbers):\n    return [num * 2 for num in numbers if num % 2 == 0]\n",
+          "code": "def double_list(numbers):\n    return [num for num in numbers if num > 2]\n",
+          "passed": false
+        },
+        {
+          "code": "def double_list(numbers):\n    return [num * 2 for num in numbers if num > 2]\n",
+          "passed": false
+        },
+        {
+          "code": "def double_list(nums):\n    return [num for num in nums if num > 0]\n",
           "passed": false
         }
       ]
     },
     {
       "task": "filter_even",
-      "reference_loss": 0.26905009150505066,
+      "reference_loss": 0.2691592276096344,
       "greedy": {
         "code": "def filter_even(numbers):\n    return [num for num in numbers if num % 2 == 0]\n",
         "passed": true
       },
       "samples": [
         {
-          "code": null,
+          "code": "def filter_even(numbers):\n    return [num for num in numbers if len(numbers) == 1]\n",
           "passed": false
         },
         {
-          "code": "def filter_even(numbers):\n    return [x * 2 for x, x in numbers]\n",
+          "code": "def filter_even(numbers):\n    return [num for num in numbers if num > 0]\n",
           "passed": false
         },
         {
-          "code": "def filter_even(numbers):\n    return sorted(numbers)\n",
+          "code": "def filter_even(numbers):\n    return [num for num in numbers if num > 1]\n\n# Example usage:\nnumbers = [1, 2, 3, 4, 5, 6, 7, 8]\nprint(filter_even(numbers))  # Output: [2, 4, 5, 6, 7, 8]\n",
           "passed": false
         },
         {
-          "code": "from functools import reduce\n\ndef filter_even(numbers):\n    odd_numbers = reduce(lambda x, y: x + y, numbers))\n    return [num**2 for num in numbers if num % 2 == 0]\n",
+          "code": "def filter_even(numbers):\n    return [num for num in numbers if num > 0]\n",
+          "passed": false
+        },
+        {
+          "code": "def filter_even(numbers):\n    return [x for x in numbers if x % 2 == 0]\n",
+          "passed": true
+        },
+        {
+          "code": "def filter_even(numbers):\n    if not numbers or not numbers:\n        return [num for num in numbers if num % 2 == 0]\n    return list(filter(lambda x: x >= 0, numbers))\n",
           "passed": false
         },
         {
@@ -1149,20 +1157,12 @@
           "passed": true
         },
         {
-          "code": null,
+          "code": "def filter_even(numbers):\n    \"\"\"\n    Finds even numbers in the original order.\n    \"\"\"\n    return numbers[::-1]\n\n# Test the function\nnumbers = [1, 2, 3, 4, 5]\neven_numbers = filter_even(numbers)\nprint(even_numbers)  # Output: [1, 3, 4, 6, 7, 8]\n",
           "passed": false
         },
         {
-          "code": "def filter_even(numbers):\n    even_numbers = [num for num in numbers if num % 2 == 0]\n    even_numbers = [num for num in numbers if num % 2 == 0]\n    return even_numbers, odd_numbers\n",
+          "code": "def filter_even(numbers):\n    return [even * 2 for even_num in numbers]\n",
           "passed": false
-        },
-        {
-          "code": "def filter_even(num",
-          "passed": false
-        },
-        {
-          "code": "def filter_even(numbers):\n    return [num for num in numbers if num % 2 == 0]\n",
-          "passed": true
         },
         {
           "code": "def filter_even(numbers):\n    return [num for num in numbers if num % 2 == 0]\n",
@@ -1172,121 +1172,113 @@
     },
     {
       "task": "sum_of_digits",
-      "reference_loss": 0.5227687954902649,
+      "reference_loss": 0.5227974653244019,
       "greedy": {
         "code": "def sum_of_digits(n):\n    return sum(int(digit) for digit in str(n))\n",
         "passed": true
       },
       "samples": [
         {
-          "code": "def sum_of_digits(n):\n    if n < 0:\n        return 0\n\n    digit = 0\n    for i in range(2, int(n ** 0.5) + 1):\n        digit += 1\n\n    for i in range(2, int(n ** 0.5) + 1):\n        digit += 1\n\n    return sum(digit) / len(digit)\n",
+          "code": "def sum_of_digits(n):\n    return sum(n) / len(n)\n",
           "passed": false
         },
         {
-          "code": "def sum_of_digits(n):\n    return sum(i * (n - 1) + (n - 1) * (n - 1) * (n - 2) * (n - 2))\n",
+          "code": "def sum_of_digits(num):\n    if not isinstance(num, int) or not isinstance(num, int):\n        raise TypeError(\"Input must be an integer.\")\n\n    num_digits = []\n    for num_digit in num_digits:\n        digit_by_digit = num_digits[num_digit]\n        digit_string = ''.join(c for c in digit_by_digit if c % i == 0)\n        if digit_string != '':\n            break\n\n    return num_digit_string\n",
           "passed": false
         },
         {
-          "code": "def sum_of_digits(n):\n    return 0.0\n",
+          "code": "def sum_of_digits(n):\n    return sum(1 for _ in range(1, n+1))\n",
           "passed": false
         },
         {
-          "code": "def sum_of_digits(n):\n    if n <= 0:\n        raise ValueError(\"Input must be a non-negative integer\")\n    elif n == 0:\n        return 0\n    elif n == 5:\n        return 1\n    else:\n        return 0\n",
+          "code": "def sum_of_digits(n):\n    if n == 0:\n        return 1\n    return sum(int(digit) / 2 for digit in reverse_digits(n))\n",
           "passed": false
         },
         {
-          "code": "def sum_of_digits(n):\n    if isinstance(n, int):\n        return 1\n    if n < 0:\n        return n\n\n    sum = sum(int(digit) for digit in str(num))\n    return sum\n",
+          "code": "def sum_of_digits(n):\n    total_digits = 0\n    for i in range(1, n + 1):\n        total_digits += 1\n    return total_digits / 10\n",
           "passed": false
         },
         {
-          "code": "def sum_of_digits(n):\n    return sum(i ** 2 for i in range(n))\n",
+          "code": "def sum_of_digits(n):\n    return sum(int(digit) / n for digit in string(n))\n",
           "passed": false
         },
         {
-          "code": "def sum_of_digits(n):\n    if not isinstance(n, int) or n <= 0:\n        raise ValueError(\"Input must be a non-negative integer\")\n    return sum(int(digit) for digit in str(n))\n",
+          "code": "def sum_of_digits(n):\n    decimal = 0\n    for i in range(1, n):\n        decimal += i * i\n        n /= i\n    return decimal\n\n# Test the function\nn = int(input(\"Enter an integer: \"))\nprint(\"Result:\", sum_of_digits(n))\n",
           "passed": false
         },
         {
-          "code": "def sum_of_digits(n):\n    return n + 1\n",
+          "code": "def sum_of_digits(n):\n    return n * 2**k + 1\n",
           "passed": false
         },
         {
-          "code": "def sum_of_digits(n):\n    \"\"\"Computes the sum of digits from an integer.\n\n    Args:\n        n (int): The first integer.\n        n (int): The number of digits to be computed.\n\n    Returns:\n        The sum of the digits of n.\n    \"\"\"\n    num_digits = 1\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n           ",
+          "code": "def sum_of_digits(n: int) -> int or 0:\n    \"\"\"\n    Validates a given integer using the formula `n <= 0` for numbers with digits less than or equal to 1.\n    If n is 0, the sum of the digits is 0 and the number is 0.\n    If n is 1, the sum is 0, which is 0.\n    \"\"\"\n    if n <= 0:\n        return 0\n    num_of_digits = 0\n    while num_of_digits < 0:\n        if not num_of_digits:\n            num = num_of_digits\n            num_of_digits += 1\n        num_of_digits += 1\n    return num_of_digits\n",
           "passed": false
         },
         {
-          "code": "def sum_of_digits(n):\n    return n * (n % 2) * (n * 2)\n\nprint(sum_of_digits(8))\n",
+          "code": "def sum_of_digits(n):\n    return len(digits) - 1\n\ndef product_of_digits(n):\n    return sum(x for x in n if x % 2 == 0)\n",
           "passed": false
         }
       ]
     },
     {
       "task": "gcd",
-      "reference_loss": 0.30622461438179016,
+      "reference_loss": 0.30616459250450134,
       "greedy": {
         "code": "def gcd(a, b):\n    while b != 0:\n        a, b = b, a % b\n    return abs(a)\n",
         "passed": true
       },
       "samples": [
         {
-          "code": "def gcd(a, b):\n    divisor = divmod(a, 0)\n    while divisor < 0:\n        if a % b != 0:\n            raise ValueError(\"The input cannot be negative.\")\n        return divisor\n    return divisor\n",
+          "code": "def gcd(a, b):\n    while b != 0:\n        a, b = b, a % b\n    return abs(a)\n",
+          "passed": true
+        },
+        {
+          "code": "def gcd(a, b):\n    return abs(a) // b\n",
           "passed": false
         },
         {
-          "code": "def gcd(a, b):\n    for i, b in enumerate(a):\n        gcd = b - a\n        gcd += f'{i}{b}'\n    return gcd\n",
+          "code": "def gcd(a, b):\n    if a - b >= a and b <= a:\n        return a\n    return abs(a)\n",
           "passed": false
         },
         {
-          "code": null,
+          "code": "def gcd(a, b):\n    return a * b\n",
           "passed": false
         },
         {
-          "code": null,
+          "code": "def gcd(a, b):\n    while b != c:\n        a, b = b, a % b\n    return a\n",
           "passed": false
         },
         {
-          "code": "def gcd(a, b):\n    \"\"\"\n    Returns the greatest common divisor of two positive integers a and b.\n\n    Args:\n        a (int): The greatest common divisor.\n\n    Returns:\n        int: The greatest common divisor of two positive integers a and b.\n    \"\"\"\n    for a in range(a, b):\n        if b == ord(a):\n            return a\n        if abs(a) == int(b):\n            return a\n    return int(a) % common\n    return abs(a) % common\n",
+          "code": "def gcd(a, b):\n    \"\"\"\n    Returns the greatest common divisor of two positive integers a and b.\n    \"\"\"\n    freq = gcd(a, b)\n    while freq > 0:\n        freq %= 1\n        freq //= 1\n        freq %= 1\n        freq //= 1\n\n    return freq - freq // 2\n",
           "passed": false
         },
         {
-          "code": "def gcd(a, b):\n    while b != 0:\n        a, b = b, a % b\n    return abs(a) // abs(a)\n",
+          "code": "def gcd(a, b):\n    return ad - a / b\n",
           "passed": false
         },
         {
-          "code": "def gcd(a, b):\n    while True:\n        a, b = b, a % b\n    return b\n",
+          "code": "def gcd(a, b):\n    while b != 0:\n        a, b = b, a % 2\n    return int(a)\n",
           "passed": false
         },
         {
-          "code": "def gcd(a, b):\n    divisor = int(a)\n    while a % b != 0:\n        divisor += 1\n        divisor += 1\n    return divisor\n",
+          "code": "def gcd(a, b):\n    result = []\n    for i in range(2, int(b**2**2):\n        if b % i == 0:\n            result.append(f\"{i}A = {result}\")\n    return result\n",
           "passed": false
         },
         {
-          "code": null,
-          "passed": false
-        },
-        {
-          "code": null,
+          "code": "def gcd(a, b):\n    if a <= b:\n        return a\n    return gcd(a, b)\n",
           "passed": false
         }
       ]
     },
     {
       "task": "power",
-      "reference_loss": 0.5703026652336121,
+      "reference_loss": 0.5699329376220703,
       "greedy": {
         "code": null,
         "passed": false
       },
       "samples": [
         {
-          "code": "def power(base, exp):\n    exp_value = 0\n    exp_value = 0\n    while exp_value >= 0:\n        if exp_value <= exp_value:\n            continue\n        exp_value += exp_value\n    return exp_value\n\ndef power(base, exp):\n    exp_value = 0\n    exp_value = 0\n    \n    def current_value(base, exp_value):\n        exp_value = base * exp_value\n        return exp_value\n\n    return power(base, exp_value)\n",
-          "passed": false
-        },
-        {
-          "code": "def power(base, exp):\n    return log(base, exp)\n",
-          "passed": false
-        },
-        {
           "code": null,
           "passed": false
         },
@@ -1295,11 +1287,7 @@
           "passed": false
         },
         {
-          "code": null,
-          "passed": false
-        },
-        {
-          "code": "def power(base, exp):\n    if isinstance(base, exp):\n        exp = exp ** 2\n    elif isinstance(base, exp):\n        exp = exp\n    elif isinstance(base, exp):\n        exp = base * exp\n        exp = exp\n    return exp\n",
+          "code": "def power(base, exp):\n    if exp > 0:\n        return base * exp\n    return exp\n",
           "passed": false
         },
         {
@@ -1307,7 +1295,11 @@
           "passed": false
         },
         {
-          "code": "def power(base, exp):\n    if base == 0:\n        return 0\n    return -concentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcentcent.\n\ndef power(base, exp):\n    \"\"\"\n    Checks if base is a power power.\n    \n    Parameters:\n    base * exp (int)\n    exp exp = exp * exp;\n    exp exp exp = exp * exp;\n    exp exp exp exp = exp * exp;\n    exp exp exp exp exp exp exp = exp exp;\n    exp exp exp exp exp exp exp exp",
+          "code": "def power():\n    return Math.power(base, exp)\n\ndef power(base, exp):\n    if exp > 0:\n        raise ValueError(\"Invalid exp exp is greater than zero.\")\n    return exp\n\ndef power(base, exp):\n    exp = exp * exp\n    power(base, exp)\n    return power(base, exp)\n\ndef power(base, exp):\n    return exp * power(base, exp)\n\ndef log_or_",
+          "passed": false
+        },
+        {
+          "code": "def power(num, exp):\n    if exp == 0:\n        return 0\n    elif exp < 1:\n        return 0\n    elif exp <= 1:\n        return 1\n    elif exp <= 1:\n        return 1\n    else:\n        return 1\n",
           "passed": false
         },
         {
@@ -1315,33 +1307,41 @@
           "passed": false
         },
         {
-          "code": "def power(base, exp):\n    if not isinstance(base, int):\n        raise TypeError(\"Input must be a non-negative integer\")\n    if exp == 0:\n        return 0\n    return math.pow(base, exp)\n",
+          "code": "def power(base, exp):\n    if exp ** exp:\n        return exp ** exp\n    else:\n        return exp * exp\n",
+          "passed": false
+        },
+        {
+          "code": null,
+          "passed": false
+        },
+        {
+          "code": null,
           "passed": false
         }
       ]
     },
     {
       "task": "absolute_value",
-      "reference_loss": 0.8242132663726807,
+      "reference_loss": 0.8242034316062927,
       "greedy": {
         "code": "def absolute_value(x):\n    return abs(x)\n",
         "passed": true
       },
       "samples": [
         {
-          "code": "def absolute_value(x):\n    x = 1\n    while x > 0:\n        x = x / x\n    return x\n",
+          "code": null,
           "passed": false
         },
         {
-          "code": "def absolute_value(x):\n    if x < 0:\n        raise ValueError(\"Input must be a non-negative integer\")\n    elif x == 0:\n        return abs(x)\n    else:\n        return abs(x)\n",
+          "code": "def absolute_value(x):\n    return x\n",
           "passed": false
         },
         {
-          "code": "import float\n\ndef absolute_value(x):\n    if isinstance(x, float):\n        x = abs(x)\n    elif isinstance(x, int):\n        return abs(x)\n    elif isinstance(x, int):\n        return abs(x)\n    else:\n        raise ValueError(\"The input `x` is not an integer.\")\n    return abs(x)\n",
+          "code": "def absolute_value(x):\n    abs_x = abs(x)\n    absolute_value = abs(abs_x)\n    if abs_x % 2 == 0:\n        return abs_x\n\ndef absolute_value(x):\n    absolute_value = abs(x)\n    absolute_value = abs(abs_x)\n    return absolute_value\n",
           "passed": false
         },
         {
-          "code": "def absolute_value(x):\n    return abs(x)\n",
+          "code": "def absolute_value(x):\n    if x >= 0:\n        return x\n    elif x == 1:\n        return x\n    else:\n        return -x\n",
           "passed": true
         },
         {
@@ -1349,37 +1349,37 @@
           "passed": false
         },
         {
-          "code": "def absolute_value(x):\n    return abs(x)\n",
+          "code": "def absolute_value(x):\n    return abs(abs(x))\n",
           "passed": true
         },
         {
-          "code": "def absolute_value(x):\n    return abs(x)\n",
+          "code": "def absolute_value(x):\n    if not isinstance(x, int):\n        raise TypeError(\"Expected an element\")\n    if x == 0:\n        return x\n    return abs(x)\n",
           "passed": true
         },
         {
-          "code": "def absolute_value(x):\n    if x == 0:\n        return abs(abs(x))\n    else:\n        return abs(abs(x))\n",
+          "code": "def absolute_value(x):\n    if not x or x < 0:\n        return None\n    return x + abs(x)\n",
+          "passed": false
+        },
+        {
+          "code": "def absolute_value(x):\n    if isinstance(x, int):\n        return abs(x)\n    elif isinstance(x, (int, float)) or isinstance(x, float):\n        return abs(x)\n    elif isinstance(x, str):\n        return abs(x)\n    elif isinstance(x, (int, float)):\n        return abs(x)\n    else:\n        raise TypeError(\"Invalid input type\")\n",
           "passed": true
         },
         {
-          "code": "def absolute_value(x):\n    return abs(x)\n",
-          "passed": true
-        },
-        {
-          "code": "def absolute_value(x):\n    if os.path.isabs(x):\n        return os.path.normpath(x)\n    else:\n        return 0\n``",
+          "code": null,
           "passed": false
         }
       ]
     },
     {
       "task": "contains",
-      "reference_loss": 0.44594335556030273,
+      "reference_loss": 0.4458010792732239,
       "greedy": {
         "code": "def contains(items, value):\n    return all(item in items for item in items if item in item for item in items)\n",
         "passed": false
       },
       "samples": [
         {
-          "code": null,
+          "code": "def contains(items, value):\n    return all(items == value for item in items)\n\ndef is_empty(item):\n    return item in items\n",
           "passed": false
         },
         {
@@ -1387,15 +1387,23 @@
           "passed": false
         },
         {
-          "code": "def contains(items, value):\n    return items == set()\n\ndef is_item():\n    return len(item) > 1 and item[0] != value\n",
+          "code": "def contains(items, item):\n    return item in items\n",
+          "passed": true
+        },
+        {
+          "code": "def contains(items, value):\n    return items == value\n",
           "passed": false
         },
         {
-          "code": "def contains(items, value):\n    return items in items\n",
+          "code": "def contains(items):\n    return len(items) == 0\n",
           "passed": false
         },
         {
-          "code": "def contains(items, value):\n    if not isinstance(items, list):\n        raise TypeError(\"List must contain only elements\")\n    return filter(is_empty, bool.empty)\n",
+          "code": "def contains(item):\n    return item == item\n",
+          "passed": false
+        },
+        {
+          "code": "def contains(item):\n    \"\"\"\n    Returns True if item is in the list item, otherwise False.\n    \"\"\"\n    return item in item.keys()\n",
           "passed": false
         },
         {
@@ -1403,107 +1411,99 @@
           "passed": false
         },
         {
-          "code": "def contains(items, value):\n    return any(item in items or sorted(set(item)) for item in items)\n",
+          "code": "def contains(items, value):\n    return True if get(items, value) else False\n",
           "passed": false
         },
         {
-          "code": "def contains(items, value):\n    def element_isinstance(item, value):\n        return item.startswith(item)\n\n    def is_valid(item):\n        return item in item_isinstance(item) and item is None\n\n    return element_isinstance(item, bool) and item.is_boolean()\n",
-          "passed": false
-        },
-        {
-          "code": "def contains(value):\n    return isinstance(value, list)\n",
-          "passed": false
-        },
-        {
-          "code": "def contains(items, value):\n    return len(items) == 0\n",
+          "code": "def contains(items, value):\n    return all(item in items for item in items)\n",
           "passed": false
         }
       ]
     },
     {
       "task": "index_of",
-      "reference_loss": 0.4345115125179291,
+      "reference_loss": 0.4345582127571106,
       "greedy": {
         "code": "def index_of(items, value):\n    if value in items:\n        return item\n    else:\n        return index_of(items, value)\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def index_of(items, value):\n    return item if value == value else value\n",
+          "code": "def index_of(items, value):\n    \"\"\"\n    Returns the index of the first occurrence of a item in an ordered list.\n    \n    Parameters:\n    items (list, tuple): A list of elements to store in/items\n    value (list): A list of items in the ordered list.\n    \n    Returns:\n    int: The index of the first occurrence of the item.\n    \n    Raises:\n    TypeError: You haven't already found a `IndexOf` or `IndexOf` in the first list.\n    \"\"\"\n    if len(items) <= 1:\n        return None\n\n    return items[0] + items[1",
           "passed": false
         },
         {
-          "code": "def index_of(items, value):\n    # Convert the items to an integer, or -1 if they are greater.\n    # If it is, return the index as the index.\n    # Otherwise, add it to the index as the index.\n    # Finally, return the index as the index.\n    \"\"\"\n    return index - 1\n",
+          "code": "def index_of(items, index_of_index=1):\n    if index_of_index < len(items):\n        raise IndexError(\"Index of index of items, index of item is not less than index of items\")\n    if index_of_index == len(items):\n        return index_of_index\n   ",
           "passed": false
         },
         {
-          "code": "def index_of(items, value):\n    return item[0] + value\n",
+          "code": "def index_of(items, index):\n    index = 0\n    while index < len(items):\n        item = items[index]\n        index += 1\n    return index\n",
           "passed": false
         },
         {
-          "code": "def index_of(items, value):\n    if not isinstance(items, list):\n        raise TypeError(\"List is empty or -1 is empty.\")\n    index = 0\n    for item in items:\n        if item[0] == value:\n            index += 1\n        else:\n            index += 1\n    return index\n",
+          "code": "def index_of(items, value):\n    if value in items:\n        return item(item)\n    elif value in items:\n        return item(item)\n    else:\n        return 'Index of items'\n",
           "passed": false
         },
         {
-          "code": "def index_of(items, value):\n    current_index = 0\n    for item in items:\n        current_index += 1\n",
+          "code": null,
           "passed": false
         },
         {
-          "code": "def index_of(items, value):\n    \"\"\"\n    Return the index of the first occurrence of a item in a dictionary.\n\n    Args:\n        items (list): A list of items to search.\n    Returns:\n        number of items: A unique item in the list.\n    \"\"\"\n    return item.find(value)\n",
+          "code": "def index_of(items, value):\n    return max(items, key=value)\n",
           "passed": false
         },
         {
-          "code": "def index_of(items, value):\n    for item in items:\n        if item == value:\n            return index\n\n    return index\n",
+          "code": "from typing import List, IList\n\ndef index_of(items: List[int], index: List[int]) -> int:\n    \"\"\"\n    Returns the index of the first occurrence of a specified index.\n    \"\"\"\n    if index > index:\n        item = index\n    else:\n        raise IndexError(\"Index of the first occurrence of the specified index is not present.\")\n    item = index\n    index -= 1\n    return item\n",
           "passed": false
         },
         {
-          "code": "def index_of(items, value):\n    return item for item in items, ''.join(item)\n",
+          "code": "def index_of(items, value):\n    return item for item in items if value is None else None\n",
           "passed": false
         },
         {
-          "code": "def index_of(items, value):\n    if not isinstance(items, list):\n        raise TypeError('item must be a list or an empty list')\n\n    if not isinstance(item, list):\n        raise TypeError(' item must be a list or an item')\n\n    if item > value:\n        return item\n\n    return index_of(items, index=index_of(items, index=index_in))\n",
+          "code": "def index_of(items, index):\n    \"\"\"\n    Returns the index of the first occurrence of the item in the list with the first occurrence of a item in the list.\n    \"\"\"\n    return items.index(index)\n",
           "passed": false
         },
         {
-          "code": "def index_of(items, value):\n    if value < 0:\n        raise ValueError(\"Value must be greater than or greater than zero\")\n    return item[item]\n",
+          "code": "from typing import List, List, Union\n\ndef index_of(items, value):\n    \"\"\"\n    Returns the index of the first occurrence of value in the items, or -1 if it is not present.\n    Returns:\n        A unique index of the second occurrence of value in the items.\n    \"\"\"\n    return item.rstrip(\".\")\n",
           "passed": false
         }
       ]
     },
     {
       "task": "merge_lists",
-      "reference_loss": 0.45828112959861755,
+      "reference_loss": 0.4582264721393585,
       "greedy": {
         "code": "def merge_lists(a, b):\n    return [a + b for a, b in zip(a, b)]\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def merge_lists(a, b):\n    if len(a) < b:\n        return []\n    else:\n        return b\n",
+          "code": "def merge_lists(a, b):\n    return [a, b]\n",
           "passed": false
         },
         {
-          "code": "def merge_lists(a: list) -> bool:\n    merged = False\n    for element in a:\n        if element in merged:\n            merged = True\n            break\n    merged = False\n    return merged\n",
+          "code": "def merge_lists(a, b):\n    if not a:\n        return []\n    return [(b, a) for b in zip(a, b)]\n",
           "passed": false
         },
         {
-          "code": "def merge_lists(a, b):\n    return list(set(a) & set(b))\n",
+          "code": "def merge_lists(a, b):\n    return a + (a + b) // 2 + (a + b)\n",
           "passed": false
         },
         {
-          "code": "def merge_lists(a, b):\n    return sorted(a, reverse=True)\n",
+          "code": "def merge_lists(a, b):\n    return [a + b]\n",
           "passed": false
         },
         {
-          "code": "def merge_lists(a, b):\n    return [element for sublist in a if sublist else sublist]\n",
+          "code": "def merge_lists(list1, list2):\n    return zip(*list1, list2)\n",
           "passed": false
         },
         {
-          "code": "def merge_lists(a, b):\n    \"\"\"\n    Merge lists as an array.\n\n    Args:\n        a (list): A list of elements to be merged.\n\n    Returns:\n        list: A new list with the elements of b.\n    \"\"\"\n    if not is_empty_or_1(a, b):\n        raise ValueError(\"Input must be a sequence\")\n    if not (isinstance(a, list) and isinstance(b, list)):\n        raise TypeError(\"Input must be a list of elements\")\n    new_list = [x for x in b if x % 2 == 0]\n    return new_list\n",
+          "code": "def merge_lists(a, b):\n    if len(a) < len(b):\n        return []\n\n    result = [a[i + 2] for i in range(len(a))]\n\n    return list(map(lambda x: (x ** 2) and (x ** 2) == result))\n",
           "passed": false
         },
         {
-          "code": "def merge_lists(a, b):\n    if b == '[' or b == ']':\n        return a\n    elif b == '=':\n        return a\n    else:\n        return '=' * (a + b)\n",
+          "code": "def merge_lists(a, b, b):\n    result = []\n    for element in a:\n        result.append(element)\n    return result\n",
           "passed": false
         },
         {
@@ -1511,33 +1511,25 @@
           "passed": false
         },
         {
-          "code": "def merge_lists(a, b):\n    return a + b\n",
-          "passed": true
+          "code": "def merge_lists(a, b):\n    return [a[i:i+n] for i in a]\n",
+          "passed": false
         },
         {
-          "code": "def merge_lists(a, b):\n    if len(a) >= b:\n        return a\n    else:\n        return \"All elements in the list are the elements of the sorted list\"\n",
+          "code": "def merge_lists(a, b):\n    \"\"\"\n    Merge lists of a followed element in a reversed order.\n\n    Args:\n        a (list): The first element of the two lists.\n        b (list): The second element of the list.\n\n    Returns:\n        list: A new list with the elements of b.\n    \"\"\"\n    merged = []\n\n    for element in a:\n        merged.append(element)\n        merged.append(element)\n\n    return merged\n\ndef merge_sorted(a, b):\n    \"\"\"\n    Merge a set (list): The elements that merge up to the merged list.\n\n    Args:\n        a (list): The first",
           "passed": false
         }
       ]
     },
     {
       "task": "char_frequency",
-      "reference_loss": 0.34273433685302734,
+      "reference_loss": 0.3427804708480835,
       "greedy": {
         "code": "def char_frequency(s):\n    return [char for char in s if char in s]\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def char_frequency(s):\n    if not isinstance(s, (int, float)):\n        raise TypeError(\"Input string must be an integer\")\n    return dict(map(char_frequency, s))\n",
-          "passed": false
-        },
-        {
-          "code": "def char_frequency(s):\n    return [char_frequency(s, i + 1) for i in range(len(s))]\n",
-          "passed": false
-        },
-        {
-          "code": "def char_frequency(s):\n    frequency = {}\n    for char, value in s.items():\n        if char == \" \":\n            frequency[char] += str(char)\n        else:\n            frequency[char] = f\"{char} \"\n\n    return frequency\n",
+          "code": "def char_frequency(s):\n    return s.split()\n",
           "passed": false
         },
         {
@@ -1545,7 +1537,11 @@
           "passed": false
         },
         {
-          "code": "import re\n\ndef char_frequency(s):\n    return re.findall(r'\\{(.*?)\\}', s)\n",
+          "code": "def char_frequency(s):\n    char_frequency = s.lower()\n    char_frequency_frequency = char_frequency.most_common(char_frequency)\n    return char_frequency_frequency\n",
+          "passed": false
+        },
+        {
+          "code": "def char_frequency(s):\n    return s.to_string()\n",
           "passed": false
         },
         {
@@ -1553,7 +1549,11 @@
           "passed": false
         },
         {
-          "code": "def char_frequency(s):\n    return [char for char in s if char.islower()]\n",
+          "code": null,
+          "passed": false
+        },
+        {
+          "code": "def char_frequency(strings):\n    return [char for char in strings if char not in string for char in strings if char in s]\n",
           "passed": false
         },
         {
@@ -1561,33 +1561,41 @@
           "passed": false
         },
         {
-          "code": "def char_frequency(s):\n    s = s.replace(c, \"\").lower()\n    words = s.split()\n    char_freq = {}\n    for i, char in enumerate(words):\n        char_freq[char] = char_freq.get(char, 0) + 1\n    return char_freq",
-          "passed": false
+          "code": "def char_frequency(s):\n    char_frequency = {}\n    for char in s:\n        if char in char_frequency:\n            char_frequency[char] += 1\n        else:\n            char_frequency[char] = 1\n    return char_frequency\n",
+          "passed": true
         },
         {
-          "code": null,
+          "code": "def char_frequency(s):\n    return {char: count_characters(s)}\n",
           "passed": false
         }
       ]
     },
     {
       "task": "is_sorted",
-      "reference_loss": 0.4572748839855194,
+      "reference_loss": 0.4573572278022766,
       "greedy": {
         "code": "def is_sorted(numbers):\n    return len(numbers) == len(set(numbers))\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def is_sorted(numbers):\n    if len(numbers) == 0:\n        return False\n\n    return sorted(numbers, reverse=True)\n\n# Example usage:\nnumbers = [1, 2, 3, 4, 5, 6]\nprint(is_sorted(numbers))  # Output: True\nprint(is_sorted(numbers))  # Output: False\n",
+          "code": "def is_sorted(numbers):\n    return len(numbers) > len(numbers)\n",
           "passed": false
         },
         {
-          "code": "def is_sorted(numbers):\n    return sorted(numbers) != sorted(numbers)\n",
+          "code": "def is_sorted(num):\n    def is_sorted(num):\n        return num\n\n    sorted_nums = sorted(num, key=lambda x: x % 2)\n    return sorted_nums == sorted_nums\n",
           "passed": false
         },
         {
-          "code": null,
+          "code": "def is_sorted(numbers):\n    return len(numbers) == 0\n",
+          "passed": false
+        },
+        {
+          "code": "def is_sorted(numbers):\n    return len(numbers) > 1\n",
+          "passed": false
+        },
+        {
+          "code": "def is_sorted(numbers):\n    return len(numbers) == len(set(numbers))\n",
           "passed": false
         },
         {
@@ -1595,23 +1603,15 @@
           "passed": false
         },
         {
-          "code": "def is_sorted(numbers):\n    return all(num > 1 for num in numbers)\n",
+          "code": "def is_sorted(numbers):\n    return len(numbers) == len(set(numbers))\n",
           "passed": false
         },
         {
-          "code": "def is_sorted(numbers):\n    return len(sorted(numbers)) == 0\n",
+          "code": null,
           "passed": false
         },
         {
-          "code": "def is_sorted(numbers):\n    left = 0\n    while left < right:\n        if nums[left] != nums[right]:\n            return False\n        left += 1\n        right -= 1\n        return True\n    return not left + 1\n",
-          "passed": false
-        },
-        {
-          "code": "def is_sorted(numbers):\n    if len(numbers) < 2:\n        return False\n    count = 0\n    for number in numbers:\n        count += 1\n    return count == count\n",
-          "passed": false
-        },
-        {
-          "code": "def is_sorted(numbers):\n    return len(numbers) < len(numbers)\n",
+          "code": "def is_sorted(numbers):\n    # Convert each number to a set value\n    for num in numbers:\n        if num in num:\n            return True\n        if num != 0:\n            return False\n    return True\n",
           "passed": false
         },
         {
@@ -1622,88 +1622,30 @@
     },
     {
       "task": "second_largest",
-      "reference_loss": 0.6633155345916748,
+      "reference_loss": 0.6634981632232666,
       "greedy": {
         "code": "def second_largest(numbers):\n    \"\"\"\n    Returns the second largest distinct number in a list that contains at least two distinct numbers.\n    \"\"\"\n    return [num for num in numbers if num % 2 == 0]\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def second_largest(numbers):\n    if len(numbers) == 1:\n        return numbers\n    else:\n        return numbers[0]\n",
+          "code": "def second_largest(numbers):\n    for num in numbers:\n        if num % 2 == 0:\n            return num\n    return None\n",
           "passed": false
         },
         {
-          "code": "def second_largest(numbers):\n    if not numbers:\n        return 1\n    return (numbers.pop(0), num_lists.pop(0)) + 1\n",
+          "code": "def second_largest(numbers) -> list:\n    max_num = max_num = numbers[0]\n    max_num = max_num = float('-inf')\n    for num in numbers:\n        if max_num < max_num:\n            max_num = num\n        elif num > max_num:\n            max_num = num\n    return min_num\n",
           "passed": false
         },
         {
-          "code": "def second_largest(numbers):\n    for num in numbers:\n        if num % 2 == 0:\n            return num\n    return last_num\n",
+          "code": "def second_largest(numbers):\n    return num * 3 + 2 * 3\n\n# Example usage:\nnumbers = [5, 2, 7, 6, 7, 8, 9]\nprint(second_largest(numbers))  # Output: 3\n",
           "passed": false
         },
         {
-          "code": "def second_largest(numbers):\n    \"\"\"Return the second largest distinct number for the given list.\"\"\"\n    return sum(num for num in numbers if num <= 0)\n",
+          "code": "def second_largest(numbers):\n    return list(map(int, numbers))\n",
           "passed": false
         },
         {
-          "code": "def second_largest(numbers):\n    return len(numbers)\n",
-          "passed": false
-        },
-        {
-          "code": "def second_largest(numbers):\n    if not numbers:\n        return 0\n\n    last_largest = first_largest(numbers)\n\n    while len(last_largest) != len(last_largest):\n        return 0\n\n    return len(first_largest) if last_largest else 0\n",
-          "passed": false
-        },
-        {
-          "code": "def second_largest(numbers):\n    return [num for num in numbers if num != num]\n",
-          "passed": false
-        },
-        {
-          "code": "def second_largest(numbers):\n    if len(numbers) <= 1:\n        print(\"First largest first distinct number is:\", second_largest(numbers))\n    elif len(numbers) == 1:\n        print(\"First largest number is:\", second_largest(numbers))\n    elif len(numbers) == 1:\n        print(\"Second largest number is:\", second_largest(numbers))\n    else:\n        print(\"No largest number is:\", second_largest(numbers))\n\n# Example usage:\nnumbers = [1, 2, None]\nprint(\"Weighted list:\")\n",
-          "passed": false
-        },
-        {
-          "code": "def second_largest(numbers):\n    if not numbers:\n        return None\n    return [num for num in numbers if num.length == 0]\n",
-          "passed": false
-        },
-        {
-          "code": "def second_largest(numbers):\n    return [num for num in numbers if num > 1]\n",
-          "passed": false
-        }
-      ]
-    },
-    {
-      "task": "count_occurrences",
-      "reference_loss": 0.5698174834251404,
-      "greedy": {
-        "code": "def count_occurrences(items, value):\n    count = 0\n    for item in items:\n        count += 1\n    return count\n",
-        "passed": false
-      },
-      "samples": [
-        {
-          "code": "def count_occurrences(items, value):\n    return len(items) // len(items) // 2\n",
-          "passed": false
-        },
-        {
-          "code": "def count_occurrences(items, value):\n    count = 0\n    for item in items:\n        count += item.count(value)\n    count += count\n\n    return count\n",
-          "passed": false
-        },
-        {
-          "code": "def count_occurrences(items):\n    return len(items) + 1\n\nitems = [\n    (\"apple\", 15),\n    (\"crooked\", 15),\n    (\"cherry\", 15),\n    (\"banana\", 15),\n    (\"cherry\", 15),\n    (\"cherry\", 16),\n    (\"cherry\", 18),\n    (\"cherry\", 18),\n    (\"cherry\", 20),\n    (\"cherry\", 15),\n    (\"cherry\", 20),\n    (\"cherry\", 20),\n    (\"cherry\", 15)\n]\n\nfor item, count in items:\n    print(item)\n",
-          "passed": false
-        },
-        {
-          "code": "def count_occurrences(items, value):\n    return [(item['item'] * value for item in items if item['item'] > value)]\n",
-          "passed": false
-        },
-        {
-          "code": "def count_occurrences(items, value):\n    count_occurrences = {}\n    for item in items:\n        count_occurrences(item)\n    return count_occurrences(items, count_occurrences)\n\n# Example usage:\nitems = {\"a\": 1, \"b\": 2}\ncount_occurrences(items, count_occurrences):\n\nsorted_items = count_occurrences",
-          "passed": false
-        },
-        {
-          "code": "def count_occurrences(items, value):\n    counts = {}\n\n    for item in items:\n        counts[item] = counts.get(item, 0) + 1\n\n    return counts\n",
-          "passed": false
-        },
-        {
-          "code": "def count_occurrences(items, value):\n    count_count = 0\n    for item in items:\n        count_count += count_count * 2\n    return count_count\n",
+          "code": "def second_largest(numbers):\n    return max(numbers, key=len)\n",
           "passed": false
         },
         {
@@ -1711,45 +1653,83 @@
           "passed": false
         },
         {
-          "code": "def count_occurrences(items, value):\n    count = 0\n    for item in items:\n        if item.count(item) >= value:\n            count += 1\n    return count\n",
+          "code": "def second_largest(numbers):\n    return [num for num in numbers if num != 0]\n",
           "passed": false
         },
         {
-          "code": "def count_occurrences(items, value):\n    counts = {}\n    counts['total'] = sum(counts.get(value, 0))\n    for item in items:\n        count += count_occurrences(item)\n    count = count_occurrences(item)\n    return count\n",
+          "code": "def second_largest(numbers):\n    if not numbers:\n        return None\n    return second_largest(numbers)\n",
+          "passed": false
+        },
+        {
+          "code": "def second_largest(numbers):\n    if len(numbers) <= 2:\n        return None\n    return second_largest(2)\n",
+          "passed": false
+        },
+        {
+          "code": "def second_largest(numbers):\n    \"\"\"\n    Returns the second largest distinct numbers in the list.\n\n    Parameters:\n    numbers (list): A list of numbers.\n\n    Returns:\n    int: A larger number that will be less than or equal to the second largest.\n    \"\"\"\n    num_list = num_to_largest(numbers)\n    return max(num_list, key=len)\n",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "task": "count_occurrences",
+      "reference_loss": 0.5698784589767456,
+      "greedy": {
+        "code": "def count_occurrences(items, value):\n    count = 0\n    for item in items:\n        count += 1\n    return count\n",
+        "passed": false
+      },
+      "samples": [
+        {
+          "code": "def count_occurrences(items, value):\n    count = 0\n    for item, count in items[:]:\n        count += count * count\n    return count\n",
+          "passed": false
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    counts = {}\n    for item in items:\n        counts[item] += item\n\n    return counts\n",
+          "passed": false
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    counts = {}\n    for item in items:\n        counts[item] = count_occurrences(item)\n    return count_occurrences(items, key=count_occurrences(item))\n",
+          "passed": false
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    count_occurrences = {}\n    for item in items:\n        count_occurrences[item] = count_occurrences.get(item, 0) + 1\n    return count_occurrences(items, count_occurrences)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    count_occurrences(items, value)\n    return count_occurrences(items, value)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    return sum(item for item in items if item in items)\n\nprint(count_occurrences(5))\n",
+          "passed": false
+        },
+        {
+          "code": null,
+          "passed": false
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    return items.count(item)\n",
+          "passed": false
+        },
+        {
+          "code": "def count_occurrences(items, value):\n    counted_items = count_occurrences(items, 1)\n    for item, count in items:\n        counted_item = count_occurrences(item, count)\n        if counted_item is not None:\n            counted_item *= 1\n        counted_item *= 1\n\n    return counted",
+          "passed": false
+        },
+        {
+          "code": null,
           "passed": false
         }
       ]
     },
     {
       "task": "to_uppercase",
-      "reference_loss": 0.32170307636260986,
+      "reference_loss": 0.3215380311012268,
       "greedy": {
         "code": "import re\n\ndef to_uppercase(s):\n    return re.sub(r'[^\\w\\s]', '', s)\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def to_uppercase(s):\n    s = s.upper()\n    return s.lower()\n",
-          "passed": false
-        },
-        {
-          "code": "import re\n\ndef to_uppercase(s):\n    return re.sub(r'[^a-zA-Z0-9]', '', s)\n\n# Test the function\nprint(to_uppercase('abc'))\n",
-          "passed": false
-        },
-        {
-          "code": "def to_uppercase(s):\n    return s.lower()\n",
-          "passed": false
-        },
-        {
-          "code": "def to_uppercase(s: str) -> str:\n    return s.upper() if s.upper() == 'a' else str.upper() and s.upper() in s.upper()\n",
-          "passed": false
-        },
-        {
-          "code": "def to_uppercase(s):\n    return s.lower(s)\n",
-          "passed": false
-        },
-        {
-          "code": "def to_uppercase(s):\n    return s.upper() if s else None\n",
+          "code": "def to_uppercase(s):\n    return s[::-1]\n",
           "passed": false
         },
         {
@@ -1757,22 +1737,42 @@
           "passed": true
         },
         {
-          "code": "def to_uppercase(s):\n    return s.lower() if is_upper(s) else s\n",
+          "code": null,
+          "passed": false
+        },
+        {
+          "code": "def to_uppercase(s):\n    return s[::-1]\n",
+          "passed": false
+        },
+        {
+          "code": "def to_uppercase(s):\n    return s.replace(c.upper(), c.upper())\n",
+          "passed": false
+        },
+        {
+          "code": "def to_uppercase(s):\n    return s.lower()\n",
+          "passed": false
+        },
+        {
+          "code": "def to_uppercase(s: str) -> str:\n    return ' '.join(c for c in s if c not in s)\n",
+          "passed": false
+        },
+        {
+          "code": null,
+          "passed": false
+        },
+        {
+          "code": "def to_uppercase(s: str) -> cipher_type:\n    return ''.join(cipher_type(s) for char in s)\n",
           "passed": false
         },
         {
           "code": "def to_uppercase(s):\n    return s.upper()\n",
           "passed": true
-        },
-        {
-          "code": "def to_uppercase(s):\n    return s[::-1]\n",
-          "passed": false
         }
       ]
     },
     {
       "task": "starts_with_vowel",
-      "reference_loss": 0.9521991610527039,
+      "reference_loss": 0.9521340727806091,
       "greedy": {
         "code": null,
         "passed": false
@@ -1795,10 +1795,6 @@
           "passed": false
         },
         {
-          "code": "def starts_with_vowel(word):\n    return \" \".join(word.lower() if word else \" \" + word.lower() if word else \" \" + word.lower())\n",
-          "passed": false
-        },
-        {
           "code": null,
           "passed": false
         },
@@ -1815,29 +1811,49 @@
           "passed": false
         },
         {
-          "code": "def starts_with_vowel(word):\n    vowels = 'aeiouAX'\n    return word + ''.join(vowel.join(c) for c in word.split())\n",
+          "code": null,
+          "passed": false
+        },
+        {
+          "code": null,
           "passed": false
         }
       ]
     },
     {
       "task": "multiply_list",
-      "reference_loss": 0.5136762261390686,
+      "reference_loss": 0.5136421322822571,
       "greedy": {
         "code": "def multiply_list(numbers):\n    \"\"\"\n    Computes the product of all numbers in a list.\n\n    Args:\n        numbers (list): A list of numbers.\n\n    Returns:\n        int: The product of all numbers in the list.\n    \"\"\"\n    return numbers\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def multiply_list(numbers):\n    if not numbers:\n        return None\n\n    total = 0\n    for num in numbers:\n        total += num\n    return total\n",
+          "code": "def multiply_list(numbers):\n    \"\"\"\n    Calculates the total of a list in a list.\n\n    Args:\n        numbers (list): A list of numbers.\n\n    Returns:\n        float: The product of all numbers in the list.\n    \"\"\"\n    total = 0\n    for num in numbers:\n        total += num\n    return total\n",
           "passed": false
         },
         {
-          "code": "def multiply_list(numbers):\n    return [num for num in numbers if num % 2 != 0]\n",
+          "code": "def multiply_list(numbers):\n    return [num ** 2 for num in numbers]\n",
           "passed": false
         },
         {
-          "code": "def multiply_list(numbers):\n    return sum(numbers)\n",
+          "code": "def multiply_list(numbers):\n    num_list = []\n    for num in numbers:\n        if num % 2 == 0:\n            num_list.append(num)\n        elif num % 2 == 0:\n            num_list.append(num)\n    return num_list\n",
+          "passed": false
+        },
+        {
+          "code": null,
+          "passed": false
+        },
+        {
+          "code": "def multiply_list(numbers):\n    return [x ** 2 for x in numbers if x < 0]\n",
+          "passed": false
+        },
+        {
+          "code": "def multiply_list(numbers):\n    numbers.sort()\n    return [item for item in numbers if item.isunion()]\n\ndef multiply_list(numbers):\n    result = []\n    for item in numbers:\n        if isinstance(item, list):\n            result.append(item)\n        else:\n            result.append(item)\n    return result\n\n# Example usage:\nnumbers = [1, 2, 3, 4, 5]\nresult = multiply_list(numbers)\nprint(result)  # Output: [2, 4, 6, 7, 8]\n",
+          "passed": false
+        },
+        {
+          "code": "def multiply_list(numbers):\n    try:\n        return [x for x in numbers if x % 2 == 0]\n    except ValueError:\n        raise Exception(\"Input list must contain at least two integers.\")\n",
           "passed": false
         },
         {
@@ -1845,40 +1861,44 @@
           "passed": false
         },
         {
-          "code": "def multiply_list(nums):\n    numbers.sort()\n    if not numbers:\n        return None\n    return [num for num in numbers if num > num]\n",
+          "code": "def multiply_list(numbers):\n    return [num * 2 for num in numbers if num > 0]\n",
           "passed": false
         },
         {
-          "code": "def multiply_list(numbers):\n    return list(map(lambda x: x ** 2, numbers))\n",
-          "passed": false
-        },
-        {
-          "code": "def multiply_list(numbers):\n    total = 0\n    for num in numbers:\n        total += num\n    return total + count\n",
-          "passed": false
-        },
-        {
-          "code": "import math\n\ndef multiply_list(numbers):\n    return [num * 2 for num in numbers if num % 2 == 1]\n",
-          "passed": false
-        },
-        {
-          "code": "def multiply_list(numbers):\n    result = []\n    num_set = set()\n    result.sort()\n    return result\n",
-          "passed": false
-        },
-        {
-          "code": null,
+          "code": "def multiply_list(numbers):\n    i, j = 0, 0\n    while i < len(numbers) and numbers[i] <= num:\n        if num % i == 0:\n            numbers.append(numbers[i])\n        else:\n            numbers.append(numbers[i])\n    return numbers\n",
           "passed": false
         }
       ]
     },
     {
       "task": "range_sum",
-      "reference_loss": 0.7071431279182434,
+      "reference_loss": 0.7071954011917114,
       "greedy": {
         "code": "def range_sum(a, b):\n    \"\"\"\n    Returns the sum of all integers from a to b.\n\n    Args:\n        a (int): The integer value of the integer.\n\n    Returns:\n        int: The sum of all integers from a to b.\n    \"\"\"\n    return a * b\n",
         "passed": false
       },
       "samples": [
         {
+          "code": "def range_sum(a, b):\n    return a + b\n",
+          "passed": false
+        },
+        {
+          "code": "def range_sum(a, b):\n    return a % 3 == 0 or a % b != 0\n",
+          "passed": false
+        },
+        {
+          "code": "def range_sum(a, b):\n    if num == 0 or b == 0:\n        return 0\n    return a / 2\n",
+          "passed": false
+        },
+        {
+          "code": null,
+          "passed": false
+        },
+        {
+          "code": "def range_sum(a, b):\n    return a - b\n\n# Test the implementation\nprint(range_sum(a, b)) # Outputs: [2, 4]\nprint(range_sum(a, b)) # Outputs: [4, 5]\n",
+          "passed": false
+        },
+        {
           "code": null,
           "passed": false
         },
@@ -1887,53 +1907,29 @@
           "passed": false
         },
         {
-          "code": null,
+          "code": "def range_sum(a, b):\n    return a + b\n",
           "passed": false
         },
         {
-          "code": null,
+          "code": "def range_sum(a, b):\n    return [range(i) for i in range(len(b))]\n",
           "passed": false
         },
         {
-          "code": null,
-          "passed": false
-        },
-        {
-          "code": "def range_sum(a, b):\n    if a == b:\n        return a\n    else:\n        return a\n",
-          "passed": false
-        },
-        {
-          "code": "def range_sum(a, b):\n    a_sum = 0\n    a_sum = 0\n\n    for i in range(a, b):\n        b_sum += a_sum\n        a_sum += b_sum\n        a_sum += b_sum\n    return a_sum\n",
-          "passed": false
-        },
-        {
-          "code": "def range_sum(a, b):\n    return a * b\n",
-          "passed": false
-        },
-        {
-          "code": "def range_sum(a, b):\n    return a % b\n",
-          "passed": false
-        },
-        {
-          "code": "def range_sum(a, b):\n    return a * b\n",
+          "code": "def range_sum(nums, b):\n    return (nums.count(b) + (nums.count(b) - 1)) + 1\n",
           "passed": false
         }
       ]
     },
     {
       "task": "swap_pair",
-      "reference_loss": 0.5057768225669861,
+      "reference_loss": 0.5058223605155945,
       "greedy": {
         "code": "def swap_pair(pair):\n    return tuple(pair)\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def swap_pair(pair):\n    \"\"\"\n    Shapes a tuple (a, b) with a pair of length a and b's as the result of the tuple (a, b), where a and b are the length of the pair.\n    Returns the tuple (a, b).\n\n    Parameters:\n        tuple (str): The tuple (a, b) with a pair of length b's.\n        items (tuple): A tuple (b, a) with a pair of length b's.\n\n    Returns:\n        tuple (str, int): A tuple (a, b) with a pair of length b's, which is a tuple (a, b) with a",
-          "passed": false
-        },
-        {
-          "code": "def swap_pair(pair):\n    \"\"\"\n    Swap a pair of two elements to a power of the given pair.\n\n    Args:\n        pair (tuple): A pair of pairs to swap.\n\n    Returns:\n        tuple: A tuple (a, b) with the element being swapped.\n\n    Raises:\n        TypeError: If the pair is not a pair with an empty pair.\n        TypeError: If the pair is not a pair, which raises a `TypeError`.\n    \"\"\"\n    if not isinstance(pair, list) or not all(pair.lower() == \"yes\"):\n        raise TypeError(\"Cannot swap at least one element is not a pair\")\n    return list(pair)",
+          "code": null,
           "passed": false
         },
         {
@@ -1941,57 +1937,73 @@
           "passed": false
         },
         {
-          "code": "def swap_pair(pair):\n    return tuple(set(pair), []) + set(pair)\n",
+          "code": "def swap_pair(pair):\n    return tuple([pair[1]] + tuple(tuple([1,)), tuple([1]]) * tuple([a, b, a).slice(1, 2)]))\n",
           "passed": false
         },
         {
-          "code": "def swap_pair(pair):\n    swapped = False\n    for pair in pair:\n        if not isinstance(pair, list):\n            raise TypeError(\"Invalid pair: must be a list of pairs.\")\n        swapped = True\n        for i, j in range(0, len(pair), 1):\n            if pair[i][j] == pair[j + 1]:\n                swapped = False\n    return swapped",
+          "code": "def swap_pair(pair):\n    return list(pair)\n",
           "passed": false
         },
         {
-          "code": "def swap_pair(pair: str) -> str:\n    return str(pair)\n",
+          "code": null,
           "passed": false
         },
         {
-          "code": "def swap_pair(pair):\n    return tuple(pair[::-1])\n",
-          "passed": true
-        },
-        {
-          "code": "def swap_pair(pair):\n    if not pair:\n        return None\n    return (pair[0], pair[1])\n",
+          "code": null,
           "passed": false
         },
         {
-          "code": "def swap_pair(pair):\n    return tuple(pair)\n",
+          "code": "from typing import List\n\ndef swap_pair(pair: List[str] = []):\n    if len(pair) != len(set(pair)):\n        raise ValueError(\"The list must be strings\")\n    return tuple(pair for pair in pair if pair[0] == pair[1:])\n",
           "passed": false
         },
         {
-          "code": "def swap_pair(pair):\n    new_pair = []\n    for pair in pairs:\n        pairs.append(pair)\n    return new_pair\n",
+          "code": "def swap_pair(pair):\n    if len(pair) < 1:\n        return None\n    if not pair:\n        return None\n\n    swapped = True\n    for pair in pair:\n        if pair.startswith(']'):\n            swapped = False\n            return False\n        if not sw",
+          "passed": false
+        },
+        {
+          "code": "def swap_pair(pair, a, b):\n    return pair.join(pair)\n",
+          "passed": false
+        },
+        {
+          "code": "def swap_pair(pair):\n    if not isinstance(pair, (list, tuple, tuple)) and len(pair) == 0:\n        return tuple([pair[1] if is_empty(pair[2]) else tuple([pair[1] if not is_empty(pair[0]) else tuple([pair[2] if not is_empty(pair[2]) else tuple([pair[-1",
           "passed": false
         }
       ]
     },
     {
       "task": "clamp",
-      "reference_loss": 0.841684877872467,
+      "reference_loss": 0.8415477275848389,
       "greedy": {
         "code": "def clamp(x, low, high):\n    if x < high:\n        return x\n    else:\n        return x\n",
         "passed": false
       },
       "samples": [
         {
-          "code": "def clamp(x, high):\n    if x < high:\n        return -1\n    else:\n        return x + low\n\ndef cumulative(x, low, low):\n    if high == -1:\n        return -1\n    else:\n        return x - low\n\n    return -2\n",
+          "code": "def clamp(x, high):\n    return x + high\n",
           "passed": false
         },
         {
-          "code": "def clamp(x, low, low, high):\n    result = 0\n    low, high = 0, 1\n\n    while True:\n        result += 1\n        high, high = result\n        low, high = result, 1\n\n    return result\n",
+          "code": null,
           "passed": false
         },
         {
-          "code": "def clamp(x, low, high):\n    if high < 0:\n        return 0\n    return (x + high) / 2\n\n# Test the function\nprint(clamp(5, 5))  # Output: 3.0\nprint(clamp(5, 5",
+          "code": "def clamp(x, low, high):\n    x, low = x, x + high\n    x, y = x + high, x + high\n    return x, x + high\n",
           "passed": false
         },
         {
-          "code": "def clamp(x, high):\n    if x > high:\n        return x + high\n    else:\n        return x * high\n",
+          "code": "def clamp(x, high):\n    x, high = x, x - high\n    return x, lanes(x, high)\n",
+          "passed": false
+        },
+        {
+          "code": "import math\n\ndef clamp(x, low, high):\n    return math.log(x, high)\n",
+          "passed": false
+        },
+        {
+          "code": null,
+          "passed": false
+        },
+        {
+          "code": "def clamp(x, high):\n    if x < low:\n        return x\n    else:\n        return x\n",
           "passed": false
         },
         {
@@ -2003,23 +2015,11 @@
           "passed": false
         },
         {
-          "code": null,
-          "passed": false
-        },
-        {
-          "code": "def clamp(x, low, high):\n    for i, x in enumerate(x):\n        if x < low:\n            return x\n        else:\n            print(f'Error: {x}')\n    return -1\n",
-          "passed": false
-        },
-        {
-          "code": "def clamp(x, low, high=True):\n    l = high - low\n    low = low - high\n    low = low - low\n    low = l * high\n    while low >= high:\n        if low <= high:\n            low = l * high\n            high = high - high\n        if low >= low:\n            break\n    return l\n",
-          "passed": false
-        },
-        {
-          "code": "def clamp(x, low, high, high):\n    return x + low\n",
+          "code": "def clamp(x, low, high):\n    if low <= high:\n        return x\n\n    high = x + low\n    if high <= high:\n        return x, high\n    return abs(x + high)\n",
           "passed": false
         }
       ]
     }
   ],
-  "commit": "eeb2c1a"
+  "commit": "86b8c32"
 }
