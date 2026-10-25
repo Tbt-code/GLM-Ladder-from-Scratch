@@ -32,6 +32,7 @@ class ModelOutput(NamedTuple):
 class LinearCache:
     state: torch.Tensor | None = None        # [B, H, d, e] float32
     normalizer: torch.Tensor | None = None   # [B, H, d] float32
+    valid: torch.Tensor | None = None        # [B, T] bool during a padded prefill: False on padding
 
 
 @dataclass
@@ -44,6 +45,10 @@ class SparseCache:
 class ModelCache:
     layers: list = field(default_factory=list)   # one LinearCache or SparseCache per layer
     length: int = 0                              # positions already processed
+    # For a batch of prompts with different lengths, right-padded to one length: True on real
+    # tokens. Padding comes after every real token, so causality keeps it out of their outputs;
+    # only the linear-attention sums would see it, and they skip it (see LinearAttention).
+    valid: torch.Tensor | None = None            # [B, T] bool, prefill only
 
 
 # A CUDA graph replays exactly the kernels it recorded, on exactly the same memory. So a cache
@@ -60,7 +65,7 @@ class StaticSparseCache:
 @dataclass
 class StaticCache:
     layers: list                                 # LinearCache (preallocated) or StaticSparseCache per layer
-    position: torch.Tensor                       # long [1]: index of the next token
+    position: torch.Tensor                       # long [B]: index of each sequence's next token
 
 
 class RMSNorm(nn.Module):
@@ -78,18 +83,22 @@ def apply_rope(q: torch.Tensor, k: torch.Tensor, start: int | torch.Tensor = 0) 
     """Apply rotary position embeddings to [batch, time, heads, head_dim].
 
     `start` is the position of the first token: 0 for a whole sequence, the number of
-    cached positions when decoding with a cache.
+    cached positions when decoding with a cache, or a long tensor [batch] (one start per
+    sequence) when a batch of different-length prompts is decoded from a static cache.
     """
     length, width = q.shape[1], q.shape[-1]
     if width % 2:
         raise ValueError("head dimension must be even for RoPE")
 
-    # `start` is an int, or a long tensor of shape [1] when decoding from a CUDA graph.
-    positions = torch.arange(length, device=q.device, dtype=torch.float32) + start
+    steps = torch.arange(length, device=q.device, dtype=torch.float32)
+    if isinstance(start, torch.Tensor):
+        positions = start.to(torch.float32)[:, None] + steps         # [batch, T]
+    else:
+        positions = steps + start                                    # [T]
     frequencies = 1 / (10000 ** (torch.arange(0,width,2,device=q.device).float() / width))
-    angles = positions[:,None] * frequencies[None,:]
-    cos = angles.cos()[None, :, None, :].to(q.dtype)
-    sin = angles.sin()[None, :, None, :].to(q.dtype)
+    angles = positions[..., None] * frequencies                      # [T, d/2] or [batch, T, d/2]
+    cos = angles.cos().unsqueeze(-2).to(q.dtype)                     # broadcasts over heads (and batch)
+    sin = angles.sin().unsqueeze(-2).to(q.dtype)
 
     def rotate(x: torch.Tensor) -> torch.Tensor:
         even, odd = x[..., 0::2], x[..., 1::2]
@@ -199,6 +208,14 @@ class LinearAttention(nn.Module):
                 # Whole sequence, or the prompt when generating ("prefill").
                 if cache is not None and start != 0:
                     raise ValueError("a linear-attention cache must be filled from position 0")
+                if cache is not None and cache.valid is not None:
+                    # Dolgu (padding) konumlarının çalışan toplamlara girmemesi için k sıfırlanır
+                    k = k * cache.valid[:, :, None, None].to(k.dtype)
+                    output = chunked_causal_linear_attention(q, k, v, self.chunk_size)
+                    if cache is not None:
+                        cache.state = torch.einsum("bthd,bthe->bhde", k, v)
+                        cache.normalizer = k.sum(dim=1)
+
                 output = chunked_causal_linear_attention(q, k, v, self.chunk_size)
                 if cache is not None:
                     cache.state = torch.einsum("bthd,bthe->bhde", k, v)
@@ -240,22 +257,23 @@ def cached_attention(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, cache: S
 
 def static_cached_attention(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, cache: StaticSparseCache,
                             position: torch.Tensor, window: int, stride: int) -> torch.Tensor:
-    """One new position with a preallocated key/value buffer (CUDA-graph friendly).
+    """One new position per sequence with a preallocated key/value buffer (CUDA-graph friendly).
 
-    q, k, v: [B, H, 1, d] for the token at `position` (long tensor [1]).
-    cache.keys / cache.values: [B, H, L, d], where L is the full context length.
-    Write k and v into slot `position`, then attend over all L slots with a mask that keeps
-    only this token's sparse causal row: slots after `position` hold old or unwritten data
-    and must be masked out. Returns [B, H, 1, d]. No shape may depend on the position value.
+    q, k, v: [B, H, 1, d]. position: long [B], where each sequence's new token goes (sequences
+    may be at different positions when their prompts had different lengths; a single-element
+    position is shared by all rows). cache.keys / cache.values: [B, H, L, d].
+    Write each row's k and v into its own slot, then attend over all L slots with each row's
+    sparse causal mask. Returns [B, H, 1, d]. No shape may depend on the position values.
     """
- 
-    cache.keys.index_copy_(2, position, k)
-    cache.values.index_copy_(2, position, v)
+    B = q.shape[0]
     L = cache.keys.shape[2]
+    rows = torch.arange(B, device=q.device)
+    cache.keys[rows, :, position] = k[:, :, 0]
+    cache.values[rows, :, position] = v[:, :, 0]
     cols = torch.arange(L, device=q.device)
-    allowed = (cols <= position) & (((position - cols) < window) | ((cols % stride) == 0))
-    
-    return F.scaled_dot_product_attention(q, cache.keys, cache.values, attn_mask=allowed.view(1, L))
+    p = position[:, None]
+    allowed = (cols <= p) & (((p - cols) < window) | ((cols % stride) == 0))
+    return F.scaled_dot_product_attention(q, cache.keys, cache.values, attn_mask=allowed.view(-1, 1, 1, L))
 
 
 def sparse_mask_rows(start: int, length: int, window: int, stride: int, device: torch.device) -> torch.Tensor:
@@ -494,11 +512,16 @@ class GLMLadderModel(nn.Module):
                 layers.append(LinearCache(
                     state=torch.zeros(batch, heads, width, width, device=device, dtype=torch.float32),
                     normalizer=torch.zeros(batch, heads, width, device=device, dtype=torch.float32)))
-        return StaticCache(layers=layers, position=torch.zeros(1, dtype=torch.long, device=device))
+        return StaticCache(layers=layers, position=torch.zeros(batch, dtype=torch.long, device=device))
 
     @staticmethod
-    def fill_static_cache(static: StaticCache, cache: ModelCache) -> None:
-        """Copy a prompt's ordinary cache into static buffers, in place (the CUDA graph keeps its addresses)."""
+    def fill_static_cache(static: StaticCache, cache: ModelCache, lengths: torch.Tensor | None = None) -> None:
+        """Copy a prompt's ordinary cache into static buffers, in place (the CUDA graph keeps its addresses).
+
+        lengths: long [B], each prompt's real length after right-padding (default: cache.length for all).
+        Key/value slots beyond a sequence's length hold padding; its next tokens overwrite them
+        one by one, and the attention mask never looks past the current position.
+        """
         for target, source in zip(static.layers, cache.layers):
             if isinstance(target, StaticSparseCache):
                 if source.keys.shape[2] > target.keys.shape[2]:
@@ -508,7 +531,10 @@ class GLMLadderModel(nn.Module):
             else:
                 target.state.copy_(source.state)
                 target.normalizer.copy_(source.normalizer)
-        static.position.fill_(cache.length)
+        if lengths is None:
+            static.position.fill_(cache.length)
+        else:
+            static.position.copy_(lengths)
 
     def forward_embeddings(self, embedded: torch.Tensor, cache: ModelCache | None = None) -> ModelOutput:
         """Run the language model from precomputed token-like embeddings.
@@ -520,6 +546,15 @@ class GLMLadderModel(nn.Module):
             raise ValueError("embedded inputs must have shape [batch, time, dim]")
         if isinstance(cache, StaticCache):
             start = cache.position          # a tensor; the caller keeps the position inside the buffers
+        elif cache is not None and cache.valid is not None:
+            if cache.length != 0 or cache.valid.shape != embedded.shape[:2]:
+                raise ValueError("a padding mask is only for the first (prefill) call")
+            start = 0
+            if embedded.shape[1] > self.config.max_sequence_length:
+                raise ValueError("input exceeds max_sequence_length")
+            for layer_cache in cache.layers:
+                if isinstance(layer_cache, LinearCache):
+                    layer_cache.valid = cache.valid
         else:
             start = 0 if cache is None else cache.length
             if start + embedded.shape[1] > self.config.max_sequence_length:

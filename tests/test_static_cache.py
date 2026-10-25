@@ -3,6 +3,7 @@ import torch
 
 from glm_ladder import GLMLadderModel, ModelConfig
 from glm_ladder.code_eval import sample_many
+from glm_ladder.graph_decode import GraphDecoder, generate_batch
 from glm_ladder.model import (
     LinearCache, SparseCache, StaticSparseCache, cached_attention, linear_attention_step, sparse_mask_rows,
     static_cached_attention,
@@ -34,23 +35,47 @@ def test_linear_step_updates_the_cache_in_place() -> None:
     torch.testing.assert_close(state, torch.einsum("bhd,bhe->bhde", k[:, 0], v[:, 0]))
 
 
-@pytest.mark.parametrize("position", [0, 5, 8, 9, 16, 19])
-def test_static_attention_matches_the_growing_cache(position) -> None:
-    generator = torch.Generator().manual_seed(position)
-    keys = torch.randn(2, 3, position + 1, 4, generator=generator)
-    values = torch.randn(2, 3, position + 1, 4, generator=generator)
-    q = torch.randn(2, 3, 1, 4, generator=generator)
+def growing_reference(q, keys, values, position):
+    """What one row's token at `position` sees with the growing (non-static) cache."""
     growing = SparseCache(keys=keys[:, :, :position], values=values[:, :, :position]) if position else SparseCache()
-    expected = cached_attention(q, keys[:, :, position:], values[:, :, position:], growing,
-                                sparse_mask_rows(position, 1, 8, 8, torch.device("cpu")))
+    return cached_attention(q, keys[:, :, position:position + 1], values[:, :, position:position + 1], growing,
+                            sparse_mask_rows(position, 1, 8, 8, torch.device("cpu")))
+
+
+@pytest.mark.parametrize("position", [0, 5, 8, 9, 16, 19])
+def test_static_attention_with_one_shared_position(position) -> None:
+    generator = torch.Generator().manual_seed(position)
+    keys = torch.randn(2, 3, 20, 4, generator=generator)
+    values = torch.randn(2, 3, 20, 4, generator=generator)
+    q = torch.randn(2, 3, 1, 4, generator=generator)
+    expected = growing_reference(q, keys, values, position)
     # Static buffer of 20 slots: earlier positions filled, later ones full of garbage.
     static = StaticSparseCache(keys=torch.randn(2, 3, 20, 4) * 100, values=torch.randn(2, 3, 20, 4) * 100)
     static.keys[:, :, :position] = keys[:, :, :position]
     static.values[:, :, :position] = values[:, :, :position]
-    got = static_cached_attention(q, keys[:, :, position:], values[:, :, position:], static,
-                                  torch.tensor([position]), window=8, stride=8)
+    got = static_cached_attention(q, keys[:, :, position:position + 1], values[:, :, position:position + 1],
+                                  static, torch.tensor([position]), window=8, stride=8)
     torch.testing.assert_close(got, expected, atol=1e-5, rtol=1e-5)
     torch.testing.assert_close(static.keys[:, :, position], keys[:, :, position])     # written into its slot
+
+
+def test_static_attention_with_a_position_per_row() -> None:
+    generator = torch.Generator().manual_seed(7)
+    positions = [3, 12, 0]
+    keys = torch.randn(3, 2, 20, 4, generator=generator)
+    values = torch.randn(3, 2, 20, 4, generator=generator)
+    q = torch.randn(3, 2, 1, 4, generator=generator)
+    static = StaticSparseCache(keys=torch.randn(3, 2, 20, 4) * 100, values=torch.randn(3, 2, 20, 4) * 100)
+    new_k = torch.stack([keys[row, :, p] for row, p in enumerate(positions)])[:, :, None]
+    new_v = torch.stack([values[row, :, p] for row, p in enumerate(positions)])[:, :, None]
+    for row, p in enumerate(positions):
+        static.keys[row, :, :p] = keys[row, :, :p]
+        static.values[row, :, :p] = values[row, :, :p]
+    got = static_cached_attention(q, new_k, new_v, static, torch.tensor(positions), window=8, stride=8)
+    for row, p in enumerate(positions):
+        expected = growing_reference(q[row:row + 1], keys[row:row + 1], values[row:row + 1], p)
+        torch.testing.assert_close(got[row:row + 1], expected, atol=1e-5, rtol=1e-5)
+        torch.testing.assert_close(static.keys[row, :, p], keys[row, :, p])
 
 
 # ----------------------------------------------------------------- the whole model, eagerly
@@ -64,11 +89,39 @@ def test_static_cache_decoding_gives_the_full_forward_logits(prompt) -> None:
     pieces = [model(ids[:, :prompt], cache=cache).logits]
     static = model.new_static_cache(batch=2, max_length=48)
     model.fill_static_cache(static, cache)
-    assert static.position.item() == prompt
+    assert static.position.tolist() == [prompt, prompt]
     for position in range(prompt, ids.shape[1]):
         pieces.append(model(ids[:, position:position + 1], cache=static).logits)
-    assert static.position.item() == ids.shape[1]
+    assert static.position.tolist() == [ids.shape[1]] * 2
     torch.testing.assert_close(torch.cat(pieces, dim=1), full, atol=1e-4, rtol=1e-4)
+
+
+@torch.no_grad()
+def test_prompts_of_different_lengths_share_one_batch() -> None:
+    # Three prompts (lengths below, at and past a chunk / window of 8), each continued with
+    # 12 fixed tokens. Every row must get exactly the logits of its own sequence run alone.
+    model, ids = model_and_ids(length=30, batch=3)
+    lengths = [3, 8, 14]
+    decoder = GraphDecoder(model, batch=3, max_length=40, graph=False)
+    first = decoder.prefill([ids[row, :n].tolist() for row, n in enumerate(lengths)])
+    steps = [first.clone()]
+    for offset in range(12):
+        tokens = torch.stack([ids[row, n + offset] for row, n in enumerate(lengths)])
+        steps.append(decoder.step(tokens).clone())
+    for row, n in enumerate(lengths):
+        alone = model(ids[row:row + 1, :n + 12]).logits[0, n - 1:]      # predictions after token n-1 ... n+10
+        got = torch.stack([s[row] for s in steps])[:12 + 1]
+        torch.testing.assert_close(got, alone[:13], atol=1e-4, rtol=1e-4)
+
+
+def test_batched_generation_matches_one_prompt_at_a_time() -> None:
+    model, ids = model_and_ids(length=10, batch=2)
+    prompts = [ids[0, :4].tolist(), ids[1, :9].tolist()]
+    settings = dict(max_new_tokens=15, temperature=0.0, top_k=None, seed=0, stop=lambda out: 5 in out)
+    decoder = GraphDecoder(model, batch=4, max_length=32, graph=False)
+    batched = generate_batch(decoder, [prompts[0], prompts[0], prompts[1], prompts[1]], **settings)
+    one_by_one = [out for prompt in prompts for out in sample_many(model, prompt, n=2, **settings)]
+    assert batched == one_by_one
 
 
 # ----------------------------------------------------------------- CUDA graphs (GPU only)
@@ -76,23 +129,20 @@ def test_static_cache_decoding_gives_the_full_forward_logits(prompt) -> None:
 @pytest.mark.skipif(not CUDA, reason="CUDA graphs need a GPU")
 @torch.no_grad()
 def test_graph_replay_gives_the_full_forward_logits() -> None:
-    from glm_ladder.graph_decode import GraphDecoder
-
     model, ids = model_and_ids(device="cuda")
     full = model(ids).logits
     decoder = GraphDecoder(model, batch=2, max_length=48)
-    pieces = [decoder.prefill(ids[:, :8]).clone()]
+    pieces = [decoder.prefill(ids[:, :8].tolist()).clone()]
     for position in range(8, ids.shape[1] - 1):
         pieces.append(decoder.step(ids[:, position]).clone())
     torch.testing.assert_close(torch.stack(pieces, dim=1), full[:, 7:-1], atol=1e-3, rtol=1e-3)
 
 
 @pytest.mark.skipif(not CUDA, reason="CUDA graphs need a GPU")
-def test_graph_decoder_reused_for_a_second_prompt_and_in_sample_many() -> None:
-    from glm_ladder.graph_decode import GraphDecoder
-
-    model, ids = model_and_ids(device="cuda", length=6)
-    decoder = GraphDecoder(model, batch=4, max_length=40)
-    settings = dict(n=4, max_new_tokens=20, temperature=0.0, top_k=None, seed=0, stop=lambda out: False)
-    for prompt in (ids[0].tolist(), ids[1].tolist()):        # the same recorded graph, two prompts
-        assert sample_many(model, prompt, decoder=decoder, **settings) == sample_many(model, prompt, **settings)
+def test_graph_batch_of_different_prompts_matches_eager() -> None:
+    model, ids = model_and_ids(device="cuda", length=12, batch=3)
+    prompts = [ids[0, :3].tolist(), ids[1, :7].tolist(), ids[2, :12].tolist()]
+    settings = dict(max_new_tokens=20, temperature=0.0, top_k=None, seed=0, stop=lambda out: False)
+    graph = generate_batch(GraphDecoder(model, batch=3, max_length=40), prompts, **settings)
+    eager = generate_batch(GraphDecoder(model, batch=3, max_length=40, graph=False), prompts, **settings)
+    assert graph == eager

@@ -134,14 +134,19 @@ def sample_many(
     context = torch.tensor([prompt_ids] * n, dtype=torch.long, device=device)
     outputs: list[list[int]] = [[] for _ in range(n)]
     done = [False] * n
-    if decoder is not None and (decoder.batch != n or len(prompt_ids) + max_new_tokens > decoder.max_length):
-        raise ValueError("decoder does not fit this batch or length")
+    if decoder is not None:                  # CUDA-graph decoding: see glm_ladder/graph_decode.py
+        from .graph_decode import generate_batch
+
+        if decoder.batch != n:
+            raise ValueError("decoder was built for a different batch size")
+        outputs = generate_batch(decoder, [prompt_ids] * n, max_new_tokens=max_new_tokens,
+                                 temperature=temperature, top_k=top_k, seed=seed, stop=stop)
+        model.train(was_training)
+        return outputs
     cache = model.new_cache() if hasattr(model, "new_cache") and len(prompt_ids) + max_new_tokens <= window else None
     step_input = context
-    for step in range(max_new_tokens):
-        if decoder is not None:
-            logits = (decoder.prefill(context) if step == 0 else decoder.step(step_input[:, 0])).float()
-        elif cache is not None:
+    for _ in range(max_new_tokens):
+        if cache is not None:
             logits = model(step_input, cache=cache).logits[:, -1].float()
         else:
             logits = model(context[:, -window:]).logits[:, -1].float()
