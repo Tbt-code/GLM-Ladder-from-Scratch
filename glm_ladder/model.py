@@ -209,7 +209,6 @@ class LinearAttention(nn.Module):
                 if cache is not None and start != 0:
                     raise ValueError("a linear-attention cache must be filled from position 0")
                 if cache is not None and cache.valid is not None:
-                    # Dolgu (padding) konumlarının çalışan toplamlara girmemesi için k sıfırlanır
                     k = k * cache.valid[:, :, None, None].to(k.dtype)
                     output = chunked_causal_linear_attention(q, k, v, self.chunk_size)
                     if cache is not None:
