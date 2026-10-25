@@ -120,13 +120,18 @@ def sample_many(
     one token per step, as long as prompt + new tokens fit in the context; otherwise every step
     re-runs the whole (sliding) window. With `decoder` (a GraphDecoder recorded for batch n),
     each new token is one CUDA-graph replay. All paths draw the same random numbers.
+
+    Sampling happens on the model's device, and only the n chosen token ids go to the CPU:
+    copying [n, 16384] logits and sampling them on the CPU took ~70 ms per step at n = 128,
+    far longer than the model step itself. The random numbers therefore come from a generator
+    on that device (same seed -> same samples on the same device, but GPU and CPU differ).
     """
     was_training = model.training
     model.eval()
     device = next(model.parameters()).device
     window = model.config.max_sequence_length
-    generator = torch.Generator().manual_seed(seed)
-    context = torch.tensor([prompt_ids] * n, dtype=torch.long)
+    generator = torch.Generator(device=device).manual_seed(seed)
+    context = torch.tensor([prompt_ids] * n, dtype=torch.long, device=device)
     outputs: list[list[int]] = [[] for _ in range(n)]
     done = [False] * n
     if decoder is not None and (decoder.batch != n or len(prompt_ids) + max_new_tokens > decoder.max_length):
@@ -135,11 +140,11 @@ def sample_many(
     step_input = context
     for step in range(max_new_tokens):
         if decoder is not None:
-            logits = (decoder.prefill(context) if step == 0 else decoder.step(step_input[:, 0].to(device))).float().cpu()
+            logits = (decoder.prefill(context) if step == 0 else decoder.step(step_input[:, 0])).float()
         elif cache is not None:
-            logits = model(step_input.to(device), cache=cache).logits[:, -1].float().cpu()
+            logits = model(step_input, cache=cache).logits[:, -1].float()
         else:
-            logits = model(context[:, -window:].to(device)).logits[:, -1].float().cpu()
+            logits = model(context[:, -window:]).logits[:, -1].float()
         if temperature == 0:
             tokens = logits.argmax(dim=-1)
         else:
@@ -148,7 +153,7 @@ def sample_many(
                 kth = torch.topk(logits, min(top_k, logits.shape[-1]), dim=-1).values[:, -1:]
                 logits = logits.masked_fill(logits < kth, float("-inf"))
             tokens = torch.multinomial(torch.softmax(logits, dim=-1), 1, generator=generator).squeeze(1)
-        for i, token in enumerate(tokens.tolist()):
+        for i, token in enumerate(tokens.tolist()):           # the one GPU -> CPU copy per step: n ids
             if not done[i]:
                 outputs[i].append(token)
                 done[i] = stop(outputs[i])
