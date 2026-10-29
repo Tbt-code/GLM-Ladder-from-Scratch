@@ -1,32 +1,37 @@
 # GLM Ladder From Scratch
 
-A family of GLM-5.3-Flash-inspired mixture-of-experts language models at 25M, 50M, 100M, and 200M parameters, pretrained from random initialization, post-trained, fine-tuned, and improved with reinforcement learning, entirely on Google Colab GPUs.
+A ladder of GLM-5.3-Flash-inspired mixture-of-experts language models, pretrained from random initialization, post-trained, fine-tuned, and improved with reinforcement learning, entirely on Google Colab GPUs. Four sizes were designed (25M, 50M, 100M, 200M parameters); two of them, **`s-50m` and `m-100m`, went through every phase** and are the project's output.
 
 This project extends [vukrosic/glm-5.3-flash-from-scratch](https://github.com/vukrosic/glm-5.3-flash-from-scratch), which showed that executable-reward RL can teach a 25.7M model narrow coding behaviors. The central question here is what happens to that result as the model grows.
 
-> **Status: Phase 4 (fine-tuning) complete for `s-50m` and `m-100m`.** Both models are pretrained to 20 tokens per parameter ([results](#pretraining-results)), fine-tuned on chat data ([results](#post-training-sft-results)), and compared under full fine-tuning and LoRA on review rating in Turkish and English ([results](#fine-tuning-results-full-vs-lora)). After SFT, `m-100m` writes a function that passes its unit tests for 65% of 40 coding tasks within 10 tries; full fine-tuning beats LoRA on all four review-rating comparisons, by 0.004–0.036 macro-F1. One [joint fine-tuning](#joint-fine-tuning-one-model-per-size) run per size then gave a model that rates reviews in both languages almost as well as the specialists while keeping chat and code; these two models are the starting point for RL. `baseline-25m` reproduction and `l-200m` are deferred until fine-tuning and RL are done on the two trained rungs. Every number in this README comes from a receipt in [`artifacts/`](artifacts/) unless it is labeled as an estimate.
+> **Status: complete for `s-50m` and `m-100m`.** Both models are pretrained to 20 tokens per parameter ([results](#pretraining-results)), fine-tuned on chat data ([results](#post-training-sft-results)), compared under full fine-tuning and LoRA on review rating in Turkish and English ([results](#fine-tuning-results-full-vs-lora)), jointly fine-tuned into one model per size that keeps chat and code ([results](#joint-fine-tuning-one-model-per-size)), and finally trained with RL on executable code rewards ([results](#reinforcement-learning-on-code)). RL raised the pass rate on held-out tasks of the trained kinds from 0.9% to 40% (`s-50m`) and from 6.7% to 71% (`m-100m`), and on kinds of task never trained on the gain was 8× larger at the larger size; review rating, chat losses, and code reference loss barely moved. See [Final models](#final-models) for one table across all phases. **`baseline-25m` (reproduction of the original) and `l-200m` are deferred, not dropped: they can be done later if compute allows**; the code, configs, and notebooks already support both. Every number in this README comes from a receipt in [`artifacts/`](artifacts/) unless it is labeled as an estimate.
 
 ## Research question
 
 > With the architecture, training pipeline, and evaluation protocol held fixed, how do the gains from executable-reward reinforcement learning change from 25M to 200M parameters, and does RL interference on untrained task families shrink or grow with scale?
 
-Secondary questions, each run as a controlled ablation:
+What was answered: the question was measured at two rungs, 50M and 100M ([RL results](#reinforcement-learning-on-code)). Extending it to 25M and 200M is the deferred part.
 
-- Does a working MoE load-balancing loss change pretraining quality? (The original's balance loss had no gradient; see below.)
-- Byte-level versus BPE tokenization at equal compute.
-- RLOO versus GRPO versus DPO under a matched rollout budget.
-- Full fine-tuning versus LoRA on the same downstream task.
+Secondary questions, each planned as a controlled ablation:
+
+| Question | Status |
+|---|---|
+| Full fine-tuning versus LoRA on the same downstream task | Done ([results](#fine-tuning-results-full-vs-lora)) |
+| RL with versus without the KL penalty | Done on `s-50m` ([results](#kl-ablation-s-50m)) |
+| Does a working MoE load-balancing loss change pretraining quality? (The original's balance loss had no gradient; see below.) | Not run: the fix is in, the ablation is deferred |
+| Byte-level versus BPE tokenization at equal compute | Not run, deferred |
+| RLOO versus GRPO versus DPO under a matched rollout budget | Not run: only RLOO was trained, deferred |
 
 ## The ladder
 
 All rungs keep the original rhythm: three linear-attention blocks then one sparse-attention block, 8 routed experts with top-2 routing plus one shared expert, and four residual streams. Only width, depth, vocabulary, and context change.
 
-| Rung | Width × layers | Heads | Total params | Active params/token | Tokenizer | Context |
-|---|---:|---:|---:|---:|---|---:|
-| `baseline-25m` | 192 × 12 | 6 | 25,730,592 | 9,805,344 | bytes (260) | 192 |
-| `s-50m` | 384 × 12 | 6 | 53,229,024 | 26,686,944 | BPE (16,384) | 1024 |
-| `m-100m` | 512 × 16 | 8 | 96,027,264 | 48,841,344 | BPE (16,384) | 1024 |
-| `l-200m` | 640 × 18 | 10 | 199,345,424 | 93,177,104 | BPE (16,384) | 1024 |
+| Rung | Width × layers | Heads | Total params | Active params/token | Tokenizer | Context | Status |
+|---|---:|---:|---:|---:|---|---:|---|
+| `baseline-25m` | 192 × 12 | 6 | 25,730,592 | 9,805,344 | bytes (260) | 192 | deferred |
+| `s-50m` | 384 × 12 | 6 | 53,229,024 | 26,686,944 | BPE (16,384) | 1024 | **all phases done** |
+| `m-100m` | 512 × 16 | 8 | 96,027,264 | 48,841,344 | BPE (16,384) | 1024 | **all phases done** |
+| `l-200m` | 640 × 18 | 10 | 199,345,424 | 93,177,104 | BPE (16,384) | 1024 | deferred |
 
 Parameter counts come from the closed-form formula in [`glm_ladder/config.py`](glm_ladder/config.py) and are checked against the PyTorch modules by the test suite. The baseline row is identical to the original repository.
 
@@ -203,7 +208,7 @@ The pretraining validation sets were evaluated again after SFT (nats per token, 
 
 ### Code evaluation
 
-To measure coding ability directly, 40 small Python tasks with unit tests ([`evals/code_tasks.jsonl`](evals/code_tasks.jsonl), e.g. `is_even`, `reverse_words`, `running_sum`) were written for this project. A test of the task set checks that every reference solution passes and that `return None` fails every task. Each generated function runs in a subprocess with a timeout, after a deny-list check (no `os`, `sys`, `subprocess`, `open(`, `eval(`, ...). This is a basic guard, not a sandbox; RL at scale will run generated code in a container.
+To measure coding ability directly, 40 small Python tasks with unit tests ([`evals/code_tasks.jsonl`](evals/code_tasks.jsonl), e.g. `is_even`, `reverse_words`, `running_sum`) were written for this project. A test of the task set checks that every reference solution passes and that `return None` fails every task. Each generated function runs in a subprocess with a timeout, after a deny-list check (no `os`, `sys`, `subprocess`, `open(`, `eval(`, ...). This is a basic guard, not a sandbox; for RL it was hardened with resource limits and an unprivileged user (see [Running generated code](#running-generated-code)).
 
 The same tasks are asked in two ways:
 
@@ -421,7 +426,7 @@ Measured on 20 ordinary requests per language: the probability that the first an
 | `s-50m` SFT → joint | 0.029 → 0.065 | 0 → 1 of 20 | 0.013 → 0.004 | 0 → 0 |
 | `m-100m` SFT → joint | 0.035 → 0.089 | 0 → 1 of 20 | 0.037 → 0.038 | 0 → 0 |
 
-The leak is real but small and only in Turkish, which fits the explanation: English has about nine times more replay. The models were accepted as the RL starting point; the measurement will be repeated after RL. More Turkish replay would be the fix.
+The leak is real but small and only in Turkish, which fits the explanation: English has about nine times more replay. The models were accepted as the RL starting point; the measurement was repeated after RL ([results](#what-rl-cost-interference)). More Turkish replay would be the fix.
 
 Other samples (greedy, [`artifacts/finetune-mix/summary.json`](artifacts/finetune-mix/summary.json)): both models still answer English chat requests in the SFT style, rate the two example reviews correctly (5 and 1), and `m-100m` still writes a correct `is_even`.
 
@@ -456,9 +461,175 @@ The two RL starting models, evaluated with the final decoding (40 tasks, chat pr
 | `mix-s50m-lr1e-04` | 0.375 | 0.130 | 0.393 | 0.525 | 0.491 |
 | `mix-m100m-lr1e-04` | 0.450 | 0.253 | 0.544 | 0.700 | 0.379 |
 
-**How noisy is this?** The same `m-100m` model scored pass@10 = 0.550 with CPU sampling and 0.700 with GPU sampling: only the random numbers changed. With 10 samples per task, a task whose solution appears 1 time in 10 passes or fails by chance, and each task moves pass@10 by 0.025. An RL gain of this size could not be told apart from luck, so the RL evaluation will draw many more samples per task and use more tasks.
+**How noisy is this?** The same `m-100m` model scored pass@10 = 0.550 with CPU sampling and 0.700 with GPU sampling: only the random numbers changed. With 10 samples per task, a task whose solution appears 1 time in 10 passes or fails by chance, and each task moves pass@10 by 0.025. An RL gain of this size could not be told apart from luck, so the RL evaluation draws 64 samples per task on 229 tasks and compares models task by task.
 
 Receipts: [`artifacts/evals/generation-speed*.json`](artifacts/evals/), [`code-mix-*-chat.json`](artifacts/evals/). Reproduce: [`notebooks/07_generation.ipynb`](notebooks/07_generation.ipynb).
+
+## Reinforcement learning on code
+
+The last phase trains each joint model on its own answers to coding tasks, rewarded only by whether the code passes the tests. Three runs: one per size with a KL penalty (the final models) and `s-50m` without it (the ablation).
+
+### Training tasks
+
+The 40 hand-written tasks are too few to train on and must stay untouched for evaluation, so tasks are generated ([`glm_ladder/task_gen.py`](glm_ladder/task_gen.py), [`evals/rl_tasks/`](evals/rl_tasks/)). A *family* is one kind of function ("count the numbers greater than k") and a *variant* fixes its parameter (k = 3). Tests are random inputs run through the reference solution, so the expected outputs are always right, and a task is kept only if its tests reject `return None` and constant answers.
+
+| Split | Tasks | What it measures |
+|---|---:|---|
+| `train` | 301 | 24 families (arithmetic, comparisons, list filters and maps, string edits) |
+| `test_id` | 82 | **new variants of the trained families** (a quarter of each family's variants, held out) |
+| `test_ood` | 107 | **9 families never trained on** (e.g. `last_word`, `adjacent_differences`, `round_down_to_multiple`) |
+| hand-written | 40 | the tasks from Phase 3: **near transfer**, written separately, with some close relatives in `train` (a fixed-range `clamp` vs `clamp(x, low, high)`) |
+
+Every generated reference solution is a single `return` line. This turned out to matter (see [below](#what-rl-did-to-the-hand-written-tasks)).
+
+**Difficulty filter.** RLOO learns only from a task whose answers differ: if all of them fail, or all pass, every advantage is zero. Each starting model wrote 32 answers to every training task, and the tasks it solved at least once but not always form its training set. A first filter with 8 answers kept only 19 tasks for `s-50m`, which 300 steps of 32 tasks would have repeated ~500 times each.
+
+| Training tasks solved by the starting model | `s-50m` | `m-100m` |
+|---|---:|---:|
+| Never in 32 answers | 235 | 116 |
+| Always | 0 | 0 |
+| **Sometimes (the training set)** | **66** | **185** |
+
+The larger model can learn from 2.8× more of the same 301 tasks. That is part of the scale effect below: RL can only sharpen what the model already does sometimes.
+
+### Recipe
+
+| Setting | Value |
+|---|---|
+| Algorithm | RLOO: 16 answers per task, each answer's advantage is its reward minus the mean reward of the other 15 |
+| Reward | 1 if the code block passes every test, else 0 |
+| Update | on-policy: one AdamW step per batch of fresh answers, so no importance ratio or clipping; loss averaged over answer tokens |
+| KL penalty | 0.02 × k3 estimate of KL(model ‖ starting model), per answer token; 0 for the ablation |
+| Batch | 16 tasks × 16 answers = 256 answers per step, 200 steps, at most 192 new tokens |
+| Sampling | temperature 1.0, no top-k (the distribution the policy gradient assumes) |
+| Learning rate | 5e-6, 10 warmup steps, MoE balance loss 0.01, gradient clip 1.0 |
+| Time per step (A100) | ~6 s (`s-50m`), ~8 s (`m-100m`): generation 1.6–2.4 s, tests ~1.8 s, update 2.1–3.8 s |
+
+The learning rate is from a 20-step trial on `s-50m`: training reward rose from 0.03 to 0.20 with KL 0.02 and steady gradient norms, so it was kept. The trial also showed that in its first steps only 12–28% of the tasks in a step gave any signal (answers that differ), which led to the larger filter and to 16 answers per task instead of 8; in the final runs, 55–100% of the tasks in a step had signal after the first few steps.
+
+Training reward (mean over the 256 answers of a step) went from 0.02 to ~0.75 for `s-50m` and from 0.09 to ~0.85 for `m-100m`; the KL to the starting model leveled off at ~0.06 per token after ~60 steps in both runs.
+
+### Evaluation
+
+Every model is measured the same way before and after ([`notebooks/08_rl.ipynb`](notebooks/08_rl.ipynb), section 7): 64 samples per task at temperature 1.0 plus one greedy answer, on 229 tasks. pass@1 is the mean per-task pass rate over the 64 samples. Before/after differences are **paired by task**, with a bootstrap 95% interval over tasks; an interval that excludes 0 is a change the sampling noise cannot explain. The same measurement also covers review rating (both test sets), SFT validation loss, code reference loss, the Turkish format leak, and chat samples.
+
+### Results
+
+| pass@1 (64 samples), before → after | `s-50m` | `m-100m` |
+|---|---:|---:|
+| `test_id` (trained families, new variants) | 0.009 → **0.402** | 0.067 → **0.712** |
+| paired difference [95% interval] | +0.393 [+0.317, +0.468] | **+0.646** [+0.582, +0.705] |
+| `test_ood` (families never trained on) | 0.001 → 0.010 | 0.007 → **0.082** |
+| paired difference | +0.009 [+0.006, +0.013] | **+0.075** [+0.044, +0.110] |
+| hand-written (near transfer) | 0.048 → 0.109 | 0.122 → 0.193 |
+| paired difference | +0.062 [+0.025, +0.107] | +0.070 [+0.014, +0.133] |
+
+| Other metrics, before → after | `s-50m` | `m-100m` |
+|---|---:|---:|
+| `test_id` pass@64 / greedy | 0.390 → 0.756 / 0.098 → 0.659 | 0.659 → 0.915 / 0.427 → 0.890 |
+| `test_ood` pass@64 / greedy | 0.056 → 0.280 / 0.000 → 0.000 | 0.280 → 0.383 / 0.075 → 0.150 |
+| hand-written pass@64 / greedy | 0.500 → 0.600 / 0.400 → **0.175** | 0.850 → 0.725 / 0.450 → **0.275** |
+
+What the numbers show:
+
+- **RL works at both sizes, and the gain grows with scale.** On new variants of the trained families, the paired gain is 1.6× larger at `m-100m`; on families never trained on, it is **8× larger** (+0.075 vs +0.009). `s-50m` learns the trained kinds of task and almost nothing beyond them; `m-100m` carries some of it to new kinds. For the research question: from 50M to 100M, RL gains grow, and transfer to untrained task families grows more.
+- **RL mostly makes rare solutions likely.** pass@1 grew 45× (`s-50m`) and 11× (`m-100m`) on `test_id`, pass@64 only 1.9× and 1.4×: most of the gain is on tasks the model could already solve once in 64 tries, now solved most of the time. The larger model starts with more of those (185 vs 66 training tasks in the filter).
+- **Greedy got worse on the hand-written tasks** at both sizes, while sampled pass@1 improved; and `m-100m`'s hand-written pass@64 fell from 0.850 to 0.725. The next section explains why.
+
+### What RL did to the hand-written tasks
+
+The 40 greedy answers of `m-100m` before and after RL were compared task by task (`scripts/run_code_eval.py --run rl-m100m-001 --mode chat --verbose`): 10 tasks pass both times, 1 is gained (`max_of_two`), 8 are lost, 21 fail both times.
+
+**After RL, all 40 greedy answers are a single `return` line.** None has a loop, an `if`, a helper variable, or an `import`. Every training reference was a single line, so the reward only ever reinforced that shape, and the model's most likely answer became one line even where one line cannot work:
+
+| Task | Before RL (passes) | After RL (fails) |
+|---|---|---|
+| `factorial` | base case, then `n * factorial(n - 1)` | `return n * factorial(n)` |
+| `is_prime` | loop up to √n | `return n % 2 == 0` |
+| `index_of` | `enumerate` loop, `-1` if absent | `return items[value]` |
+| `gcd` | `import math`, `math.gcd(a, b)` | `return gcd(a, b)` |
+
+8 of the 40 hand-written reference solutions need more than one line. Before RL, `m-100m` passed 5 of them greedily; after RL, none. On the 32 one-line tasks it went from 13 to 11. Sampled pass@1 still rose, because RL made correct one-line answers much more likely on the many tasks where one line is enough. Function names were not the problem: every greedy answer used the requested name. This was checked only for `m-100m`; `s-50m` shows the same greedy drop and was not analysed.
+
+The lesson is about the task distribution, not the algorithm: an executable reward teaches exactly the shape of solution that the training tasks admit. Families whose solutions need control flow (loops, early returns, accumulators) are the obvious next step.
+
+### KL ablation (`s-50m`)
+
+| `s-50m` after RL | KL 0.02 | no KL |
+|---|---:|---:|
+| `test_id` pass@1 | 0.402 | **0.488** |
+| paired gain vs start [95% interval] | +0.393 [+0.317, +0.468] | +0.479 [+0.393, +0.562] |
+| `test_ood` pass@1 / pass@64 | **0.010 / 0.280** | 0.006 / 0.196 |
+| hand-written pass@1 | **0.109** | 0.097 |
+| SFT val loss, English (start 1.949) | **1.956** (+0.4%) | 1.993 (+2.3%) |
+| Code reference loss (start 0.491) | **0.443** | 0.591 (worse than start) |
+| Answer length, last 50 steps (tokens) | ~95–135 | ~185–190 (limit 192) |
+
+**Without the KL penalty the model gains more on the trained kinds of task and loses elsewhere:** less transfer to new families, more forgetting, a worse loss on the reference solutions, and answers that grow until they hit the length limit. The KL penalty trades some in-distribution gain for generality. One run per setting; the ablation was not repeated with other seeds.
+
+The length growth was not explained further. One possibility: the loss averages over answer tokens in the batch, so a long answer with a positive advantage gets more total weight than a short one, and nothing but the KL term pushes back.
+
+### What RL cost: interference
+
+| Before → after RL (KL runs) | `s-50m` | `m-100m` |
+|---|---:|---:|
+| Review rating, test macro-F1 Turkish | 0.561 → 0.550 | 0.582 → 0.572 |
+| Review rating, test macro-F1 English | 0.584 → 0.580 | 0.611 → 0.610 |
+| SFT val loss English / Turkish | 1.949 → 1.956 / 2.709 → 2.712 | 1.692 → 1.699 / 2.404 → 2.411 |
+| Code reference loss | 0.491 → 0.443 | 0.379 → 0.353 |
+| Turkish format leak (digit probability on 20 ordinary requests) | 0.065 → 0.139 | 0.089 → 0.065 |
+
+- **Interference is small.** Review rating drops by at most 0.011 macro-F1 and the SFT losses rise by at most 0.4%; the code reference loss even improves.
+- **The Turkish leak doubled at `s-50m`** (mean 0.065 → 0.139) and fell at `m-100m`. 20 prompts are few, and the change is not explained.
+- **Chat got no better and in places worse.** Samples (greedy, in the receipts) are repetitive at both sizes; asked `Sağlıklı beslenme için üç öneri ver.`, `m-100m` repeated the question and `s-50m` repeated `Sağlıklı beslenme` until the limit. Chat was not rewarded and was measured only by losses and four samples.
+
+### Running generated code
+
+Each RL run executes ~51,000 model-written programs (200 steps × 256 answers), and each evaluation another ~15,000. Every one of them:
+
+- is checked against a deny-list (no `os`, `sys`, `subprocess`, `open(`, `eval(`, `importlib`, `ctypes`, `threading`, `multiprocessing`, `signal`, network modules, `pickle`, `/proc/`, ...);
+- runs in its own subprocess, in an empty temporary directory, with an empty environment except `PATH`, and a 2 s timeout;
+- has resource limits set before it runs: 1 GB address space, CPU time, 1 MB per written file;
+- runs as the unprivileged user `nobody` when the runtime is root (as on Colab), so it cannot change the runtime's files or reach the notebook process that holds the Hugging Face token. A test checks the privilege drop when run as root.
+
+This is defense in depth for small functions written by our own models, not a sandbox against a deliberate attacker; a container or gVisor would be the next step.
+
+### Losing a session, and resumability
+
+The first RL session died during the third run, after the two final models had been trained and measured. Nothing was saved: the notebook kept everything in memory until the end, so all of it had to be recomputed. RL was then made resumable like pretraining:
+
+- every 25 steps the full state (weights, AdamW moments, RNG states, history, task order) is pushed to the runs repo; a re-run continues from the last checkpoint, at most 25 steps lost;
+- every result (baselines, filtered training sets, final measurements, comparison) is uploaded as a receipt the moment it exists; a re-run downloads it instead of recomputing;
+- the reference model for the KL penalty is always reloaded from the starting checkpoint, never from the resumed one.
+
+A test checks that a run interrupted and resumed ends with exactly the weights of an uninterrupted run. The rerun repeated the lost session's training logs exactly (reward, KL, and length at every logged step); its evaluation numbers matched too, except hand-written pass@64 of `m-100m`, which differed by one task.
+
+Reproduce: [`notebooks/08_rl.ipynb`](notebooks/08_rl.ipynb) (about 2 hours on an A100, resumable). Tasks: `python scripts/make_rl_tasks.py`. Receipts: [`artifacts/rl/`](artifacts/rl/) (measurements before and after, training sets, paired comparison). Weights: `runs/rl-s50m-001`, `runs/rl-m100m-001`, `runs/rl-s50m-nokl-001` in the runs repo.
+
+## Final models
+
+The project's output: one model per size, each through every phase. Each row is measured on that phase's model.
+
+| Phase | Measurement | `rl-s50m-001` | `rl-m100m-001` |
+|---|---|---:|---:|
+| Pretraining (`s50m-001`, `m100m-001`) | Validation loss, mixed (nats/token) | 2.948 | 2.636 |
+| SFT (`sft-*-001`) | 40 coding tasks, chat: greedy / pass@10 | 37.5% / 50.0% | 47.5% / 65.0% |
+| Joint fine-tuning (`mix-*-lr1e-04`) | Review rating test macro-F1, Turkish / English | 0.561 / 0.584 | 0.582 / 0.611 |
+| RL (`rl-*-001`) | `test_id` / `test_ood` pass@1 | 0.402 / 0.010 | 0.712 / 0.082 |
+| RL | Hand-written tasks: pass@1 / greedy | 0.109 / 0.175 | 0.193 / 0.275 |
+| **Final model** | Review rating test macro-F1, Turkish / English | 0.550 / 0.580 | 0.572 / 0.610 |
+| **Final model** | SFT val loss, English / Turkish | 1.956 / 2.712 | 1.699 / 2.411 |
+
+What each model can do, and what it cannot:
+
+- It writes short Python functions in the chat format, and is reliable on one-line functions of the kinds it was trained on (`m-100m`: 89% greedy on new variants).
+- It rates English and Turkish reviews from 1 to 5 stars about as well as a single-task fine-tuned model.
+- It answers chat requests in the right format, but its content is unreliable and repetitive, and its Turkish chat is weak.
+- It does not write multi-line algorithms reliably; RL made this worse under greedy decoding.
+
+The weights stay in the private runs repository. Every model can be rebuilt from this repository: the notebooks in order, with the configs and seeds in the receipts.
+
+Talk to a final model on CPU: `python scripts/talk.py --run rl-m100m-001`.
 
 ## Plan
 
@@ -466,17 +637,34 @@ Receipts: [`artifacts/evals/generation-speed*.json`](artifacts/evals/), [`code-m
 |---|---|---|---|
 | 0. Infrastructure | Rewritten model, parity tests, throughput benchmark | Tests pass on Colab; measured tokens/s for every rung | Done |
 | 1. Data | BPE tokenizer, mixed English + Python + Turkish corpus, sharded and hashed | Deterministic, resumable data stream | Done |
-| 2. Pretraining | S → M; baseline reproduction and L deferred | Loss curves, held-out loss, receipts | Done for S and M |
+| 2. Pretraining | S → M; baseline reproduction and L deferred | Loss curves, held-out loss, receipts | Done for S and M; `baseline-25m` and `l-200m` deferred |
 | 3. Post-training | Supervised fine-tuning on chat data | Eval before vs after | Done for S and M: forgetting, executable code eval, chat samples |
 | 4. Fine-tuning | Full fine-tuning vs LoRA on review rating (1-5 stars) in Turkish and English | Matched-data comparison on held-out test sets | Done for S and M: LR sweep, ranks, test, forgetting; joint model per size for RL |
-| 5. Reinforcement learning | Reproduce RLOO, then GRPO, DPO, reward and KL ablations at every rung | Locked confirmation-set results with paired statistics | |
-| 6. Report | Scaling analysis, negative results, limitations | `REPORT.md` | |
+| 5. Reinforcement learning | RLOO with executable rewards on generated tasks; KL ablation | Held-out results with paired statistics | Done for S and M: three runs, paired bootstrap on 229 tasks, interference; GRPO, DPO, and reward ablations deferred |
+| 6. Report | Scaling analysis, negative results, limitations | This README ([RL](#reinforcement-learning-on-code), [final models](#final-models), [limitations](#limitations-and-deferred-work)) | Done |
 
-The evaluation protocol follows the original repository: decisions are made on a dev split, a separate confirmation split is opened once, and every comparison reports paired exact tests or bootstrap intervals. Negative results are reported.
+The evaluation protocol follows the original repository: decisions are made on a dev split, a separate confirmation split is opened once, and every comparison reports paired exact tests or bootstrap intervals. Negative results are reported. In RL, the only choices made from results (learning rate, filter size, answers per task) used the training tasks; the test splits were measured once before and once after.
+
+## Limitations and deferred work
+
+**Deferred, not dropped.** These can be done later if compute allows; the code, configs, and notebooks already support them:
+
+- `l-200m`: every phase at 200M parameters (pretraining alone is ~118 units at 20 tokens per parameter, ~59 at 10), which would give the research question a third point.
+- `baseline-25m`: reproducing the original model and its RL result with this pipeline, the fourth point.
+- The planned ablations: balance loss on/off in pretraining, byte vs BPE tokenizer, GRPO and DPO against RLOO, reward shaping.
+
+**Limitations of what was done:**
+
+- **Two sizes, one seed each.** A scaling trend from two points is a direction, not a law, and no result was repeated with another seed.
+- **RL tasks are narrow.** Every generated reference solution is one line, and RL taught that style; tasks that need control flow got worse under greedy decoding ([details](#what-rl-did-to-the-hand-written-tasks)).
+- **Joint fine-tuning underweights Turkish reviews** (window mean, not review mean), and a small Turkish format leak remains.
+- **Chat quality is low** at both sizes and was measured only by losses and a few samples.
+- **Running generated code** relies on a deny-list, resource limits, and an unprivileged user, not a real sandbox.
+- **Compute was measured in session hours**, so unit counts are estimates.
 
 ## Compute and storage
 
-- **Compute:** Google Colab Pro (L4 and A100), 300 compute units in total. Pretraining both rungs took about 7 hours of training on an A100, roughly 45–50 units including setup, evaluation, and checkpoint uploads (estimate from session hours). After SFT and the GPU code evaluation, about 95 of the 300 units had been used (Colab balance); the fine-tuning study added roughly 25–30, the joint fine-tuning about 6, and the generation work about 6 (estimates from session hours).
+- **Compute:** Google Colab Pro (L4 and A100), 300 compute units in total. Pretraining both rungs took about 7 hours of training on an A100, roughly 45–50 units including setup, evaluation, and checkpoint uploads (estimate from session hours). After SFT and the GPU code evaluation, about 95 of the 300 units had been used (Colab balance); the fine-tuning study added roughly 25–30, the joint fine-tuning about 6, the generation work about 6, and RL about 25 including the lost session (estimates from session hours). In total about 160 of the 300 units (estimate), with pretraining about 30% of it.
 - **Resumable training:** Colab sessions can end at any time. Training state (weights, AdamW moments, RNG, step, data position) is pushed to the Hub every 15–25 minutes, and re-running the notebook resumes from the latest checkpoint with the same data order. The two most recent resume checkpoints and the final weights are kept.
 - **Code and receipts:** this GitHub repository.
 - **Checkpoints and tokenized data:** a Hugging Face Hub repository (too large for GitHub), saved as `safetensors` with SHA-256 hashes recorded in receipts here.
@@ -495,6 +683,7 @@ Notebooks are run from VS Code on a Colab GPU runtime through the Google Colab e
 | [`05_finetune`](notebooks/05_finetune.ipynb) | A100 | Full fine-tuning vs LoRA on review rating: baselines, LR sweep, ranks, English, test |
 | [`06_finetune_mix`](notebooks/06_finetune_mix.ipynb) | A100 | Joint fine-tuning (both languages + SFT replay): the RL starting models |
 | [`07_generation`](notebooks/07_generation.ipynb) | A100 | Generation speed (uncached, cached, CUDA graph) and the coding baseline of the RL starting models |
+| [`08_rl`](notebooks/08_rl.ipynb) | A100 | RL on code: baselines, difficulty filter, three runs, before vs after (resumable) |
 
 In VS Code: open a notebook, *Select Kernel → Colab → New Colab Server*, pick the runtime, run all cells. The Hugging Face token is typed into a hidden prompt and never stored.
 
@@ -519,6 +708,11 @@ python scripts/fetch_evals.py
 python scripts/prepare_finetune.py
 python scripts/fetch_evals.py --pattern "finetune/*.json" --to artifacts/finetune
 python scripts/fetch_evals.py --pattern "finetune-mix/*.json" --to artifacts/finetune-mix
+
+# Generate the RL tasks; fetch the RL receipts after notebook 08; talk to a final model
+python scripts/make_rl_tasks.py
+python scripts/fetch_evals.py --pattern "rl/*.json" --to artifacts/rl
+python scripts/talk.py --run rl-m100m-001
 ```
 
 ## Repository map
@@ -540,11 +734,14 @@ python scripts/fetch_evals.py --pattern "finetune-mix/*.json" --to artifacts/fin
 - [`glm_ladder/lora.py`](glm_ladder/lora.py): LoRA layers, applying adapters by layer type, merging them into the weights.
 - [`glm_ladder/graph_decode.py`](glm_ladder/graph_decode.py): decoding from a CUDA graph with a static cache.
 - [`glm_ladder/classify.py`](glm_ladder/classify.py): review-rating prompts, scoring by label-token probability, accuracy / macro-F1 / MAE.
+- [`glm_ladder/task_gen.py`](glm_ladder/task_gen.py): generated coding tasks (families, variants, tests from the reference), train / `test_id` / `test_ood` splits.
+- [`glm_ladder/rl.py`](glm_ladder/rl.py): RLOO advantages, policy loss with the k3 KL penalty, rewards, batched rollouts, paired bootstrap, the resumable trainer.
 - [`evals/code_tasks.jsonl`](evals/code_tasks.jsonl): the 40 coding tasks with reference solutions and tests.
-- [`tests/`](tests/): parity with the original model, kernel equivalence, causality, balance-loss gradient, loader determinism, bit-exact resume of the full training loop, chat masks and packing, the code-eval task set, LoRA (formula, gradients, merge, resume), padding-invariant scoring, per-window loss, cached and static-cache decoding against the full forward, dense vs sparse MoE, CUDA-graph replay (GPU only).
+- [`evals/rl_tasks/`](evals/rl_tasks/): the 490 generated tasks and their manifest.
+- [`tests/`](tests/): parity with the original model, kernel equivalence, causality, balance-loss gradient, loader determinism, bit-exact resume of the full training loop, chat masks and packing, the code-eval task set, LoRA (formula, gradients, merge, resume), padding-invariant scoring, per-window loss, cached and static-cache decoding against the full forward, dense vs sparse MoE, CUDA-graph replay and batches of different prompts, generated tasks and the privilege drop, RLOO (a toy reward is learned, exact resume, checkpoint cadence).
 - [`tests/reference/original_model.py`](tests/reference/original_model.py): copy of the original model, used only by tests.
-- [`scripts/`](scripts/): tokenizer training, benchmark, sampling, receipts, plots, SFT and fine-tuning data preparation, chat, code evaluation.
-- [`artifacts/`](artifacts/): receipts, code-eval and fine-tuning results, samples, plots.
+- [`scripts/`](scripts/): tokenizer training, benchmark, sampling, receipts, plots, SFT and fine-tuning data preparation, RL task generation, chat, code evaluation.
+- [`artifacts/`](artifacts/): receipts, code-eval, fine-tuning, and RL results, samples, plots.
 - [`PLAN.md`](PLAN.md): decision log and compute budget.
 
 ## Sources
@@ -557,6 +754,9 @@ python scripts/fetch_evals.py --pattern "finetune-mix/*.json" --to artifacts/fin
 - [InstrucTurca](https://huggingface.co/datasets/turkish-nlp-suite/InstrucTurca), Turkish SFT data
 - [Evaluating Large Language Models Trained on Code (Chen et al., 2021)](https://arxiv.org/abs/2107.03374), unbiased pass@k
 - [LoRA (Hu et al., 2021)](https://arxiv.org/abs/2106.09685)
+- [Buy 4 REINFORCE Samples, Get a Baseline for Free! (Kool et al., 2019)](https://openreview.net/forum?id=r1lgTGL5DE), the leave-one-out baseline
+- [Back to Basics: Revisiting REINFORCE Style Optimization for Learning from Human Feedback in LLMs (Ahmadian et al., 2024)](https://arxiv.org/abs/2402.14740), RLOO for language models
+- [Approximating KL Divergence (Schulman, 2020)](http://joschu.net/blog/kl-approx.html), the k3 estimator
 - [SentiTurca / TrGLUE (Altinok, 2025)](https://huggingface.co/datasets/turkish-nlp-suite/SentiTurca), Turkish review data
 - [Character-level Convolutional Networks for Text Classification (Zhang et al., 2015)](https://arxiv.org/abs/1509.01626), Yelp Review Full
 

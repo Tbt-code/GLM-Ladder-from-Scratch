@@ -35,7 +35,7 @@ Decisions are recorded with their reasons so the final report can explain why th
 | 2026-10-16 | SFT reuses the pretraining loop (`init_from`, fresh AdamW) and evaluates the pretraining validation sets too | One tested, resumable loop; the extra validation measures forgetting |
 | 2026-10-17 | SFT recipe: LR 1e-4, 50 warmup steps, 128 × 1024-token batches, one epoch, not tuned | Common fine-tuning defaults; a sweep is an ablation candidate |
 | 2026-10-17 | Executable code eval: 40 own tasks with unit tests, completion and chat prompts, greedy + 10 samples, reference-solution loss | pass@k is near zero for base models; the reference loss still separates them |
-| 2026-10-17 | Generated code runs behind a deny-list, in a subprocess, in a temp dir, with a timeout | Enough for 40 short functions from our own models; not a sandbox, so RL at scale moves to a container |
+| 2026-10-17 | Generated code runs behind a deny-list, in a subprocess, in a temp dir, with a timeout | Enough for 40 short functions from our own models; not a sandbox. For RL it was hardened with resource limits and an unprivileged user instead of a container (see 2026-10-27) |
 | 2026-10-17 | Scripts get names that no library module has (`talk.py`, `run_code_eval.py`) | Same-named files let the editor rewrite imports and overwrite library code twice |
 | 2026-10-18 | No replay of pretraining data in SFT | Python validation loss rose ~30%, but the reference loss on the coding tasks fell on 33/40 (`s-50m`) and 37/40 (`m-100m`) tasks: the rise is a distribution shift, not lost coding ability |
 | 2026-10-18 | Code eval on an A100, not an L4 | Without a KV cache, generation is launch-bound; one evaluation took ~10 min on an A100 and was too slow on an L4 |
@@ -49,6 +49,7 @@ Decisions are recorded with their reasons so the final report can explain why th
 | 2026-10-18 | LR grids extended by one value (full 3e-4, LoRA 3e-3) before opening the test sets | All four best LRs were at the top edge of the first grid; with the extension the LoRA gap at `m-100m` shrank from 0.051 to 0.012 (val), so the first grid would have overstated full fine-tuning's advantage. Three choices are still at the new edge; not extended further |
 | 2026-10-18 | Phase 4 comparison complete; test sets opened once for 8 selected runs plus baselines | Results in README; receipts in `artifacts/finetune/` |
 | 2026-10-18 | Rule for any later fine-tuning that must keep earlier skills: select on task score **and** forgetting (SFT val loss, code reference loss), prefer the lower LR when scores are close, and mix in replay of earlier data | Selecting on F1 alone picked the LRs that erased coding ability (code reference loss 0.36 -> 7-9 nats) for gains of <0.01 F1 |
+| 2026-10-18 | Final deliverable: exactly two models, `s-50m` and `m-100m`, each through pretraining → SFT → joint fine-tuning → RL | Owner decision; the full pipeline on two sizes answers more than pretraining alone on four |
 | 2026-10-21 | Joint fine-tuning per size before RL: Turkish + English reviews + SFT replay (1/3 of windows), full fine-tuning, LR 3e-5 or 1e-4 | One model must rate reviews in both languages and keep chat and code; notebook 05 showed full fine-tuning dominates LoRA at matched forgetting and that single-task fine-tuning erases earlier skills |
 | 2026-10-21 | Loss averaged per window for the mix (`loss_per_window`) | A chat window has ~600 learned tokens, a review window 10-30; with the token mean the replay would be ~95% of the loss |
 | 2026-10-21 | Selection for the joint model: best mean val macro-F1 among runs with SFT val loss <= +10% (each language) and code reference loss <= +25%; else the least-forgetting run | The rule from Phase 4, made concrete before the runs |
@@ -59,7 +60,21 @@ Decisions are recorded with their reasons so the final report can explain why th
 | 2026-10-24 | CUDA-graph decoding with a static cache and in-place updates | ~1,600 eager operations per step cost ~40 ms of CPU launch time; 7.7x at n = 1 |
 | 2026-10-25 | Sample on the GPU, copy only token ids | CPU sampling of [n, 16,384] logits capped throughput at ~1,750 tok/s; now 32k tok/s (`s-50m`) and 21k (`m-100m`) at n = 256 |
 | 2026-10-25 | RL evaluation needs many more samples per task (and more tasks) | Same model, different random numbers: pass@10 0.550 vs 0.700 with 10 samples on 40 tasks |
-| open | RL design: training tasks, algorithm, reward, evaluation, budget | To be agreed before writing code |
+| 2026-10-25 | RL algorithm: RLOO (leave-one-out baseline), on-policy with one update per rollout batch, KL penalty (k3 estimator) to the starting model | Simplest policy gradient with a good baseline; on-policy needs no importance ratio or clipping; the KL term limits forgetting |
+| 2026-10-25 | Reward: 1 if all tests pass, else 0 | Executable and unambiguous; no partial credit to game |
+| 2026-10-25 | Training tasks generated from families with tests computed by the reference; splits `train` / `test_id` (new variants) / `test_ood` (9 held-out families); the 40 hand-written tasks only for evaluation, reported as near transfer | 40 tasks are too few to train on; two held-out splits separate "new parameters" from "new kinds of task" |
+| 2026-10-25 | Evaluate with 64 samples per task at temperature 1.0 plus greedy, before/after paired by task with a bootstrap 95% interval | With 10 samples on 40 tasks, pass@10 of the same model moved by 0.15 between two sampling runs |
+| 2026-10-25 | Ablation: `s-50m` without the KL penalty | The cheapest ablation that tests a design choice of the final runs |
+| 2026-10-26 | Batched decoding of different prompts (padded prefill with a validity mask, a position per row) before RL | One rollout batch holds 16 different prompts |
+| 2026-10-26 | Difficulty filter with 32 answers per training task instead of 8; keep tasks solved sometimes | With 8, only 19 of 301 tasks remained for `s-50m` (300 steps would repeat each ~500 times); with 32, 66 (`s-50m`) and 185 (`m-100m`) |
+| 2026-10-26 | 16 tasks × 16 answers per step instead of 32 × 8; 200 steps; test timeout 2 s instead of 5 s | In the 20-step trial only 12–28% of tasks gave signal at first; 16 answers make a rare success likelier. Endless loops made some steps 4 s longer. 200 steps fit the three runs into ~80 minutes |
+| 2026-10-26 | LR 5e-6 | 20-step trial on `s-50m`: reward 0.03 → 0.20, KL 0.02, steady gradient norms |
+| 2026-10-27 | RL made resumable: full state pushed every 25 steps, every result uploaded as a receipt at once, finished work downloaded on re-run | The first RL session died and every result was lost: nothing had been saved before the end. Not checkpointing a multi-hour Colab job was a mistake |
+| 2026-10-27 | Generated programs run with resource limits (1 GB memory, CPU, 1 MB files) and as `nobody` when the runtime is root | RL runs ~51,000 programs per run while the notebook holds a write token in memory |
+| 2026-10-29 | Phase 5 complete: `rl-s50m-001` and `rl-m100m-001` are the final models | Paired gains on all three evaluation sets at both sizes, interference within 0.011 macro-F1 and 0.4% SFT loss; results in README |
+| 2026-10-29 | Greedy regression on the hand-written tasks diagnosed, not fixed | After RL every greedy answer is one `return` line, like every training reference; 5 multi-line tasks were lost. Fix: task families that need control flow |
+| 2026-10-29 | Project closed for now; `l-200m`, `baseline-25m`, and the remaining ablations deferred, not dropped | Can be done later if compute allows; the code supports them |
+| 2026-10-29 | Final models stay in the private runs repository; the report is the README | Owner decision |
 
 ## Pretraining, measured (A100 40 GB, full training loop with gradient accumulation)
 
@@ -96,7 +111,7 @@ About 95 of 300 units were used through Phase 3 (Colab balance), including pretr
 |---|---:|---:|---:|---:|
 | `s-50m` | 117,117 | 1.06B | 2.5 | ~16 |
 | `m-100m` | 82,307 | 1.92B | 6.5 | ~40 |
-| `l-200m` (deferred) | 58,229 | 3.99B (or 1.99B at 10/param) | 19.0 (9.5) | ~118 (~59) |
+| `l-200m` (deferred, not dropped) | 58,229 | 3.99B (or 1.99B at 10/param) | 19.0 (9.5) | ~118 (~59) |
 
 | Item | Units |
 |---|---:|
@@ -115,6 +130,7 @@ Raw measurements: [`artifacts/receipts/`](artifacts/receipts/).
 - Re-running the notebook resumes from `latest.json`; metrics logged after that checkpoint are dropped so no step appears twice.
 - Exact resume is tested on CPU (12 steps uninterrupted vs 6 + interrupt + resume from step 4: identical weights) and was observed on the A100 (identical loss and gradient norm after resuming `s50m-001`).
 - Not done: a per-session log in the receipt.
+- RL (notebook 08) follows the same pattern since 2026-10-27: a checkpoint every 25 steps with weights, AdamW, RNG states, history, and task order; every measurement uploaded as a receipt when it is made. A CPU test checks that an interrupted and resumed run ends with the weights of an uninterrupted one.
 
 ## Security
 
@@ -122,6 +138,7 @@ Raw measurements: [`artifacts/receipts/`](artifacts/receipts/).
 - Checkpoints stored as `safetensors` (no pickle, no code execution on load).
 - SHA-256 of every checkpoint recorded in GitHub receipts and verified on load.
 - All checkpoints are reproducible from configs and seeds in this repository.
+- Model-written code (code eval and RL) runs after a deny-list check, in a subprocess in an empty temp dir, with only `PATH` in its environment, a timeout, resource limits, and as `nobody` when the runtime is root. Not a sandbox against a deliberate attacker.
 
 ## Open research questions
 
@@ -132,3 +149,6 @@ Raw measurements: [`artifacts/receipts/`](artifacts/receipts/).
   stream again, so the input is counted twice per layer (inherited from the original model,
   kept for parity). Ablation: blocks return only `delta`. Does it change loss or stability?
 - **RoPE base.** 1,000 vs 10,000 vs 100,000 at 1024-token context.
+- **RL task shape.** Do task families that need loops and conditionals remove the greedy regression on multi-line tasks?
+- **Answer length without KL.** Why did answers grow to the length limit without the KL penalty? Token-averaged loss is one candidate.
+- **The research question at 25M and 200M** (deferred rungs).
