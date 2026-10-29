@@ -97,3 +97,11 @@ def test_new_unsafe_patterns_are_rejected() -> None:
 @pytest.mark.skipif(os.name != "posix", reason="resource limits are set on Linux (Colab) only")
 def test_memory_hog_fails_under_the_limit() -> None:
     assert not run_tests("def f():\n    x = [0] * (10 ** 9)\n    return 1\n", ["assert f() == 1"])
+
+
+@pytest.mark.skipif(os.name != "posix" or not hasattr(os, "geteuid") or os.geteuid() != 0,
+                    reason="the privilege drop happens only when tests run as root (Colab)")
+def test_test_programs_run_as_nobody_and_cannot_write() -> None:
+    # The model's code may not import os (deny-list), but the tests may: check the uid there.
+    assert run_tests("def f():\n    return 1\n", ["import os", "assert os.getuid() == 65534"])
+    assert not run_tests("def f():\n    return 1\n", ["import io", "io.open('x.txt', 'w').write('a')"])

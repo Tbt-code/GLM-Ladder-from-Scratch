@@ -125,3 +125,64 @@ def test_kl_is_measured_against_a_frozen_reference() -> None:
 
     assert run(0.5)[0] and run(0.5)[1] > 0
     assert run(0.0) == (False, 0.0)
+
+
+# ----------------------------------------------------------------- resuming
+
+def toy_trainer(steps, model, reference=None, kl_coef=0.5):
+    tasks = [CodeTask(f"t{i}", "x", "", ("assert True",), "") for i in range(5)]
+    cfg = RLConfig(run_name="resume", steps=steps, prompts_per_step=4, group=4, max_new_tokens=2, lr=3e-3,
+                   warmup_steps=1, kl_coef=kl_coef, micro_batch=8, balance_coef=0.0)
+    return RLTrainer(cfg, model, tokenizer=None, tasks=tasks, device=CPU, log=lambda _: None,
+                     prompts_fn=lambda ts: [[2 + int(t.name[1:]), 9, 11] for t in ts], stop=lambda out: False,
+                     reward_fn=lambda ts, answers: [float(a[0] < 16) for a in answers], reference=reference)
+
+
+def fresh_model():
+    torch.manual_seed(0)
+    return GLMLadderModel(TINY)
+
+
+def test_state_dict_is_json_and_round_trips() -> None:
+    import json
+
+    trainer = toy_trainer(3, fresh_model())
+    trainer.run()
+    state = json.loads(json.dumps(trainer.state_dict()))            # what a checkpoint stores
+    other = toy_trainer(3, fresh_model())
+    other.load_state_dict(state)
+    assert other.history == trainer.history and other.order == trainer.order
+    assert other.rng.random() == trainer.rng.random()                 # same random stream from here on
+
+
+def test_resume_refuses_different_settings() -> None:
+    trainer = toy_trainer(3, fresh_model())
+    state = trainer.state_dict()
+    with pytest.raises(ValueError):
+        toy_trainer(4, fresh_model()).load_state_dict(state)          # steps differ
+
+
+def test_interrupted_rl_run_resumes_exactly(tmp_path) -> None:
+    import copy
+
+    start = fresh_model()
+    straight = toy_trainer(6, copy.deepcopy(start), reference=copy.deepcopy(start))
+    straight.run()
+
+    first = toy_trainer(6, copy.deepcopy(start), reference=copy.deepcopy(start))
+    for step in range(3):                                             # session dies after step 3 ...
+        first.step(step)
+    first.save(tmp_path / "step-000003")
+    resumed = toy_trainer(6, fresh_model(), reference=copy.deepcopy(start))   # ... new session, new model object
+    resumed.restore(tmp_path / "step-000003")
+    resumed.run()
+
+    assert [r["reward"] for r in resumed.history] == [r["reward"] for r in straight.history]
+    for p, q in zip(straight.model.parameters(), resumed.model.parameters()):
+        assert torch.equal(p, q)
+
+
+def test_checkpoint_callback_cadence() -> None:
+    calls = []
+    toy_trainer(7, fresh_model(), kl_coef=0.0).run(on_checkpoint=calls.append, checkpoint_every=3)
+    assert calls == [3, 6, 7]

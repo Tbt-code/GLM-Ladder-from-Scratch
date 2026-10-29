@@ -37,17 +37,25 @@ UNSAFE_PATTERNS = (
     "import resource", "from resource", "import ctypes", "from ctypes", "import importlib", "from importlib",
     "import multiprocessing", "from multiprocessing", "import threading", "from threading",
     "import signal", "from signal", "import urllib", "from urllib", "import http", "from http",
-    "import requests", "import asyncio", "from asyncio", "import pickle", "from pickle",
+    "import requests", "import asyncio", "from asyncio", "import pickle", "from pickle", "/proc/",
 )
 
 # On Linux (Colab) every test program first limits itself: 1 GB of memory, a few CPU seconds,
-# no files larger than 1 MB. The limits are set inside the child, before the model's code runs.
+# no files larger than 1 MB. Then, if it runs as root (Colab does), it becomes the unprivileged
+# user "nobody": it can no longer read the notebook's memory or files (where the Hugging Face
+# token lives during RL) or write anywhere. All of this happens before the model's code runs.
 LIMITS_PRELUDE = (
     "import resource as _r\n"
     "_r.setrlimit(_r.RLIMIT_AS, (1 << 30, 1 << 30))\n"
     "_r.setrlimit(_r.RLIMIT_CPU, ({cpu}, {cpu}))\n"
     "_r.setrlimit(_r.RLIMIT_FSIZE, (1 << 20, 1 << 20))\n"
     "del _r\n"
+    "import os as _os\n"
+    "if _os.geteuid() == 0:\n"
+    "    _os.setgroups([])\n"
+    "    _os.setgid(65534)\n"
+    "    _os.setuid(65534)\n"
+    "del _os\n"
 )
 
 
@@ -91,6 +99,7 @@ def run_tests(code: str, tests: Sequence[str], timeout: float = 5.0) -> bool:
         program = LIMITS_PRELUDE.format(cpu=int(math.ceil(timeout)) + 1) + program
         environment = {"PATH": "/usr/bin:/bin"}        # nothing from the parent's environment
     with tempfile.TemporaryDirectory() as workdir:
+        os.chmod(workdir, 0o755)                      # readable by "nobody", writable by no one else
         try:
             result = subprocess.run([sys.executable, "-I", "-c", program], cwd=workdir, capture_output=True,
                                     stdin=subprocess.DEVNULL, timeout=timeout, env=environment)

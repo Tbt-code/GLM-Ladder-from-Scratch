@@ -27,6 +27,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .chat import END_TOKEN, prompt_ids, special_id
+from .checkpoint import load_checkpoint, save_checkpoint
 from .code_eval import CodeTask, extract_from_chat, pass_at_k, run_tests_many
 from .graph_decode import GraphDecoder, generate_batch
 from .tokenizer import EOS_ID, PAD_ID
@@ -35,13 +36,14 @@ from .tokenizer import EOS_ID, PAD_ID
 @dataclass(frozen=True)
 class RLConfig:
     run_name: str
-    steps: int = 300
-    prompts_per_step: int = 32
-    group: int = 8                     # answers per task; prompts_per_step * group rows in one decode batch
+    steps: int = 200
+    prompts_per_step: int = 16
+    group: int = 16                    # answers per task; prompts_per_step * group rows in one decode batch
+                                       # (16 answers make a hard task's rare success, and so a signal, likelier)
     max_new_tokens: int = 192
     temperature: float = 1.0           # sample from the model's own distribution (no top-k): the
                                        # gradient below is for exactly that distribution
-    lr: float = 2e-6
+    lr: float = 5e-6                   # chosen with a 20-step trial run (README)
     warmup_steps: int = 10
     kl_coef: float = 0.02              # 0: no KL penalty (the ablation)
     balance_coef: float = 0.01         # MoE load-balancing loss, as in every earlier phase
@@ -117,14 +119,18 @@ def token_logprobs(model: nn.Module, inputs: torch.Tensor, targets: torch.Tensor
 # ----------------------------------------------------------------- rewards and evaluation
 
 def code_rewards(tokenizer, tasks: Sequence[CodeTask], answers: Sequence[Sequence[int]],
-                 workers: int | None = None) -> list[float]:
-    """1.0 if the answer's code passes all of its task's tests, else 0.0 (one per answer)."""
+                 workers: int | None = None, timeout: float = 2.0) -> list[float]:
+    """1.0 if the answer's code passes all of its task's tests, else 0.0 (one per answer).
+
+    timeout: these functions run in milliseconds; 2 s only cuts off endless loops, which with
+    the default 5 s made some RL steps 4 s longer.
+    """
     end_id = special_id(tokenizer, END_TOKEN)
     jobs = []
     for task, ids in zip(tasks, answers):
         text = tokenizer.decode([t for t in ids if t not in (end_id, EOS_ID)])
         jobs.append((extract_from_chat(text, task.name), task.tests))
-    return [float(ok) for ok in run_tests_many(jobs, workers=workers)]
+    return [float(ok) for ok in run_tests_many(jobs, workers=workers, timeout=timeout)]
 
 
 def chat_prompts(tokenizer, tasks: Sequence[CodeTask]) -> list[list[int]]:
@@ -192,7 +198,9 @@ class RLTrainer:
                  device: torch.device, log: Callable[[str], None] = print,
                  reward_fn: Callable[[Sequence[CodeTask], Sequence[Sequence[int]]], list[float]] | None = None,
                  prompts_fn: Callable[[Sequence[CodeTask]], list[list[int]]] | None = None,
-                 stop: Callable[[list[int]], bool] | None = None) -> None:
+                 stop: Callable[[list[int]], bool] | None = None, reference: nn.Module | None = None) -> None:
+        """reference: the frozen starting model for the KL penalty. When resuming, pass the
+        original starting model here (the model being trained has already moved)."""
         if cfg.group < 2:
             raise ValueError("RLOO needs at least two answers per task")
         self.cfg, self.model, self.tokenizer, self.tasks = cfg, model, tokenizer, list(tasks)
@@ -202,7 +210,9 @@ class RLTrainer:
         self.stop = stop or stop_at_end(tokenizer)
         torch.manual_seed(cfg.seed)
         self.rng = random.Random(cfg.seed)
-        self.reference = copy.deepcopy(model).eval() if cfg.kl_coef > 0 else None
+        self.reference = None
+        if cfg.kl_coef > 0:
+            self.reference = (reference if reference is not None else copy.deepcopy(model)).eval()
         if self.reference is not None:
             for parameter in self.reference.parameters():
                 parameter.requires_grad_(False)
@@ -279,10 +289,51 @@ class RLTrainer:
                      f"time {row['seconds_generate']:.1f}+{row['seconds_reward']:.1f}+{row['seconds_update']:.1f} s")
         return row
 
-    def run(self) -> list[dict]:
+    def run(self, on_checkpoint: Callable[[int], None] | None = None, checkpoint_every: int = 25) -> list[dict]:
+        """Train until cfg.steps, starting after the steps already in history (a resumed run).
+
+        on_checkpoint(step) is called every `checkpoint_every` steps and after the last one.
+        """
         for step in range(len(self.history), self.cfg.steps):
             self.step(step)
+            done = step + 1
+            if on_checkpoint is not None and (done % checkpoint_every == 0 or done == self.cfg.steps):
+                on_checkpoint(done)
         return self.history
+
+    # ------------------------------------------------------------- resuming
+
+    def state_dict(self) -> dict:
+        """Everything besides weights, optimizer and torch RNG that a resumed run needs. JSON only."""
+
+        return {"rl_config":asdict(self.cfg),
+                "history":list(self.history),
+                "order":self.order,
+                "python_rng":self.rng.getstate()}
+
+    def load_state_dict(self, state: dict) -> None:
+        if state["rl_config"] != asdict(self.cfg):
+            raise ValueError("Configuration mismatch when resuming training.")
+        self.history = list(state["history"])
+        self.order = list(state["order"])
+
+        rng_state = state["python_rng"]
+        version = rng_state[0]
+        internal = tuple(rng_state[1])
+        gauss = rng_state[2]
+        self.rng.setstate((version, internal, gauss))
+
+
+    def save(self, directory, extra: dict | None = None) -> None:
+        """Weights, AdamW state and torch RNG (save_checkpoint) plus state_dict() and `extra`."""
+        save_checkpoint(directory, model=self.model, optimizer=self.optimizer,
+                        trainer_state={**(extra or {}), **self.state_dict(), "step": len(self.history)})
+
+    def restore(self, directory) -> dict:
+        """Load a checkpoint written by save() into this trainer; returns its trainer state."""
+        state = load_checkpoint(directory, model=self.model, optimizer=self.optimizer, device=self.device)
+        self.load_state_dict(state)
+        return state
 
     def config_dict(self) -> dict:
         return asdict(self.cfg)
