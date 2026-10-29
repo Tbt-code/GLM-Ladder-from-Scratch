@@ -1,0 +1,118 @@
+{
+  "commit": "32aac13",
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "n_samples": 64,
+  "eval_temperature": 1.0,
+  "configs": {
+    "rl-s50m-001": {
+      "run_name": "rl-s50m-001",
+      "steps": 200,
+      "prompts_per_step": 16,
+      "group": 16,
+      "max_new_tokens": 192,
+      "temperature": 1.0,
+      "lr": 5e-06,
+      "warmup_steps": 10,
+      "kl_coef": 0.02,
+      "balance_coef": 0.01,
+      "grad_clip": 1.0,
+      "micro_batch": 32,
+      "seed": 1234,
+      "log_every": 10
+    },
+    "rl-m100m-001": {
+      "run_name": "rl-m100m-001",
+      "steps": 200,
+      "prompts_per_step": 16,
+      "group": 16,
+      "max_new_tokens": 192,
+      "temperature": 1.0,
+      "lr": 5e-06,
+      "warmup_steps": 10,
+      "kl_coef": 0.02,
+      "balance_coef": 0.01,
+      "grad_clip": 1.0,
+      "micro_batch": 32,
+      "seed": 1234,
+      "log_every": 10
+    },
+    "rl-s50m-nokl-001": {
+      "run_name": "rl-s50m-nokl-001",
+      "steps": 200,
+      "prompts_per_step": 16,
+      "group": 16,
+      "max_new_tokens": 192,
+      "temperature": 1.0,
+      "lr": 5e-06,
+      "warmup_steps": 10,
+      "kl_coef": 0.0,
+      "balance_coef": 0.01,
+      "grad_clip": 1.0,
+      "micro_batch": 32,
+      "seed": 1234,
+      "log_every": 10
+    }
+  },
+  "comparison": {
+    "rl-s50m-001": {
+      "test_id": {
+        "mean": 0.39291158536585363,
+        "low": 0.31668730945121953,
+        "high": 0.46818311737804874,
+        "tasks": 82
+      },
+      "test_ood": {
+        "mean": 0.009345794392523364,
+        "low": 0.005841121495327103,
+        "high": 0.013142523364485981,
+        "tasks": 107
+      },
+      "hand_written": {
+        "mean": 0.06171875,
+        "low": 0.024609375,
+        "high": 0.106640625,
+        "tasks": 40
+      }
+    },
+    "rl-m100m-001": {
+      "test_id": {
+        "mean": 0.6457698170731707,
+        "low": 0.5817454268292683,
+        "high": 0.7052258003048779,
+        "tasks": 82
+      },
+      "test_ood": {
+        "mean": 0.0749123831775701,
+        "low": 0.04439252336448598,
+        "high": 0.10981673481308406,
+        "tasks": 107
+      },
+      "hand_written": {
+        "mean": 0.0703125,
+        "low": 0.0140625,
+        "high": 0.133203125,
+        "tasks": 40
+      }
+    },
+    "rl-s50m-nokl-001": {
+      "test_id": {
+        "mean": 0.47884908536585363,
+        "low": 0.39272103658536583,
+        "high": 0.5623094512195121,
+        "tasks": 82
+      },
+      "test_ood": {
+        "mean": 0.0048189252336448595,
+        "low": 0.002336448598130841,
+        "high": 0.007885514018691588,
+        "tasks": 107
+      },
+      "hand_written": {
+        "mean": 0.04921875,
+        "low": 0.007421875,
+        "high": 0.1,
+        "tasks": 40
+      }
+    }
+  }
+}
